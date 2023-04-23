@@ -990,3 +990,219 @@ A coroutine is a program component that generalizes the concept of a subroutine,
 The advanced features of generators in Python (yield and yield from expressions, sending values to generators) are used to implement coroutines.
 Coroutines are useful for implementing asynchronous non-blocking operations and cooperative multitasking on the same thread without using callback functions and writing asynchronous code in a synchronous style.
 Python 3.5 includes support for coroutines at the language level. The async and await keywords are used for this.
+
+## Classes, objects
+
+### How to get a list of object attributes
+
+The `dir` function returns a list of strings - fields of the object. The `__dict__` field contains a dictionary of the form `{field -> value}`.
+
+### What are magic methods, what are they for?
+
+Magic methods are methods whose names begin and end with a double underscore. They are magical because they are almost never called explicitly. They are called by built-in functions or syntactic constructs. For example, the `len()` function calls the `__len__()` method of the passed object. The `__add__(self, other)` method is called automatically when added with the `+` operator.
+
+Here are some magical methods:
+
+- `__init__`: class initializer
+- `__new__`: called when an instance of a class is created and returns a new object of that class. It is called before the `__init__` method and allows you to create and configure an object before it is initialized.
+- `__add__`: addition with another object
+- `__eq__`: check for equality with another object
+- `__iter__`: returns an iterator
+
+### How to refer to the parent class in a class
+
+The `super` function takes a class and an instance:
+
+```python
+class NextClass(FirstClass):
+     def __init__(self, x):
+         super(NextClass, self).__init__()
+         self.x = x
+```
+
+### Is it possible to have multiple inheritance
+
+Yes, you can specify more than one parent in a child class.
+
+### What is MRO
+
+_MRO_ – method resolution order, method resolution order. The algorithm by which the method should be searched if the class has two or more parents.
+
+In classical classes, the search for inheritance by references to names is carried out in the following order:
+
+1. Instance first
+2. Then his class
+3. Next, all superclasses of its class, first by depth, and then from left to right
+
+The first occurrence found is used. This order is called DFLR (Depth Traversal Left to Right).
+
+When inheriting new-style classes, the MRO (method resolution order) rule is applied, i.e. linearized traversal of the class tree, with the nested inheritance element made available in the `__mro__` attribute of the class. Such an algorithm is called _C3-linearization_. Inheritance according to the MRO rule is carried out approximately in the following order.
+
+1. Enumeration of all classes inherited by the instance, according to the DFLR search rule for classical classes, and the class is included in the search result as many times as it occurs during the traversal.
+2. View in the resulting list of duplicate classes, from which all are removed, except for the last (rightmost) duplicate in the list.
+
+MRO ordering is used in inheritance and invocation of the super() built-in function, which always calls the next MRO class (relative to the call point).
+
+**Example of inheritance in non-diamond hierarchical trees:**
+
+```python
+class D: attr = 3 # D:3 E:2
+class B(D) pass # | |
+class E: attr = 2 # B C:1
+class C(E): attr = 1 # / /
+class A(B, C): pass # A
+X = A() # |
+print(X.attr) # X
+
+#DFLR = [X, A, B, D, C, E]
+# MRO = [X, A, B, D, C, E, object]
+# Both in version 3.x and in version 2.x (always) prints the string "3"
+```
+
+**An example of inheritance in diamond-shaped hierarchical trees:**
+
+```python
+class D: attr = 3 # D:3 D:3
+class B(D) pass # | |
+class C(D): attr = 1 # B C:1
+class A(B, C): pass # / /
+X = A() # A
+print(X.attr) # |
+                                 # X
+
+#DFLR = [X, A, B, D, C, D]
+# MRO = [X, A, B, C, D, object] (keeps only the last duplicate of D)
+# Output string "1" in version 3.x, string "3" in version 2.x ("1" if D(object))
+```
+
+### What is Diamond problem
+
+With diamond inheritance, determine which class method should be called
+
+### What are mixins
+
+Mixin (mix-in, English “mixture”), a design pattern in OOP, when a small helper class is added to the inheritance chain. For example, there is a class
+
+```python
+class NowMixin(object):
+     def now():
+         return datetime.datetime.utcnow()
+```
+
+Then any class inherited with this mixin will have a `now()` method.
+
+It is customary to add the word `Mixin` to mixin names, since there is no mechanism for understanding whether this is a full-fledged class or mixin. A mixin is technically the most common class.
+
+### What is a context manager. How to write your
+
+Python has the `with` operator. The code placed inside is executed with a peculiarity: before and after, the events of entering and exiting the `with` block are guaranteed to fire. The object that defines this logic is called the context manager.
+
+Block entry and exit events are defined by the `__enter__` and `__exit__` methods. The first is triggered at the moment when the program execution flow goes inside `with`. The method can return a value. It will be available to the underlying code inside the `with` block.
+
+`__exit__` fires at the moment of exit from the block, incl. and because of the exception. In this case, the triple of values `(exc_class, exc_instance, traceback)` will be passed to the method.
+
+The most common context manager is the class generated by the `open` function. It guarantees that the file will be closed even if an error occurs inside the block.
+
+You should try to exit the context manager as quickly as possible to free the context and resources.
+
+```python
+with open('file.txt') as f:
+     data = f.read()
+process_data(data)
+```
+
+An example of implementing your context manager based on a class:
+
+```python
+class Printable:
+     def __enter__(self):
+         print('enter')
+
+     def __exit__(self, type, value, traceback):
+         print('exit')
+```
+
+An example of implementing your own context manager using the built-in contextlib library:
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def printable():
+     print('enter')
+     try:
+       yield
+     finally:
+       print('exit')
+```
+
+Context managers can also be used to temporarily replace parameters, environment variables, database transactions.
+
+### Comment out the expression
+
+`object() == object()`
+
+Always false, because by default objects are compared by their id (memory address) field, unless the `__eq__` method is overridden.
+
+### What is \_\_slots\_\_. Pros, cons
+
+Classes store fields and their values in a secret `__dict__` dictionary. Since the dictionary is a mutable structure, you can add and remove fields from the class on the fly. The `__slots__` parameter on the class hard-codes the set of class fields. Slots are used when a class can have a lot of fields, such as in some `ORM`s, or when performance is critical because slot access is faster than dictionary lookups, or when millions of class instances are created during program execution, using ` __slots__` will save memory.
+
+Slots are actively used in the `requests` and `falcon` libraries.
+
+Drawback: You can't assign a field to a class that isn't in the slots. The `__getattr__` and `__setattr__` methods do not work.
+Solution: include `__dict_ element in `**slots**`
+
+### What is the meaning of \_value, \_\_value parameters
+
+A class field with a single leading underscore indicates that the parameter is only used within the class. At the same time, it is available for external access. This access restriction is at the agreement level only.
+
+```python
+class Foo(object):
+     def __init__(self):
+         self._bar = 42
+
+Foo()._bar
+>>> 42
+```
+
+Modern IDEs like `PyCharm` will highlight field access with an underscore, but there will be no runtime error.
+
+Double underscore fields are available inside the class, but are not available from outside. This is achieved by a tricky trick: the interpreter assigns names like `_<ClassName>__<fieldName>` to such fields. The described mechanism is called _name mangling_ or _name decoration_
+
+```python
+class Foo(object):
+     def __init__(self):
+         self.__bar = 42
+
+Foo().__bar
+>>> AttributeError: 'Foo' object has no attribute '__bar'
+Foo()._Foo__bar
+>>> 42
+```
+
+### What is \_\_new\_\_. And how is it different from \_\_init\_\_. In what order are they executed?
+
+The main difference between the two methods is that `__new__` handles object creation, while `__init__` handles object initialization.
+
+`__new__` is called automatically when the class name is called (when an instance is created), while `__init__` is called every time a class instance returns `__new__`, passing the returned instance to `__init__` as the `self` parameter, so even if you saved an instance somewhere globally/statically and returned it every time from `__new__`, it will still call `__init__` every time.
+
+It follows from the above that `__new__` is called first, and then `__init__`
+
+### What is and how old-style differs from new-style classes
+
+The new-style classes (3.x are the only ones available, in 2.x when inheriting from `object`) differ from the classic ones (the default in 2.x) in the following ways:
+
+- The reason for the creation of new style classes was the idea to remove the difference between built-in types and user-defined types. [Unifying types and classes in Python 2.2](https://www.python.org/download/releases/2.2.3/descrintro/)
+- Diamond patterns of multiple inheritance have a slightly different search order. They are searched in breadth rather than depth before starting from bottom to top (see question about MRO)
+- Classes now stand for types, and types are classes. Thus, calling the built-in function `type(I)` returns the class from which the instance is obtained, not the type of the instance, which is usually equivalent to the expression `I.__class__`. The class `type` can be subclassed to create special classes. All classes inherit from the built-in `object` class, which provides a small set of methods by default
+
+### What is duck typing
+
+Implicit typing, latent typing or _duck typing_ (eng. Duck typing) is a type of dynamic typing used in some programming languages (Perl, Smalltalk, Python, Objective-C, Ruby, JavaScript, Groovy, ColdFusion, Boo, Lua, Go , C#), when the scope of an object's use is determined by its current set of methods and properties, as opposed to inheriting from a particular class.
+That is, an object is considered to implement an interface if it contains all the methods of this interface, regardless of the relationships in the inheritance hierarchy and belonging to any particular class.
+
+Duck typing solves hierarchical typing problems such as:
+
+- the inability to explicitly indicate (by inheritance) the compatibility of an interface with all present and future interfaces with which it is ideologically compatible;
+- an exponential increase in the number of relationships in the type hierarchy with at least a partial attempt to do this.
