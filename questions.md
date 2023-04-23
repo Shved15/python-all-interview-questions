@@ -167,7 +167,7 @@ ba = bytearray(b'hello')
 Like other sequence types in Python, you can access individual bytes in a bytearray object using indexing.
 You can also slice a bytearray object to get a new bytearray object containing a subset of the original bytes:
 
-Одним из преимуществ bytearray над bytes является то, что вы можете изменять отдельные байты объекта bytearray с помощью индексации:
+One advantage of bytearray over bytes is that you can change individual bytes of a bytearray object using indexing:
 
 ```python
 ba[1] = 111  # changes the second byte to the ASCII code for 'o'
@@ -418,17 +418,19 @@ Sequences can also optionally implement the `count()`, `index()`, `__contains__(
 
 Immutable sequences usually implement the hash(s) operation, the hash value of an object.
 
-- `s[i] = x` – элемент с индексом i заменяется на x
-- `s[i:j] = t`, `s[i:j:k] = t` – элементы с индексами от i до j (с шагом k) заменяются содержимым итерабельного объекта t
-- `del s[i:j]`, `del s[i:j:k]` – удаление соответствующих элементов из последовательности
-- `s.append(x)` – добавление x в конец последовательности
-- `s.clear()` – удаление всех элементов последовательности
-- `s.copy()` – нерекурсивная копия последовательности
-- `s.extend(t)` – добавление всех элементов итерабельного объекта в конец последовательности
-- `s.insert(i, x)` – вставка элемента x по индексу i
-- `s.pop()`, `s.pop(i)` – возврат значения по индексу i (по умолчанию – последний элемент) и удаление его из последовательности
-- `s.remove(x)` – удаление первого вхождения x
-- `s.reverse()` – разворот последовательности в обратном порядке
+Most mutable sequences support the following operations:
+
+- `s[i] = x` - element with index i is replaced by x
+- `s[i:j] = t`, `s[i:j:k] = t` - elements with indexes from i to j (in increments of k) are replaced by the contents of the iterable object t
+- `del s[i:j]`, `del s[i:j:k]` - remove matching elements from sequence
+- `s.append(x)` - append x to the end of the sequence
+- `s.clear()` - remove all elements of the sequence
+- `s.copy()` - non-recursive copy of a sequence
+- `s.extend(t)` - add all elements of an iterable object to the end of the sequence
+- `s.insert(i, x)` - insert element x at index i
+- `s.pop()`, `s.pop(i)` - return the value at index i (default is the last element) and remove it from the sequence
+- `s.remove(x)` - remove the first occurrence of x
+- `s.reverse()` - reverse the sequence
 
 ### What kinds of strings are there in python
 
@@ -502,3 +504,182 @@ for x in [1, 2, 2, 2, 3, 3, 1]:
 Two sequences are equal if they have the same type, the same length, and the corresponding elements of both sequences are equal.
 
 Sequences of the same types can be compared. Comparisons occur in lexicographic order: a sequence of smaller length is less than a sequence of larger length, but if their lengths are equal, then the result of the comparison is equal to the result of comparing the first differing elements.
+
+## Sets and mappings
+
+### How to understand if an object is hashable
+
+An object is said to be hashable if it has a hash value (an integer) that never changes during its life cycle and is returned by the `__hash__()` method, and can be compared with other objects (implements the `__eq__()` method). Equal hashable objects must have equal hash values.
+All standard immutable objects are hashable. All standard mutable objects are not hashable.
+
+### What is a set
+
+A set is an unordered collection of hashable objects that do not repeat.
+Sets have no concept of element position. Accordingly, they do not support indexing and slicing.
+Built-in set classes: set (mutable set), frozenset (immutable set).
+
+### What sets are used for
+
+Commonly used to test an element for membership in a set and remove repetitions of elements and perform operations such as union, intersection, difference, and symmetrical difference
+
+### What operations can be performed on sets
+
+- `set([iterable])`, `frozenset([iterable])` - creating a set (empty or from elements of an iterable object)
+- `len(s)` - the number of elements in the set
+- `x in s`, `x not in s` - checking if an element is in the set
+- `s.isdisjoint(t)` - checking that the given set has no common elements with the given
+- `s.issubset(t)`, `s <= t` - checking that all elements of set s are elements of set t
+- `s < t` - check that s <= t and s != t
+- `s.isuperset(t)`, `s >= t` - checking that all elements of set t are elements of set s
+- `s > t` - check that `s >= t` and `s != t`
+- `s.union(t, ...)`, `s | t | ...` – creation of a new set, which is the union of the given sets
+- `s.intersection(t, ...)`, `s & t & ...` - create a new set that is the intersection of the given sets
+- `s.difference(t, ...)`, `s - t - ...` - create a new set, which is the difference of given sets
+- `s.symmetric_difference(t)`, `s ^ t` - create a new set that is the symmetric difference of the given sets (i.e., the difference between union and intersection of sets)
+- `s.copy()` is an incomplete copy of the set s
+
+Set operations, which are methods, take any iterable objects as arguments. Set operations written as binary operations require that the second operand of the operation is also a set and return a set of the same type as the first set.
+
+Operations on mutable sets:
+
+- `s.update(t, ...)`, `s |= t | ...` – add elements from other sets to the given set
+- `s.intersection_update(t, ...)`, `s &= t & ...` - leave in this set only those elements that are in other sets
+- `s.difference_update(t, ...)`, `s -= t | ...` - remove from the given set those elements that are in other sets
+- `s.symmetric_difference_update(t)`, `s ^= t` - keep or add to s elements that are either in s or t, but not in both sets
+- `s.add(element)` - add a new element to the set
+- `s.remove(element)` - remove an element from the set; if there is no such element, a KeyError exception is thrown
+- `s.discard(element)` - remove an element from the set if it is in it
+- `s.pop()` - remove from the set and return an arbitrary element; if the set is empty, a KeyError exception is thrown
+- `s.clear()` - remove all elements of the set.
+
+### How sets are checked for equality
+
+Sets are checked for equality element by element, regardless of the types of sets.
+
+### What is mapping
+
+Mapping is a container object that supports random access to elements by keys and describes all methods described in the abstract base class `collections.Mapping` (`get()`, `items()`, `keys() `, `values()`) or `collections.MutableMapping` (`clear()`, `get()`, `items()`, `keys()`, `pop()`, `popitem()` , `setdefault()`, `update()`, `values()`).
+Mappings include the `dict`, `collections.defaultdict`, `collections.OrderedDict` and `collections.Counter` classes.
+
+### What are the nuances in using numbers as keys
+
+Numeric keys in dictionaries follow the rules for comparing numbers. Thus, `int(1)` and `float(1.0)` are considered the same key. However, because float values are stored approximately, it is not recommended to use them as keys.
+
+```python
+>>> {True: 'yes', 1: 'no', 1.0: 'maybe'}
+{True: 'maybe'}
+```
+
+### What operations can be performed on mappings
+
+- `len(d)` is the number of elements.
+- `d[key]` - get value with key key. If no such key exists and the mapping implements the `__missing__(self, key)` special method, then it is called. If the key does not exist and the `__missing__` method is not defined, a KeyError exception is thrown.
+- `d[key] = value` - change the value or create a new key-value pair if the key does not exist.
+- `key in d`, `key not in d` – check if the key is present in the display.
+- `iter(d)` is the same as iter(d.keys()).
+- `clear()` - remove all elements of the dictionary.
+- `copy()` - create an incomplete copy of the dictionary.
+- `(class method) dict.fromkeys(sequence[, value])` – creates a new dictionary with keys from the sequence sequence and the given value (default is None).
+- `d.get(key[, default])` - safely get value by key (never throws KeyError). If the key is not found, the default value is returned (the default is None).
+- `d.items()` - in Python 3, returns a dictionary representation object corresponding to pairs (two-tuples) of the form (key, value). In Python 2, it returns the corresponding list, and the iteritems() method returns an iterator. The equivalent method in Python 2.7 is viewitems().
+- `d.keys()` - in Python 3, returns a dictionary view object corresponding to the keys of the dictionary. In Python 2, it returns the corresponding list, and the iterkeys() method returns an iterator. The equivalent method in Python 2.7 is viewkeys().
+- `d.pop(key[, default])` - if the key key exists, removes the element from the dictionary and returns its value. If the key does not exist and default is set, then that value is returned, otherwise a KeyError exception is thrown.
+- `d.popitem()` - removes an arbitrary key-value pair and returns it. If the dictionary is empty, a KeyError exception is thrown. The method is useful for algorithms that traverse the dictionary by removing already processed values (for example, certain algorithms related to graph theory).
+- `d.setdefault(key[, default])` - if the key key exists, returns the corresponding value. Otherwise, it creates an element with key key and default value. default is None by default.
+- `d.update(mapping)` - accepts either another dictionary or mapping, or an iterable object consisting of iterable objects - key-value pairs, or named arguments. Adds matching elements to the dictionary, overwriting elements with existing keys.
+- `d.values()` - in Python 3, returns a dictionary view object corresponding to the values. In Python 2, it returns the corresponding list, and the itervalues() method returns an iterator. The equivalent method in Python 2.7 is viewvalues().
+
+### What the items method returns
+
+The objects returned by the `items()`, `keys()` and `values()` methods (`viewitems()`, `viewkeys()`, `viewvalues()` in Python 2.7) are _dictionary view_ objects . They provide a dynamic view of dictionary elements, that is, changes to this dictionary are automatically reflected on these objects as well.
+
+Operations with dictionary representations:
+
+- `iter(dictview)` - Get an iterator over keys, values, or key/value pairs. All dictionary views, when iterated, return the elements of the dictionary in the same order. Trying to modify a dictionary while iterating may throw a RuntimeError exception
+- `len(dictview)` is the number of elements in the dictionary.
+- `x in dictview` - Check if a key, value, or key-value pair exists in the dictionary.
+
+### How to sort a list of dictionaries by a specific field
+
+The list method `.sort()` and the built-in function `sorted()` take a `key` parameter. It should be a callable object that takes the next element (in our case, a dictionary) and returns a sorting criterion value.
+
+The code below shows how to sort a list of people by age:
+
+```python
+users = [{'age': 30}, {'age': 20}, {'age': 10}]
+users.sort(key=lambda user: user['age'])
+>>> [{'age': 10}, {'age': 20}, {'age': 30}]
+```
+
+### What can be a dictionary key. What can't. Why
+
+A dictionary key can be any hashable immutable object: a number, a string, a datetime, a function, and even a module. Such objects have a `__hash__()` method that unambiguously maps the object to some number. By this number, the dictionary looks up the value for the key.
+
+Lists, dictionaries, and sets are mutable and have no hashing method. When substituting them into a dictionary, an error will occur.
+
+The hash of a tuple is calculated recursively over all elements. Yes, tuple
+
+`(1, (True, (42, ('hello', ))))`
+consists only of immutable elements, so it can be a key. However, such a tuple
+
+`(1, (True, (42, ({'hello': 'world'}, ))))`
+contains a dictionary deep inside, so the hash cannot be calculated.
+
+### There are two lists - keys and values. How to make a dictionary out of them
+
+```python
+keys = ['foo', 'bar', 'baz']
+vals = [1, 2, 3]
+dict(zip(keys, vals))
+>>> {'baz': 3, 'foo': 1, 'bar': 2}
+```
+
+The `zip` function returns a list of pairs of Nth elements. The `dict` constructor takes a list of pairs. It treats each pair as a key and a value, respectively.
+
+### How a hash table works
+
+A hash table is a sparse array (an array that has empty positions). In standard English textbooks, hash table cells are called "bucket". In the dict hash table, each element corresponds to a cell containing two fields: a reference to the key and a reference to the element's value. Since the size of all cells is the same, an individual cell is accessed by offset.
+
+Python tends to leave at least a third of the cells empty; if the hash table becomes too full, it is copied to a new location in memory where there is room for more cells.
+
+To put an element into a hash table, the first step is to calculate the hash value of the element's key. This is done by the `hash()` built-in function.
+
+To select a value using the `my_dict[search_key]` expression, Python calls the `hash(search_key)` function to get the search*key hash value, and uses the few least significant bits of the resulting number as a cell offset from the beginning of the hash table (exactly how many bits depends from the current table size). If the found cell is empty, a `KeyError` exception is raised. Otherwise, there is some element in the found cell - a `key:value` pair - and then Python checks if search_key == found_key is true. If yes, then the element is found and found_value is returned. If search_key and found_key do not match, then there is a \_hash collision*. To resolve a collision, the algorithm takes various bits of the hash value, performs certain actions on them, and uses the result as an offset to another cell.
+
+### What is a collision
+
+When a hash function returns the same answer for different data.
+
+### Where search will be faster, and where search and why: dict, list, set, tuple
+
+The lookup will be faster in dict and set because they are hash tables and element access takes O(1). For list and tuple, the search will be performed in O(n) on average.
+
+The exception only works for very small lists up to 5 elements long. In this case, it will be faster for the interpreter to run through the list than to calculate the hash.
+
+In Python 2, the `keys`, `values`, `items` dictionary methods return a list. That is, before iterating over a dictionary (or set), the interpreter first creates a new list, which takes additional time and memory, but after creation it is already an ordinary list. That is, in Python 2, iteration over dictionaries and sets takes longer, by creating a new list and copying elements into it.
+
+In Python 3, these methods create a representation object. This is definitely faster than creating a new list in Python2. But iteration over such a representation should take a little longer than over the list due to the fact that data in dictionaries is stored sparsely (rarely, sparsely). In support of the above (Python 3):
+
+```python
+>>> l = list(range(1000000))
+>>> d = dict.fromkeys(l)
+>>> s = set(l)
+>>>def iter_list():
+... for i in l:
+... pass
+...
+>>>def iter_dict():
+... for i in d:
+... pass
+...
+>>>def iter_set():
+... for i in s:
+... pass
+...
+>>> timeit.timeit(iter_list, number=1000)
+  6.727667486004066
+>>> timeit.timeit(iter_dict, number=1000)
+  9.293120226997416
+>>> timeit.timeit(iter_set, number=1000)
+  8.627948219014797
+```
