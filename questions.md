@@ -812,3 +812,181 @@ If the name is associated with a variable of a mutable type, then during operati
 ### What is a closure
 
 In Python, a closure is a function object that has access to variables in its enclosing lexical scope, even when the function is called outside that scope. This means a closure can remember and access values from the outer function even if the outer function has completed execution. Closures are created when a nested function references a value from its enclosing scope. The nested function can be returned as a closure, allowing the referenced value to be accessed even after the outer function has completed execution. Closures are commonly used in situations where a value needs to be accessed and updated by multiple functions or methods.
+
+## Iterators and generators
+
+- [Iterators and generators(rus)](https://xakep.ru/2014/10/06/generatora-iteratory-python/)
+- [Iterable object, iterator and generator](https://habr.com/ru/post/337314/)
+
+### What is a container
+
+A container is a data type that encapsulates values of other types. Lists, tuples, sets, dictionaries, etc. are containers.
+
+### What is an iterable object
+
+_An iterable object_ is an object that can return values one at a time.
+Examples: all containers and sequences (lists, strings, etc.), files, and instances of any classes that have an `__iter__()` or `__getitem__()` method defined.
+Iterables can be used inside a `for` loop, as well as in many other cases where a sequence is expected (functions `sum()`, `zip()`, `map()`, etc.).
+
+**More**:
+
+Consider an iterable object (`Iterable`). In the standard library, it is declared as an abstract class `collections.abc.Iterable`:
+
+```python
+class Iterable(metaclass=ABCMeta):
+
+    __slots__ = ()
+
+    @abstractmethod
+    def __iter__(self):
+        while False:
+            yield None
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        if cls is Iterable:
+            return _check_methods(C, "__iter__")
+        return NotImplemented
+```
+
+It has an abstract `__iter__` method which should return an iterator object. And the `__subclasshook__` method which checks if the class has the `__iter__` method. Thus, it turns out that an iterable object is any object that implements the `__iter__` method.
+
+```python
+class SomeIterable1(collections.abc.Iterable):
+    def __iter__(self):
+        pass
+
+class SomeIterable2:
+    def __iter__(self):
+        pass
+
+print(isinstance(SomeIterable1(), collections.abc.Iterable))
+# True
+print(isinstance(SomeIterable2(), collections.abc.Iterable))
+# True
+```
+
+But there is one point, this is the `iter()` function. It is this function that is used, for example, by the for loop to obtain an iterator. The `iter()` function first calls its `__iter__` method to get an iterator from an object. If the method is not implemented, then it checks for the presence of the `__getitem__` method, and if it is implemented, then an iterator is created based on it. `__getitem__` must accept a zero-based index. If none of these methods are implemented, then a `TypeError` exception will be thrown.
+
+```python
+from string import ascii_letters
+
+class SomeIterable3:
+    def __getitem__(self, key):
+        return ascii_letters[key]
+
+for item in SomeIterable3():
+    print(item)
+```
+
+### What is an iterator
+
+_Iterator_ (iterator) is an object that represents a stream of data. Repeatedly calling the `__next__()` (`next()` in Python 2) method of an iterator, or passing it to the `next()` built-in function, returns the subsequent elements of the stream.
+
+If there is no more data left, a `StopIteration` exception is thrown. After that, the iterator is exhausted and any subsequent calls to its `__next__()` method again throw a `StopIteration` exception.
+
+Iterators are required to have a `__iter__` method that returns the iterator object itself, so any iterator is also an iterable object and can be used almost anywhere that iterable objects are accepted.
+
+**Details:**
+
+Iterators are represented by the abstract class `collections.abc.Iterator`:
+
+```python
+class Iterator(Iterable):
+
+     __slots__ = ()
+
+     @abstractmethod
+     def __next__(self):
+         'Return the next item from the iterator. When exhausted, raise StopIteration'
+         raise StopIteration
+
+     def __iter__(self):
+         return self
+
+     @classmethod
+     def __subclasshook__(cls, C):
+         if cls is Iterator:
+             return _check_methods(C, '__iter__', '__next__')
+         return NotImplemented
+```
+
+`__next__` Returns the next available element and throws a `StopIteration` exception when there are no more elements left.
+`__iter__` Returns `self`. This allows an iterator to be used where an iterable object is expected, such as `for`.
+`__subclasshook__` Checks if the class has a method `__iter__` and `__next__`
+
+### What is a generator
+
+Depending on the context, it can mean either a generator function or a generator iterator (most often the latter).
+The `__iter__` and `__next__` methods for generators are created automatically.
+
+From an implementation point of view, a _generator_ in Python is a language construct that can be implemented in two ways: as a function with the `yield` keyword, or as a generator expression. As a result of calling a function or evaluating an expression, we get a generator object of type `types.GeneratorType`. The canonical example is a generator generating a sequence of Fibonacci numbers that, being infinite, could not fit into any collection. Sometimes the term is applied to the generator function itself, and not just the object returned to it as a result.
+
+Since the `__next__` and `__iter__` methods are defined in the generator object, that is, the iterator protocol is implemented, from this point of view, in Python, any generator is an iterator.
+
+When the generator function terminates (by using the `return` keyword or reaching the end of the function), a `StopIteration` exception is thrown.
+
+### What is a generator function
+
+_Generator function_ - a function whose body contains the `yield` keyword. When called, such a function returns a generator object (generator iterator).
+
+### What yield does
+
+`yield` freezes the state of the generator function and returns the current value. After the next call to `__next__()`, the generator function continues its execution from where it left off.
+
+### What is the difference between \[x for x in y\] and (x for x in y)
+
+The first expression returns a list (list inclusion), the second is a generator.
+
+### What is special about the generator
+
+The generator does not store all elements in memory, but only the internal state for calculating the next element. At each step, only the next element can be calculated, but not the previous one. You can only loop through the generator once.
+
+### How to declare a generator
+
+- use `(x for x in seq)` syntax
+- `yield` operator in function body instead of `return`
+  is the `iter` built-in function that calls the `__iter__()` method of an object. This method must return a generator.
+
+### How to get a list from a generator
+
+Pass it to the list constructor: `list(x for x in some_seq)`. It is important that after that it will no longer be possible to iterate over the generator.
+
+### What is a subgenerator
+
+In Python 3, there are so-called subgenerators. If a pair of keywords `yield from` occurs in a generator function, followed by a generator object, then this generator delegates access to the subgenerator until it completes (its values run out), after which it continues its execution.
+
+Actually `yield` is an expression. It can take values that are sent to the generator. If no values are sent to the generator, the result of this expression is `None`.
+
+`yield from` is also an expression. Its result is the value that the subgenerator returns in the `StopIteration` exception (for this, the value is returned using the `return` keyword).
+
+### What methods do generators have
+
+- `__next__()` - starts or continues execution of the generator function. The result of the current yield expression will be None. Execution then continues to the next yield expression, which passes the value to where `__next__` was called. If the generator terminates without returning a value with `yield`, a `StopIteration` exception is thrown. The method is usually called implicitly, i.e. by a `for` loop or the built-in `next()` function.
+- `send(value)` - continues execution and sends the value to the generator function. The value argument becomes the value of the current yield expression. The `send()` method returns the next value returned by the generator, or throws a `StopIteration` exception if the generator terminates without returning a value. If `send()` is used to start a generator, then the only valid value is `None`, since no yield expression has yet been executed that can be assigned that value.
+- `throw(type[, value[, traceback]])` - throws an exception of type type at the place where the generator was stopped and returns the next value of the generator (or throws `StopIteration`). If the generator does not handle the given exception (or throws another exception), then it is thrown at the call site.
+- `close()` - Throws a `GeneratorExit` exception at the location where the generator was suspended. If a generator throws `StopIteration` (by terminating normally or because it is already closed) or `GeneratorExit` (by not handling the given exception), `close` simply returns to the place of the call. If the generator returns another value, a `RuntimeError` exception is thrown. The `close()` method does nothing if the generator has already completed.
+
+### Is it possible to extract a generator element by index
+
+No, there will be an error. The generator does not support the `__getitem__` method.
+
+### What does iterating over a dictionary return
+
+Key. The order of the keys is not guaranteed (in 3.6 it is unofficially guaranteed, in 3.7 it is guaranteed). For small dictionaries, the order will be the same as in the declaration. For larger ones, the order depends on the location of the elements in memory. The special class `OrderedDict` respects the order in which keys are added.
+
+```python
+for key in {'foo': 1, 'bar': 2}:
+     process_key(key)
+```
+
+### How to iterate a dictionary over key-value pairs
+
+The `.items()` dictionary method returns a generator of `(key, value)` tuples.
+
+### What is a coroutine
+
+A coroutine is a program component that generalizes the concept of a subroutine, which additionally supports multiple entry points (rather than one, like a subroutine) and stopping and continuing execution while maintaining a certain position.
+The advanced features of generators in Python (yield and yield from expressions, sending values to generators) are used to implement coroutines.
+Coroutines are useful for implementing asynchronous non-blocking operations and cooperative multitasking on the same thread without using callback functions and writing asynchronous code in a synchronous style.
+Python 3.5 includes support for coroutines at the language level. The async and await keywords are used for this.
