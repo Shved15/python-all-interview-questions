@@ -25,7 +25,7 @@ x = 'abc' # here the interpreter does not swear, since the typing is dynamic
 - Strict - no automatic casts to another type (implicit conversions).
 - Non-strict - the presence of those.
 
-пример строгой типизации (Python):
+strong typing example (Python):
 
 ```python
 a = [5, 6]
@@ -44,7 +44,7 @@ console.log(c); // "hello100"
 - Explicit - we specify types everywhere by hand.
 - Implicit - the compiler/interpreter does this itself.
 
-пример явной типизации (C++):
+explicit typing example (C++):
 
 ```C++
 int x = 5;
@@ -369,7 +369,7 @@ Overall, frozenset objects provide a way to create an immutable set of elements 
 
 - Bytes
 
-В Python байты — это встроенный тип данных, используемый для представления последовательностей байтов. Объекты bytes являются неизменяемыми, что означает, что их содержимое не может быть изменено после их создания.
+In Python, bytes is a built-in data type used to represent sequences of bytes. bytes objects are immutable, meaning that their contents cannot be changed once they are created.
 Like other sequence types in Python, you can access individual bytes in a bytes object using indexing.
 Here are some common methods for bytes objects:
 
@@ -391,3 +391,114 @@ def my_func():
 ```
 
 None is often used as a default return value for functions that don't return anything useful, or as a sentinel value to indicate that a function encountered an error.
+
+## Sequences
+
+### What is sequence
+
+A sequence in Python is an iterable object that supports efficient element access using integer indices through a special `__getitem__()` method and supports a `__len__()` method that returns the length of the sequence.
+The main built-in sequence types are list, tuple, range, str, bytes and bytearray.
+
+Sequences can also optionally implement the `count()`, `index()`, `__contains__()` and `__reversed__()` methods and others.
+
+### Which operations are supported by most sequences
+
+- `x in s`, `x not in s` - whether element x is in sequence s (for strings and byte sequences - whether x is a substring of s)
+- `s + t` - sequence concatenation
+- `s * n, n * s` - concatenation of n non-recursive copies of the sequence s
+- `s[i]` - i-th element of the sequence s
+- `s[i:j]` – slice of sequence s from i to j
+- `s[i:j:k]` - cut sequence s from i to j with step k
+- `len(s)` - sequence length
+- `min(s)` - the minimum element of the sequence
+- `max(s)` - the maximum element of the sequence
+- `s.index(x[, i[, j]])` - index of the first occurrence of x (optional - starting from position i to position j)
+- `s.count(x)` is the total number of occurrences of x in s
+- `sum(s)` - the sum of the elements of the sequence
+
+Immutable sequences usually implement the hash(s) operation, the hash value of an object.
+
+- `s[i] = x` – элемент с индексом i заменяется на x
+- `s[i:j] = t`, `s[i:j:k] = t` – элементы с индексами от i до j (с шагом k) заменяются содержимым итерабельного объекта t
+- `del s[i:j]`, `del s[i:j:k]` – удаление соответствующих элементов из последовательности
+- `s.append(x)` – добавление x в конец последовательности
+- `s.clear()` – удаление всех элементов последовательности
+- `s.copy()` – нерекурсивная копия последовательности
+- `s.extend(t)` – добавление всех элементов итерабельного объекта в конец последовательности
+- `s.insert(i, x)` – вставка элемента x по индексу i
+- `s.pop()`, `s.pop(i)` – возврат значения по индексу i (по умолчанию – последний элемент) и удаление его из последовательности
+- `s.remove(x)` – удаление первого вхождения x
+- `s.reverse()` – разворот последовательности в обратном порядке
+
+### What kinds of strings are there in python
+
+Depends on the version of Python. In the second branch, two types: single-byte strings and Unicode are represented by the str and unicode classes, respectively. Python 3 has one kind of string, str, which is Unicode. There are no single-byte strings, instead of them there is a bytes type, that is, a chain of bytes.
+
+### Is it possible to change a single character within a string
+
+No, strings are immutable. The replace, format, and concatenation operations return a new string.
+
+### How to concatenate a list of strings into one. How to split a string into a list of strings
+
+To join, you need the `.join()` string method. To split, the `.split()` method.
+
+### How to encode and decode strings
+
+Encode - translate Unicode into a byte string. Call the `.encode()` method on a string.
+
+Decode - recover a string from a string of bytes. Call the `.decode()` method on the `str` or `bytes` object (Python 2 and 3 respectively).
+
+In both cases, explicitly pass the encoding, otherwise the one defined in the system by default will be used. Be prepared to catch `UnicodeEncodeError`, `UnicodeDecodeError` exceptions.
+
+### How is a list different from a tuple
+
+Lists are mutable sequences, typically used to store data of the same type (although Python doesn't prohibit storing data of different types in them). Represented by the list class.
+
+Tuples are immutable sequences commonly used to store heterogeneous data. Represented by the tuple class.
+
+At the language level, they differ in that you cannot add or remove an element to a tuple. There are no differences at the interpreter level. Both collections are represented by an array of pointers to a `PyObject` structure.
+
+For a list, functions are defined that add a new element to such an array, remove an existing one, and merge two arrays into one. They are called by the list methods `.append()`, `.pop()`, `.sort()`, and so on.
+
+### What is a range
+
+Ranges are immutable sequences of numbers that are specified by start, end and step. Represented by the class range (in Python 2, xrange; range in Python 2 is a function that returns a list).
+Constructor parameters must be integers (either int class instances or any object with an `__index__` method)
+Supports all operations common to sequences, except for concatenation and repetition, and, in versions of Python prior to 3.2, slicing and negative indexes.
+
+### How to make a list unique (no duplicate elements)
+
+Set variant. Does not guarantee the order of elements. The order is preserved only for small lists.
+
+```python
+list(set([1, 2, 2, 2, 3, 3, 1]))
+>>> [1, 2, 3]
+```
+
+Variant with OrderedDict. Guarantees the order of elements.
+
+```python
+>>> from collections import OrderedDict
+>>> list(OrderedDict.fromkeys([1, 2, 2, 2, 3, 3, 1]))
+[1, 2, 3]
+```
+
+Loop option. Slowly, but it guarantees order. Suitable if elements cannot be placed inside a set (for example, dictionaries).
+
+```python
+res = []
+for x in [1, 2, 2, 2, 3, 3, 1]:
+     if x not in res:
+         res append(x)
+>>> [1, 2, 3]
+```
+
+### There is a tuple of three elements. Assign variables a, b, c their values
+
+`a, b, c = (1, 2, 3)`
+
+### How sequences are compared
+
+Two sequences are equal if they have the same type, the same length, and the corresponding elements of both sequences are equal.
+
+Sequences of the same types can be compared. Comparisons occur in lexicographic order: a sequence of smaller length is less than a sequence of larger length, but if their lengths are equal, then the result of the comparison is equal to the result of comparing the first differing elements.

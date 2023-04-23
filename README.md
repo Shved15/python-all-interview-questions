@@ -1,0 +1,18 @@
+## List of questions
+
+- [Python](questions.md/#python)
+  - [Typing](questions.ms/#typing)
+    - [Types of typing](questions/#types-of-typing)
+    - [Types of data types that are in python](questions.md/#types-of-data-types-that-are-in-python)
+  - [Sequences](questions.md/#sequences)
+    - [What is sequence](questions.md/#what-is-sequence)
+    - [Which operations are supported by most sequences](questions.md/#which-operations-are-supported-by-most-sequences)
+    - [What kinds of strings are there in python](questions.md/#what-kinds-of-strings-are-there-in-python)
+    - [Is it possible to change a single character within a string](questions.md/#is-it-possible-to-change-a-single-character-within-a-string)
+    - [How to concatenate a list of strings into one. How to split a string into a list of strings](questions.md/#how-to-concatenate-a-list-of-strings-into-one-how-to-split-a-string-into-a-list-of-strings)
+    - [How to encode and decode strings](questions.md/#how-to-encode-and-decode-strings)
+    - [How is a list different from a tuple](questions.md/#how-is-a-list-different-from-a-tuple)
+    - [What is a range](questions.md/#what-is-a-range)
+    - [How to make a list unique (no duplicate elements)](questions.md/#how-to-make-a-list-unique-no-duplicate-elements)
+    - [There is a tuple of three elements. Assign variables a, b, c their values](questions.md/#there-is-a-tuple-of-three-elements-assign-variables-a-b-c-their-values)
+    - [How sequences are compared](questions.md/#how-sequences-are-compared)
