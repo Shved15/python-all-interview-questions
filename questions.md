@@ -683,3 +683,132 @@ In Python 3, these methods create a representation object. This is definitely fa
 >>> timeit.timeit(iter_set, number=1000)
   8.627948219014797
 ```
+
+## Functions
+
+### What are args, kwargs. When are they required?
+
+The expressions `*args` and `**kwargs` are declared in the function signature. They mean that variables named `args` and `kwargs` (without asterisks) will be available inside the function. You can use other names, but this is considered bad form.
+
+`args` is a tuple that accumulates positional arguments. `kwargs` is a dictionary of named arguments, where key is the name of the parameter, value is the value of the parameter.
+
+**Important:** if no parameters are passed to the function, the variables will be equal to an empty tuple and an empty dictionary, respectively, and not `None`.
+
+Please don't confuse a tuple with a list. The next question explains why.
+
+### Why using mutable objects as default parameters is bad. Give an example of a bad case. How to fix
+
+The function is created once when the module is loaded. Named parameters and their default values are also created once and stored in one of the function object's fields.
+
+In our example, `bar` is equal to the empty list. The list is a mutable collection, so the value of `bar` can change from call to call. Example:
+
+```python
+def foo(bar=[]):
+     bar append(1)
+     return bar
+foo()
+>>> [1]
+foo()
+[eleven]
+foo()
+>>> [1, 1, 1]
+```
+
+It is considered good practice to specify an empty immutable value for the parameter, for example `0`, `None`, `''`, `False`. In the body of the function, check for fullness and create a new collection:
+
+```python
+def foo(bar=None):
+     if bar is None:
+         bar = []
+     bar append(1)
+     return bar
+foo()
+>>> [1]
+foo()
+>>> [1]
+foo()
+>>> [1]
+```
+
+The above is relevant incl. for sets and dictionaries.
+
+### Is it possible to pass a function as an argument to another function
+
+Yes, in Python it is possible to pass functions as arguments to another function. A function in Python is a first-order object, it allows: assignment, transfer to a function, deletion.
+This approach is called function argument passing or using functional programming.
+This is a very powerful tool that allows you to create more flexible and abstract functions that can take different actions as arguments in order to perform different operations.
+
+Example:
+
+```python
+def apply_function(func, lst):
+    result = []
+    for item in lst:
+        result.append(func(item))
+    return result
+
+def square(x):
+    return x**2
+
+numbers = [1, 2, 3, 4, 5]
+squares = apply_function(square, numbers)
+print(squares)
+```
+
+### Is it possible to declare a function inside another function. Where will she be seen?
+
+Can. Such a function will only be visible inside the first function.
+
+### What are lambdas. What are their features
+
+Lambda functions in Python are unnamed functions that can be defined and passed as arguments to other functions. They are commonly used in places where you need to quickly define a function without having to create a separate name for it.
+
+Main features of lambda functions in Python:
+
+They are defined using the lambda keyword, followed by a comma-separated list of arguments, followed by a colon, and then the body of the function.
+
+They return the result of their work using an expression that is specified in the function body.
+
+They can be used anywhere a function is expected, including as function arguments.
+
+They can be called directly, but it's better to use them as arguments to other functions.
+
+```python
+# Define a lambda function to calculate the square of a number
+square = lambda x: x ** 2
+
+# Use a lambda function as an argument to another function
+numbers = [1, 2, 3, 4, 5]
+squares = map(lambda x: x ** 2, numbers)
+
+print(square(5))   # Output: 25
+print(list(squares))   # Output: [1, 4, 9, 16, 25]
+```
+
+Thus, lambda functions in Python can be very handy when you need to quickly define a small function without creating a separate name for it. However, their use should be limited only to those places where it is really convenient and improves the readability and maintainability of the code.
+
+### Are the following expressions allowed?
+
+- `nope=lambda:pass`
+- `riser = lambda x: raise Exception(x)`
+
+No, loading the module will throw a `SyntaxError` exception. In the lambda body,
+be just an expression. `pass` and `raise` are operators.
+
+### How argument values are passed to a function or method
+
+In languages such as C++, there are variables stored on the stack and in dynamic memory. When a function is called, we push all the arguments onto the stack, after which we transfer control to the function. She knows the sizes and offsets of variables on the stack, and accordingly can interpret them correctly.
+In this case, we have two options: copy the memory of the variable onto the stack or put a reference to the object in dynamic memory (or at higher stack levels).
+It is obvious that when the values on the function stack change, the values in the dynamic memory will not change, and when the memory area changes by reference, we modify the shared memory, so all references to the same memory area will “see” the new value.
+
+In python, this mechanism has been abandoned, the replacement is the _assignment_ mechanism of a variable name with an object, for example, when creating a variable:
+`var="john"`
+
+The interpreter creates a "john" object and a "name" var, and then associates the object with the given name.
+When a function is called, no new objects are created, instead a name is created in its scope that is associated with an existing object.
+But in python there are mutable and immutable types. The latter, for example, include numbers: during arithmetic operations, existing objects do not change, but a new object is created, with which the existing name is then associated. If no name is associated with the old object after that, it will be removed using the reference counting mechanism.
+If the name is associated with a variable of a mutable type, then during operations with it, the object's memory changes, respectively, all names associated with this memory area will "see" the changes.
+
+### What is a closure
+
+In Python, a closure is a function object that has access to variables in its enclosing lexical scope, even when the function is called outside that scope. This means a closure can remember and access values from the outer function even if the outer function has completed execution. Closures are created when a nested function references a value from its enclosing scope. The nested function can be returned as a closure, allowing the referenced value to be accessed even after the outer function has completed execution. Closures are commonly used in situations where a value needs to be accessed and updated by multiple functions or methods.
