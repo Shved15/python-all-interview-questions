@@ -1258,6 +1258,13 @@ finally:
 
 If an error occurs in the try block, then the finally block will still be executed and you can do a "cleanup" inside it, for example.
 
+It should be noted:
+The `finally` block in a `try/except/finally` construct in Python always fires, except when the Python interpreter stops or a fatal error occurs, such as a syntax violation or low-level I/O errors.
+
+Also, the `finally` block can be skipped if an unhandled exception of type `SystemExit`, `KeyboardInterrupt`, or `GeneratorExit` occurs, which can be thrown when the user stops the program or for other reasons that require the program to terminate immediately.
+
+Otherwise, the `finally` block will be executed regardless of whether an exception was thrown or not.
+
 ### How to properly handle exceptions differently
 
 Except blocks are processed from top to bottom and control is transferred to no more than one handler. Therefore, if you need to handle exceptions that are in the inheritance hierarchy differently, you must first specify handlers for less common exceptions, and then for more common ones.
