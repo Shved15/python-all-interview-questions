@@ -3210,3 +3210,131 @@ There are various methods for monitoring web applications in production, includi
 7. Security monitoring: Monitoring the application for security threats and vulnerabilities, such as unauthorized access attempts or malicious activity.
 
 The choice of monitoring method will depend on the specific needs of the application and the resources available for monitoring. It is often best to use a combination of methods to get a comprehensive view of the application's performance and health in production.
+
+# HTTP
+
+## How the HTTP protocol works
+
+HTTP (Hypertext Transfer Protocol) is an application-layer protocol used to transmit data over the internet. It is the foundation of the World Wide Web and is used by web browsers and servers to communicate with each other. The HTTP protocol is based on a client-server architecture, where the client sends a request to the server and the server responds with the requested data.
+
+When a user types a URL into their browser, a request is sent to the server hosting the website. This request contains a request method, which can be one of the following:
+
+- GET: Retrieves information from the server.
+- POST: Sends information to the server for processing.
+- PUT: Updates an existing resource on the server.
+- DELETE: Deletes a resource from the server.
+
+After the server receives the request, it sends a response back to the client. This response contains the requested data and also includes a status code that indicates whether the request was successful or not. Some of the most common status codes include:
+
+- 200 OK: The request was successful.
+- 404 Not Found: The requested resource was not found on the server.
+- 500 Internal Server Error: An error occurred on the server while processing the request.
+
+HTTP also supports other features such as caching, authentication, and encryption, which are used to improve the performance and security of web applications.
+
+HTTP is a text protocol that runs on top of TCP/IP. HTTP consists of a request and a response. Their structures are similar: start line, headers, response body.
+
+The start query string consists of the method, path, and protocol version:
+
+```plaintext
+GET /index.html HTTP/1.1
+```
+
+The start line of the response consists of the protocol version, the response code, and the textual transcript of the response.
+
+```plaintext
+HTTP/1.1 200 OK
+```
+
+Headers are a set of key-value pairs, eg `User-Agent`, `Content-Type`. The headers contain request metadata: user language, authorization, redirection. The `Host` header must always be present in the request.
+
+The response body can be empty, or it can transfer pairs of variables, files, binary data. The body is separated from the headers by a blank line.
+
+## Write a raw request to google home page
+
+An example of a raw request to the Google homepage using the HTTP/1.1 protocol:
+
+```plaintext
+GET / HTTP/1.1
+Host: www.google.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+```
+
+This specifies the `GET` method to get the main page, as well as the request headers such as `User-Agent`, `Accept`, `Accept-Language`, and so on. In response to this request, the server will return the corresponding page with HTML code.
+
+## How to tell the client if the request was successful or not
+
+Check response status. Answers are divided by senior category. We have five groups with the following semantics:
+
+- `1xx`: rarely used. This group has only one status `100 Continue`.
+- `2xx`: request was successful (data received or created)
+- `3xx`: redirect to another resource
+- `4xx`: error caused by the user (no such page, no access rights)
+- `5xx`: error caused by the server (error in code, network, configuration)
+
+## What needs to be sent to the browser to redirect to another page
+
+To redirect a user to another page, the server needs to send an HTTP response with a status code of 3xx(`301` or `302`), indicating a redirection. Specifically, the server needs to include a `Location` header in the response, which specifies the URL to redirect to. Here is an example of what an HTTP response to redirect to `https://example.com` might look like:
+
+```plaintext
+HTTP/1.1 302 Found
+Location: https://example.com
+```
+
+When the browser receives this response, it will automatically send a new request to the URL specified in the `Location` header. This will cause the browser to navigate to the new page.
+
+You can place `HTML` in the body of the response with a link to the new resource. Then users of older browsers will be able to navigate manually.
+
+## How to manage caching in HTTP
+
+HTTP caching is an important feature that allows clients and servers to efficiently store and retrieve resources, such as web pages, images, and other files. There are several ways to manage caching in HTTP:
+
+1. `Cache-Control` header: This header is used to specify caching directives that control how and for how long the content should be cached. The `Cache-Control` header can include several directives, such as `max-age`, `no-cache`, `no-store`, `must-revalidate`, and `private`.
+
+2. `ETag` header: This header is used to identify a specific version of a resource. The server generates an `ETag` for each version of a resource, and the client includes the `ETag` in subsequent requests to indicate which version it has cached.
+
+3. `Last-Modified` header: This header is used to indicate the last time a resource was modified. The server includes this header in its response, and the client includes the value of this header in subsequent requests to check if the resource has been modified since the last time it was cached.
+
+4. `Conditional` requests: HTTP also supports conditional requests, which allow the client to check if a resource has been modified since the last time it was cached without actually downloading the entire resource. This can be achieved using the If-Modified-Since or If-None-Match headers.
+
+By properly managing caching in HTTP, we can improve the performance and reduce the load on both the server and the network.
+
+## How files are cached at the protocol level
+
+When `Nginx` serves up a static file, it adds an `Etag` header - the `MD5` hash of the file. The client remembers this hash. The next time the file is requested, the client sends the hash. The server checks the client's hash for this file. If the hash does not match (the file has been updated), the server responds with a `200` code and uploads the current file with the new hash. If the hashes are equal, the server responds with a `304 Not Modified` code with an empty body. In this case, the browser substitutes a local copy of the file.
+
+## What is HTTP
+
+- [In plain language about HTTP(rus)](https://habr.com/en/post/215117/)
+- [HTTP Protocol Overview - HTTP(rus)](https://developer.mozilla.org/ru/docs/Web/HTTP/Overview)
+
+HTTP is a widely used data transfer protocol, originally intended for the transfer of hypertext documents (that is, documents that may contain links that allow you to navigate to other documents).
+
+The abbreviation HTTP stands for HyperText Transfer Protocol. According to the OSI specification, HTTP is an application (upper, 7th) layer protocol. The current version of the protocol, HTTP 1.1, is described in the RFC 2616 specification.
+
+The HTTP protocol assumes the use of a client-server data transfer structure. The client application forms a request and sends it to the server, after which the server software processes this request, generates a response and sends it back to the client. After that, the client application can continue to send other requests, which will be processed in the same way.
+
+The task that is traditionally solved using the HTTP protocol is the exchange of data between a user application that accesses web resources (usually a web browser) and a web server. At the moment, it is thanks to the HTTP protocol that the work of the World Wide Web is ensured.
+
+HTTP is also often used as the communication protocol for other application layer protocols such as SOAP, XML-RPC, and WebDAV. In such a case, the HTTP protocol is said to be used as a "transport".
+
+## What is the difference between HTTP and HTTPS
+
+HTTP (HyperText Transfer Protocol) and HTTPS (HyperText Transfer Protocol Secure) are both protocols used for transmitting data over the internet, but there are some significant differences between the two.
+
+1. Security: HTTPS is a more secure version of HTTP as it uses SSL/TLS (Secure Sockets Layer/Transport Layer Security) encryption to encrypt all data between the web server and the client browser. This provides end-to-end encryption, ensuring that data transmitted between the server and client is secure and cannot be intercepted or tampered with.
+
+2. Port: HTTP uses port 80, while HTTPS uses port 443. This is why a URL for an HTTPS website will have "https://" and a URL for an HTTP website will have "http://".
+
+3. Authentication: HTTPS also provides authentication, meaning that the client can verify that they are communicating with the correct server. This is done through SSL/TLS certificates, which are issued by trusted Certificate Authorities.
+
+4. Speed: HTTPS can be slower than HTTP because the encryption and decryption of data requires additional processing power and time. However, advancements in SSL/TLS technology have reduced the performance gap between HTTP and HTTPS.
+
+5. SEO: HTTPS is becoming increasingly important for search engine optimization (SEO), as search engines like Google give priority to secure websites in search results. This means that websites using HTTPS are more likely to rank higher in search results.
+
+In summary, HTTPS is a more secure and reliable version of HTTP, providing end-to-end encryption, authentication, and better SEO. However, it can be slower than HTTP due to the additional processing required for encryption and decryption of data.
