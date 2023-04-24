@@ -1825,3 +1825,296 @@ Overall, security testing is an important aspect of the software development pro
 Integration and functional testing are two phases in the software testing process. The former is done after unit testing and the latter is a black box testing method.
 
 _Functional testing is also referred to as E2E testing for browser testing._
+
+## Functional programming
+
+### What is functional programming
+
+- [Functional Programming with Examples(rus)](https://medium.com/@kiky.tokamuro/%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B2-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%B0%D1%85-be5ebe4a6053)
+
+Functional programming is a section of discrete mathematics and a programming paradigm in which the process of calculation is interpreted as the calculation of the values of functions in the mathematical sense of the latter (as opposed to functions as subroutines in procedural programming).
+
+Functional programming is a programming paradigm that emphasizes the use of functions to solve problems. In functional programming, functions are treated as first-class citizens, which means that they can be passed as arguments to other functions, returned as values from functions, and assigned to variables. Functional programming is often contrasted with imperative programming, which emphasizes explicit changes in state and the use of control structures like loops and conditionals.
+
+Functional programming languages typically provide a set of higher-order functions that can be used to manipulate collections of data, such as maps, filters, and folds. These functions operate on immutable data structures, which means that the original data is not modified. Instead, new data structures are created that reflect the desired changes.
+
+Functional programming has several advantages over imperative programming, including the ability to write more concise and expressive code, the avoidance of mutable state, which can lead to fewer bugs, and the ability to take advantage of parallelism and concurrency, which can improve performance on modern hardware. However, functional programming can also be more difficult to learn and can require a different way of thinking about programming problems.
+
+### Features of functional programming
+
+Features of functional programming:
+
+- Pure functions are functions that have no side effects and are also deterministic.
+
+- Anonymous functions / Lambda functions are functions that are declared at the place of use and do not receive a unique identifier to access them. The most common way to define anonymous functions is to use lambda expressions.
+
+- Higher-order functions are functions that can take other functions as arguments, or return other functions as a result.
+
+- Function composition is the application of one function to the result of another function.
+  Currying is the transformation of a function with many arguments, to a set of functions from one argument.
+
+- A closure is a combination of a function and the environment in which it was defined. That is, it is a function that is defined in the body of another function, and is created every time it is executed, and it also has references to local variables of the external function.
+
+- Immutable data is data whose state cannot be changed after it has been created.
+
+- Pattern matching is a method of data analysis and processing based on matching the value under study with one or another pattern, which can be a number, string, or other construct supported by the language.
+
+- Recursion is a function call from itself, or through other functions.
+
+### Like Python with functional programming support
+
+Python partially supports the functional programming paradigm and allows you to write code in a functional style. In addition, it contains certain features that are specific to functional languages or first appeared in functional languages (list inclusions, lambda functions, higher-order functions, etc.).
+
+### What is a first class object
+
+A first-class object in programming is an object that can be passed to a function as an argument, returned from the function as a result, and assigned to a variable. In Python, all objects are first class objects, which means that functions are also first class objects and can be passed as arguments to other functions, returned from functions, and assigned to variables. This approach to programming allows you to use functions as data, which in turn allows you to create more flexible and scalable programs.
+
+An object is called a "first class object" if it:
+
+- can be stored in a variable or data structures;
+- can be passed to a function as an argument;
+- can be returned from a function as a result;
+- can be created during program execution;
+- internally self-identifying (independent of naming).
+
+The term "object" is used here in a general sense, and is not limited to programming language objects.
+In Python, as in functional languages, functions are first-class objects.
+
+### What is a higher order function
+
+A higher-order function is a function that takes one or more functions as arguments or returns a function as its result. In other words, a higher-order function treats functions as first-class citizens, allowing them to be used and manipulated in the same ways as other values. This is a fundamental concept in functional programming and enables powerful abstractions and techniques, such as function composition and currying.
+
+The basic idea is that functions have the same status as other data objects.
+
+### What is currying
+
+_Curring_ is the transformation of a function of many arguments into a set of functions, each of which is a function of one argument. We can pass part of the arguments to a function and get back a function that expects the rest of the arguments. This transformation was introduced by M. Sheinfinkel and G. Frege and got its name in honor of H. Curry.
+
+Currying is a technique in functional programming that allows you to turn a function with multiple arguments into a sequence of functions with one argument. Each subsequent function uses the previous result as the first argument.
+
+Let's create a simple greet function that takes a greeting and a name as arguments:
+
+```python
+def greet(greeting, name):
+     print(greeting + ', ' + name)
+
+greet('Hello', 'German')
+```
+
+A small improvement will allow us to create a new function for any type of greeting and pass a name to this new function:
+
+```python
+def greet_curried(greeting):
+     def greet(name):
+         print(greeting + ', ' + name)
+     return greet
+
+greet_hello = greet_curried('Hello')
+
+greet_hello('German')
+greet_hello('Ivan')
+```
+
+Or directly `greet_curried`
+
+```python
+greet_curried('Hi')('Roma')
+
+And then you can do it with any number of arguments:
+
+def greet_deeply_curried(greeting):
+     def w_separator(separator):
+         def w_emphasis(emphasis):
+             def w_name(name):
+                 print(greeting + separator + name + emphasis)
+             return w_name
+         return w_emphasis
+     return w_separator
+
+greet = greet_deeply_curried("Hello")("...")(".")
+greet('German')
+welcome('Ivan')
+```
+
+In Python, currying can be implemented using higher order functions and closures. For example, you can define a function that takes the first argument and returns an inner function that takes the next argument, and so on. When all arguments have been passed, the original function will be called with the full set of arguments. Example:
+
+```python
+def add(x):
+    def inner(y):
+        return x + y
+    return inner
+
+add5 = add(5)
+print(add5(3)) # Output: 8
+```
+
+In this example, the add function takes the first argument x and returns an internal inner function that takes an argument y and returns the sum of x + y. We then call add(5) to get a new add5 function that will add 5 to whatever value is passed to it. Calling add5(3) will return the result 8.
+
+### Describe the map, reduce, filter functions of the functools module
+
+The `functools` module in Python provides some functions that can be useful when working with functional programming.
+
+1. `map(function, iterable)`:
+   This function takes a function and a sequence as arguments and returns an iterator that applies that function to each element of the sequence.
+   The `map` function applies a function to each element of a sequence. Returns a list in Python 2, an iterator object in Python 3.
+
+Example:
+
+```python
+# Example: square each number in a list
+numbers = [1, 2, 3, 4, 5]
+squared_numbers = list(map(lambda x: x**2, numbers))
+print(squared_numbers)
+# Output: [1, 4, 9, 16, 25]
+```
+
+2. `filter(function, iterable)`:
+   This function takes a function and a sequence as arguments and returns an iterator that returns only those elements of the sequence for which the function returns True.
+   Returns a list in Python 2, an iterator object in Python 3.
+
+Example:
+
+```python
+# Example: filter out odd numbers from a list
+numbers = [1, 2, 3, 4, 5]
+odd_numbers = list(filter(lambda x: x % 2 != 0, numbers))
+print(odd_numbers)
+# Output: [1, 3, 5]
+```
+
+3. `reduce(function, iterable[, initializer])`:
+   This function takes a function and a sequence as arguments and returns a single value, which is the result of applying this function to a sequence. It is used to collapse a sequence into a single value. For Python 3+, the `reduce()` function has been moved from the `functools` module to the `functools.reduce()` module.
+   More:
+   Takes a function of two arguments, a sequence and an optional initial value, and computes a fold of the sequence as the result of applying the given function sequentially to the current value (called the accumulator) and the next element of the sequence.
+
+Example:
+
+```python
+# Example: find the product of numbers from a list
+from functools import reduce
+numbers = [1, 2, 3, 4, 5]
+product = reduce(lambda x, y: x*y, numbers)
+print(product)
+# Output: 120
+```
+
+### What other functions do you know from the functools module
+
+In addition to the `map`, `reduce`, and `filter` functions, the `functools` module also contains a number of other higher-order functions. Below are some of them:
+
+1. `partial(func, *args, **keywords)`: creates a new function with partially defined arguments. Returns a new function that calls the original function with the arguments passed in and the additional arguments passed when the new function was called. For example:
+
+```python
+from functools import partial
+
+def multiply(x, y):
+    return x * y
+
+double = partial(multiply, 2)
+triple = partial(multiply, 3)
+
+print(double(4)) # 8
+print(triple(4)) # 12
+```
+
+2. `wraps(wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)`: This is a decorator that is used to preserve the metadata (such as documentation and function name) of the original function after it has been decorated. This is useful when you create your own decorators that can change function metadata. For example:
+
+```python
+from functools import wraps
+
+def my_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("Before the function is called.")
+        result = func(*args, **kwargs)
+        print("After the function is called.")
+        return result
+    return wrapper
+
+@my_decorator
+def say_hello(name):
+    """A function that says hello."""
+    print(f"Hello, {name}!")
+
+say_hello("Alice")
+print(say_hello.__name__)  # "say_hello"
+print(say_hello.__doc__)   # "A function that says hello."
+```
+
+3. `lru_cache(maxsize=128, typed=False)`: This is a decorator that is used to memoize functions. Memoization is an optimization technique in which the results of executing a function are cached to avoid re-evaluation with the same arguments. `lru_cache` saves the most recently used results and removes rarely used results to conserve memory space. For example:
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def fibonacci(n):
+    if n <= 1:
+        return n
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)
+
+print([fibonacci(n) for n in range(10)])  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+```
+
+### What functions do you know from the itertools module
+
+The `itertools` module is part of the Python standard library and provides a set of tools for working with iterables such as lists, tuples, sets, and more.
+
+The `itertools` module implements various functions such as:
+
+- `product` – Cartesian product of iterators (to avoid nested for loops);
+- `permutations` - generation of permutations;
+- `combinations` – generation of combinations;
+- `combinations_with_replacement` - generation of placements;
+- `takewhile` - getting sequence values while the value of the predicate function for its elements is true;
+- `dropwhile` - getting the values of the sequence starting from the element for which the value of the predicate function will no longer be true.
+- `count(start=0, step=1)` - an infinite iterator that returns numbers starting at `start` with `step`.
+- `cycle(iterable)` - an infinite iterator that repeats the values from the `iterable`.
+- `repeat(elem, n=None)` - An iterator that returns the value of `elem` `n` times, or an infinite number of times if `n` is not specified.
+- `chain(*iterables)` - A function that chains multiple iterables into a single iterator.
+- `islice(iterable, start, stop[, step])` - a function that returns a slice of the elements from an `iterable` object iterable from index `start` to index `stop` in increments of `step`.
+- `groupby(iterable, key=None)` - A function that groups the elements of an `iterable` by the given `key`, which is a function applied to each element to determine the grouping.
+
+In addition, the `itertools` module also provides functions for working with permutations, combinations, and combinations of elements from iterables.
+
+Examples of using:
+
+```python
+import itertools
+
+# count
+for i in itertools.count(1, 2):
+    print(i)
+    if i > 10:
+        break
+
+# cycle
+for i, c in zip(range(10), itertools.cycle('abc')):
+    print(i, c)
+
+# repeat
+for i in itertools.repeat(3, 4):
+    print(i)
+
+# chain
+for i in itertools.chain([1, 2, 3], [4, 5, 6]):
+    print(i)
+
+# islice
+for i in itertools.islice(range(10), 1, 9, 2):
+    print(i)
+
+# groupby
+data = [('A', 1), ('B', 2), ('A', 3), ('C', 4)]
+groups = itertools.groupby(data, key=lambda x: x[0])
+for key, group in groups:
+    print(key, list(group))
+```
+
+### What is the operator module for?
+
+The `operator` module in Python provides functions that correspond to standard language operators such as addition, multiplication, comparison, and so on. The functions in this module are typically used to perform operations on elements in a list, dictionary, or other iterable without having to explicitly call the operator.
+
+For example, the function `operator.add(x, y)` is equivalent to the expression `x + y`. The `operator` module also provides functions for sorting a list by a given key (`operator.itemgetter()`, `operator.attrgetter()`), finding the minimum and maximum elements in a sequence (`operator.min()`, `operator.max()`), etc.
+
+The advantage of using functions from the `operator` module is that they can be used in conjunction with higher-order functions such as `map()`, `filter()`, `reduce()`, etc., which simplifies and speeds up some operations.
