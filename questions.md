@@ -2963,3 +2963,250 @@ Function-based views are simple Python functions that take a request object as i
 Class-based views are more powerful and flexible than function-based views. They allow you to reuse common functionality across different views, and provide a consistent interface for handling different HTTP methods (GET, POST, PUT, DELETE, etc.). Class-based views are defined as Python classes that inherit from one of the built-in view classes provided by Django.
 
 In addition to views, Django also provides a set of built-in viewsets that make it easy to build APIs using Django REST framework. Viewsets are classes that define the CRUD (Create, Read, Update, Delete) operations for a specific model or set of models. They provide a consistent interface for handling HTTP requests and responses, and can be customized to handle different authentication and permission requirements.
+
+# Web development
+
+## What is CGI. Pros, cons
+
+CGI stands for Common Gateway Interface, which is a standard protocol used to communicate between a web server and a web application. It allows web servers to interact with external applications or scripts and generate dynamic content based on user requests.
+
+The pros of using CGI are:
+
+1. Platform independence: CGI is supported by almost all web servers and can be used on any platform that supports HTTP.
+
+2. Flexibility: CGI allows for the use of any programming language to create web applications, which provides a lot of flexibility to developers.
+
+3. Security: CGI provides a certain level of security by ensuring that the script runs with limited privileges, preventing it from accessing sensitive system resources.
+
+4. The program does not store state, which is convenient for debugging.
+
+The cons of using CGI are:
+
+1. Performance: Since CGI scripts are executed every time a request is made, it can have a negative impact on the performance of the web server, especially when handling high volumes of requests.
+
+2. Scalability: Due to the performance limitations of CGI, it may not be suitable for large-scale web applications that require high performance and scalability.
+
+3. Maintenance: CGI scripts can be difficult to maintain, especially when dealing with complex applications that require multiple scripts to work together.
+
+4. Transferring data via `stdout` is slower than Unix sockets.
+
+## How to protect cookies from theft and forgery
+
+Cookies can be protected from theft and forgery in several ways:
+
+1. Use the `Secure` flag: Setting the `Secure` flag on a cookie ensures that the cookie can only be transmitted over an encrypted HTTPS connection. This helps to prevent eavesdropping and man-in-the-middle attacks.
+
+2. Use the `HttpOnly` flag: Setting the `HttpOnly` flag on a cookie prevents client-side scripts from accessing the cookie through the document.cookie API. This helps to prevent cross-site scripting (XSS) attacks.
+
+3. Use the `SameSite` attribute: Setting the `SameSite` attribute on a cookie restricts the cookie to first-party usage, meaning it can only be sent in requests originating from the same site. This helps to prevent cross-site request forgery (CSRF) attacks.
+
+4. Set an expiration date: Setting an expiration date on a cookie ensures that it will only be valid for a limited period of time, reducing the risk of theft and forgery.
+
+5. Use session cookies: Session cookies are stored in memory and are deleted when the user closes their browser. This can help to prevent long-term cookie theft.
+
+6. Add a `User-Agent` header to the session key. Then if you steal the cookie and install it on another machine, the session key will be different.
+
+7. Same as above, but add the user's `IP`.
+
+8. Sign cookies with a secret key. Add a `sig` field that is equal to `HMAC-SHA1(cookie-body, secret_key)`. Check on the server that the signature matches.
+
+It's important to note that while these measures can help to protect cookies from theft and forgery, they are not foolproof. It's also important to follow other security best practices, such as keeping software up-to-date, using strong passwords, and monitoring logs for suspicious activity.
+
+## What is the difference between authentication and authorization
+
+**Identification** (from the Latin identifico - to identify): assigning an identifier to subjects and objects and / or comparing an identifier with a list of assigned identifiers. For example, the representation of a person by name and patronymic is identification.
+
+**Authentication** (from Greek: αυθεντικός ; real or authentic): verification of the correspondence of the subject and the person he is trying to impersonate, using some unique information (fingerprints, iris color, voice, etc.), in the simplest case - using a login and password.
+
+**Authorization** is a check and determination of the authority to perform certain actions (for example, read the /var/mail/eltsin file) in accordance with the previously performed authentication.
+
+All three procedures are interconnected:
+
+1. First determine the name (login or number) - identification
+2. Then they check the password (key or fingerprint) - authentication
+3. And at the end they provide access - authorization
+
+## What is XSS. Examples. How to secure an app
+
+XSS (Cross-Site Scripting) is a type of web security vulnerability that allows attackers to inject malicious scripts into web pages viewed by other users. These scripts can steal sensitive information such as login credentials, session tokens, and personal data, or even modify the content of the page in ways that are harmful to the user.
+
+There are three types of XSS attacks:
+
+1. Stored XSS: Attacker injects malicious script into the server and is served to all users that visit the page
+2. Reflected XSS: Attacker sends a link that contains malicious script, victim clicks on the link and the script is executed in their browser
+3. DOM-Based XSS: Malicious code is executed as a result of manipulating the DOM of the web page
+
+To secure an app from XSS attacks, you can take the following measures:
+
+1. Input validation and sanitization: All user input should be validated on both the client and server side to ensure that only expected values are received. Additionally, any input that is displayed on the page should be sanitized to remove any potentially harmful content.
+
+2. Use a Content Security Policy (CSP): This is an HTTP header that specifies which sources of content are allowed to be loaded by the browser. It can prevent scripts from running from untrusted sources.
+
+3. Use HTTP-only cookies: Cookies that are marked as HTTP-only cannot be accessed by client-side scripts, which can help prevent attacks that rely on stealing session tokens.
+
+4. Escape special characters: Special characters such as <, >, and & should be properly escaped in order to prevent them from being interpreted as HTML or JavaScript.
+
+5. Keep software up-to-date: Make sure that you are using the latest version of your web server software and all the libraries and frameworks your application depends on. Security vulnerabilities can be found in outdated software.
+
+By following these best practices, you can help protect your web application from XSS attacks.
+
+XSS stands for Cross Site Requests. The affected page forces the user to make a request to another page, or to run unwanted js code.
+
+For example, a user posted a comment that contained the code:
+
+```html
+<script>
+  alert("foo");
+</script>
+```
+
+The site engine does not filter comment text, so the `<script>` tag becomes part of the page and is executed by the browser. Anyone who visits a page with a dangerous comment will see a pop-up window with the test `foo`.
+
+Another example. The search page accepts the search term `q`. In the title, the phrase “Search result for the query” + parameter text. If the parameter is not escaped, `/search?q=<script>alert('foo');</script>` will produce the same result.
+
+Knowing that the page is executing js code, a hacker can load contextual advertising, banners on the page, force browsers to go to any page, and steal cookies.
+
+The vulnerability is eliminated by escaping unsafe characters, cleaning (sanitizing) HTML tags.
+
+## REST & SOAP
+
+### What is REST
+
+- [REST Principles and Architectural Constraints](https://restfulapi.net/rest-architectural-constraints/)
+
+REST (Representational state transfer) is an agreement on how to build services. REST is often referred to as the so-called HTTP REST API. As a rule, this is a web application with a set of urls - endpoints. Urls accept and return data in JSON format. The operation type is set by the HTTP request method, for example:
+
+- `GET` - get an object or a list of objects
+- `POST` - create an object
+- `PUT` - update an existing object
+- `PATCH` - partially update an existing object
+- `DELETE` - delete an object
+- `HEAD` - get object metadata
+
+The REST architecture actively uses the capabilities of the HTTP protocol to avoid the so-called. "bicycles" - own solutions. For example, caching parameters are passed by standard headers `Cache`, `If-Modified-Since`, `ETag`. Authorization - header `Authentication`.
+
+REST is an architectural style for designing loosely coupled HTTP applications, which is often used when developing web services. REST doesn't dictate how it should be implemented at the low level, it just provides high level guidelines and leaves you free to implement your own implementation.
+
+For web services built with REST in mind (that is, not violating the restrictions imposed by it), the term "RESTful" is used.
+
+Unlike web services (web services) based on SOAP, there is no "official" standard for RESTful web API. The point is that REST is an architectural style while SOAP is a protocol.
+
+REST defines 6 architectural constraints that will allow you to create a true RESTful API:
+
+1. Interface uniformity
+2. Client-server
+3. Lack of state
+4. Caching
+5. Layers
+6. Code on demand (optional limitation)
+
+**Uniform interface**
+You must come up with an API interface for system resources that is available to users of the system and follow it at all costs. A resource in the system should have only one logical URI, which should provide a way to get related or additional data. It is always better to associate (synonymize) a resource with a web page.
+
+Any resource should not be too large and contain everything and everything in its representation. When appropriate, the resource should contain links (HATEOAS: Hypermedia as the Engine of Application State) pointing to relative URIs to retrieve related information.
+
+Also, resource representations in the system must follow certain guidelines, such as naming conventions, link formats, or data format (xml or/and json).
+
+> Once a developer is familiar with one of your APIs, they can follow a similar approach for other APIs.
+
+**Client-Server**
+Essentially, this means that the client application and the server application MUST be able to develop separately without any dependency on each other. The client only needs to know the URI of the resource and nothing else. This is a normal practice in web development today, so nothing special is required on your part. Be more simple.
+
+> Servers and clients can also be replaced and developed independently as long as the interface between them does not change.
+
+**No state**
+Roy Fielding took inspiration from HTTP and this is reflected in this limitation. Make all client-server interaction stateless. The server will not store information about the client's latest HTTP requests. It will treat each request as a new one. No session, no history.
+
+If the client application is to be a stateful application for the end user, where the user logs in once and then performs other authorized operations, then each request from the client must contain all the information necessary to service the request, including authentication and authorization details.
+
+> Client context should not be stored on the server between requests. The client is responsible for managing the state of the application.
+
+**Caching**
+In today's world, data and response caching is paramount wherever applicable/possible. Caching improves performance on the client side and increases the scalability for the server as the load is reduced.
+
+In REST, caching must be applied to resources when applicable, and then those resources MUST be declared cacheable. Caching can be implemented on the server or client side.
+
+> Well-tuned caching partially or completely eliminates some client-server interactions, further improving scalability and performance.
+
+**Layers**
+REST allows you to use a layered system architecture where you deploy APIs on server A, store data on server B, and authenticate requests against server C, for example. intermediary.
+
+**Code on demand (optional limitation)**
+This is an optional restriction. Most of the time, you will be sending static representations of resources in the form of XML or JSON. But when you need to, you can return executable code to support part of your application, for example, clients can call your API to get the rendering code for a user interface widget. It is allowed
+
+All of the above restrictions help you create a truly RESTful API and you should follow them. However, sometimes you may encounter a violation of one or two restrictions. Don't worry, you're still building RESTful APIs, but not "true RESTful".
+
+### What is SOAP
+
+SOAP (Simple Object Access Protocol) is a messaging protocol used for exchanging structured information between distributed applications over the internet. It relies on XML as its message format and typically uses HTTP or HTTPS as its transport protocol.
+
+SOAP was designed to facilitate communication between applications running on different platforms and programming languages. It defines a set of rules for exchanging messages, which includes a message envelope, a set of encoding rules, and a convention for representing remote procedure calls and responses.
+
+SOAP messages typically consist of a header and a body, where the header contains metadata about the message and the body contains the actual data being transmitted. The header can include information such as authentication details, routing information, and other optional parameters.
+
+One of the primary advantages of SOAP is that it supports a wide range of platforms and programming languages, making it ideal for distributed systems. However, it is often criticized for being too complex and difficult to use compared to more lightweight protocols such as REST.
+
+Initially, SOAP was intended mainly for implementing remote procedure call (RPC). Now the protocol is used to exchange arbitrary messages in XML format, and not just to call procedures. The official specification of the latest version 1.2 of the protocol does not decipher the name SOAP in any way. SOAP is an extension of the XML-RPC protocol.
+SOAP can be used with any application layer protocol: SMTP, FTP, HTTP, HTTPS, etc. However, its interaction with each of these protocols
+
+### What is the difference between REST and SOAP web services
+
+The main difference between REST and SOAP web services is in their architectural styles, message formats, and communication protocols.
+
+REST (Representational State Transfer) is an architectural style for designing distributed systems that allows clients to interact with web services using HTTP methods such as GET, POST, PUT, and DELETE. REST is based on the principle of using a unique URL (Uniform Resource Locator) to represent each resource, and each URL responds to a particular action. RESTful web services use simple text formats such as XML, JSON or YAML for message exchange, and they do not require the use of a separate messaging protocol.
+
+SOAP (Simple Object Access Protocol) is a messaging protocol that defines how XML messages can be exchanged between two different endpoints. SOAP uses the XML format for messages, and it requires a separate messaging protocol such as HTTP, TCP, or SMTP to transport the messages. SOAP web services use WSDL (Web Services Description Language) for defining the interface of the web service.
+
+- REST supports various formats: text, JSON, XML; SOAP - XML only,
+- REST works only over HTTP(S), while SOAP can work with various protocols,
+- REST can work with resources. Each URL is a representation of some resource. SOAP works with operations that implement some kind of business logic using several interfaces,
+- Read-based SOAP cannot be cached, while REST can be cached in this case,
+- SOAP supports SSL and WS-security while REST only supports SSL, SOAP supports ACID (Atomicity, Consistency, Isolation, Durability). REST supports transactions, but none of the ACIDs are compatible with a two-phase commit.
+
+In summary, REST is a simpler and more lightweight protocol compared to SOAP. It uses HTTP methods to access and manipulate resources, and it uses simple text formats for message exchange. SOAP, on the other hand, is a more complex protocol that uses a separate messaging protocol and XML for message exchange.
+
+### Can we send SOAP messages with an attachment
+
+Yes, it is possible to send SOAP messages with attachments. The SOAP with Attachments specification (SWA) defines a mechanism for attaching binary data, such as images or documents, to SOAP messages. This is accomplished by encoding the binary data as a MIME attachment and including it in the SOAP message using the "cid" URI scheme. The receiving SOAP node can then extract the attachment and process it as needed.
+
+You can send attachments in various formats: PDF, images, or other binary data. SOAP messages work in conjunction with the MIME extension, which provides for multipart/related.
+
+### How would you decide which REST or SOAP web service to use
+
+Choosing between REST and SOAP web services depends on the specific requirements and constraints of the project. Here are some factors to consider when deciding which type of web service to use:
+
+Complexity: SOAP is typically more complex than REST, due to its adherence to a strict messaging protocol and the use of XML for message exchange. REST, on the other hand, is simpler and more flexible, and allows for easier integration with other systems.
+
+Security: SOAP includes built-in security features, such as encryption and digital signatures, while REST relies on HTTPS for security. If you need strong security features, SOAP may be the better choice.
+
+Performance: REST is generally faster and more lightweight than SOAP, due to its simpler messaging format and lack of additional protocol layers. SOAP, however, is more reliable and offers more advanced error handling.
+
+Interoperability: SOAP is designed to work across different platforms and programming languages, while REST is more limited in this regard. If you need to integrate with a variety of systems, SOAP may be the better choice.
+
+API Design: REST APIs follow a resource-oriented design, while SOAP APIs are based on a service-oriented architecture. The choice between the two depends on the nature of the application and the type of data being exchanged.
+
+Ultimately, the choice between REST and SOAP web services depends on the specific needs of the project, as well as the resources and expertise available to the development team.
+
+REST vs. SOAP can be rephrased as "Simplicity vs. Standard". In the case of REST (simplicity), you will have speed, extensibility and support for many formats. In the case of SOAP, you will have more options for security (WS-security) and transactional security (ACID).
+
+## What methods for monitoring web applications in production have you used or know
+
+- [51 tools for APM and server monitoring(rus)](https://habr.com/ru/company/pc-administrator/blog/304356/)
+
+There are various methods for monitoring web applications in production, including:
+
+1. Log monitoring: Monitoring the application logs to track errors, performance issues, and security breaches.
+
+2. Performance monitoring: Monitoring system metrics such as CPU usage, memory usage, network usage, and disk I/O to ensure the application is performing well.
+
+3. User monitoring: Tracking user behavior and usage patterns to understand how the application is being used and identify areas for improvement.
+
+4. Synthetic monitoring: Simulating user interactions with the application to monitor its availability and performance.
+
+5. Real user monitoring (RUM): Collecting data from actual user interactions with the application to track performance and identify issues.
+
+6. Error monitoring: Tracking errors and exceptions in the application code to identify bugs and performance issues.
+
+7. Security monitoring: Monitoring the application for security threats and vulnerabilities, such as unauthorized access attempts or malicious activity.
+
+The choice of monitoring method will depend on the specific needs of the application and the resources available for monitoring. It is often best to use a combination of methods to get a comprehensive view of the application's performance and health in production.
