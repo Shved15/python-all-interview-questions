@@ -1427,3 +1427,65 @@ def users(request):
 ### Why do we need wraps
 
 `wraps` - Python standard decorator, `functools` module. It assigns the same `__name__`, `__module__`, `__doc__` fields to the wrapper function as the original function you are decorating. This is necessary so that after decorating the wrapper function in stack traces looks like a decorated function.
+
+## Metaclasses
+
+- [Metaclasses in Python: what it is and what it is eaten with(rus)](https://proglib.io/p/metaclasses-in-python/)
+- [Metaclasses in Python(rus)](https://habr.com/en/post/145835/)
+
+### What are metaclasses
+
+A metaclass is a "thing" that creates classes.
+
+We create a class in order to create objects, right? And classes are objects. A metaclass is what creates these very objects.
+
+### What is type. How metaclass lookup works when creating an object
+
+`type` is a metaclass that Python uses internally to create all classes.
+
+When you write:
+
+```python
+class Foo(Bar):
+   pass
+```
+
+Python does the following:
+
+- Does class Foo have a `__metaclass__` attribute?
+- If so, creates a class object in memory named Foo using what is specified in `__metaclass__`.
+- If Python doesn't find `__metaclass__`, it looks for `__metaclass__` in the parent class Bar and tries to do the same.
+- If `__metaclass__` is not in any parent, Python will look for `__metaclass__` at the module level.
+- And if it can't find any `__metaclass__` at all, it uses `type` to create a class object.
+
+### How metaclasses work
+
+- intercept class creation
+- change class
+- return modified
+
+### Why use metaclasses at all
+
+The main use of metaclasses is to create APIs. A typical example is Django ORM.
+
+It allows you to write something like this:
+
+```python
+classPerson(models.Model):
+   name = models.CharField(max_length=30)
+   age = models.IntegerField()
+```
+
+However, if you run the following code:
+
+```python
+guy = Person(name='bob', age='35')
+print guy.age
+
+```
+
+you will get not `IntegerField`, but `int`, and the value can be obtained directly from the database.
+
+This is possible because `models.Model` defines `__metaclass__` which will do some magic and turn the `Person` class we just defined with a simple expression into a complex database binding.
+
+Django makes something complicated look simple by exposing a simple API and using metaclasses that recreate the code from the API and do all the work behind the scenes.
