@@ -1,4 +1,4 @@
-## List of questions
+## A list of questions
 
 - [Python](questions.md/#python)
   - [Typing](questions.ms/#typing)
@@ -73,3 +73,10 @@
     - [What is \_\_new\_\_. And how is it different from \_\_init\_\_. In what order are they executed?](questions.md/#what-is-__new__-and-how-is-it-different-from-__init__-in-what-order-are-they-executed)
     - [What is and how old-style differs from new-style classes](questions.md/#what-is-and-how-old-style-differs-from-new-style-classes)
     - [What is duck typing](questions.md/#what-is-duck-typing)
+  - [Modules, packages](questions.md/#modules-packages)
+    - [What is a module](questions.md/#what-is-a-module)
+    - [How can I get the module name](questions.md/#how-can-i-get-the-module-name)
+    - [What is modular programming](questions.md/#what-is-modular-programming)
+    - [How Python looks for modules on import](questions.md/#how-python-looks-for-modules-on-import)
+    - [What is a package](questions.md/#what-is-a-package)
+    - [What can you say about the import package.item construct](questions.md/#what-can-you-say-about-the-import-packageitem-construct)

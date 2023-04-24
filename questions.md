@@ -1206,3 +1206,35 @@ Duck typing solves hierarchical typing problems such as:
 
 - the inability to explicitly indicate (by inheritance) the compatibility of an interface with all present and future interfaces with which it is ideologically compatible;
 - an exponential increase in the number of relationships in the type hierarchy with at least a partial attempt to do this.
+
+## Modules, packages
+
+### What is a module
+
+A module is a functionally complete fragment of a program, designed as a separate file with source code or a named continuous part of it. Modules allow complex tasks to be broken down into smaller ones in accordance with the principle of modularity.
+A file that contains Python source code is a module.
+Modules can be combined into packages and, further, into libraries.
+
+### How can I get the module name
+
+The name of the module is available in its global variable `__name__`. If the module is not imported but is run as a script, then `__name__` is set to `"__main__"`.
+
+### What is modular programming
+
+Modular programming is the organization of a program as a collection of small independent blocks called modules, the structure and behavior of which are subject to certain rules. The use of modular programming makes it easier to test the program and find errors. Hardware-dependent subtasks can be strictly separated from other subtasks, which improves the portability of the created programs.
+
+### How Python looks for modules on import
+
+When importing modules, the Python interpreter looks for them in directories and archives, the list of which is available both for reading and for modification in the form of the path variable of the built-in module sys.
+By default, sys.path consists of the directory with the script being run, the contents of the PYTHONPATH environment variable, and the standard location of modules specific to a particular platform and interpreter.
+
+### What is a package
+
+Modules can be combined into packages. Packages serve as namespaces for modules and a way to structure them.
+Every package is a module, but not every module is a package.
+As a rule, modules are represented as files, and packages are represented as directories in the file system (but not always).
+For a directory to be a package, it must contain an `__init__.py` file. It is automatically executed when the corresponding module is imported and may contain certain actions for initialization or be empty.
+
+### What can you say about the import package.item construct
+
+When using the from package import item statement, item can be a package, a module, or any name declared in the package. When using the import package.item statement, item must be a module or a package.
