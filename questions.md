@@ -2118,3 +2118,228 @@ The `operator` module in Python provides functions that correspond to standard l
 For example, the function `operator.add(x, y)` is equivalent to the expression `x + y`. The `operator` module also provides functions for sorting a list by a given key (`operator.itemgetter()`, `operator.attrgetter()`), finding the minimum and maximum elements in a sequence (`operator.min()`, `operator.max()`), etc.
 
 The advantage of using functions from the `operator` module is that they can be used in conjunction with higher-order functions such as `map()`, `filter()`, `reduce()`, etc., which simplifies and speeds up some operations.
+
+## GIL, threads, processes
+
+### What is GIL. What problems does he have
+
+- [GlobalInterpreterLock](https://wiki.python.org/moin/GlobalInterpreterLock)
+- [How the GIL works in Python(rus)](https://habr.com/ru/post/84629/)
+- [How the GIL works in Python(eng)](http://www.dabeaz.com/python/GIL.pdf)
+
+Only one Python thread can be running at any given time. The global interpreter lock - GIL - carefully controls the execution of threads. The GIL guarantees each thread exclusive access to interpreter variables (and the corresponding C extension calls work correctly).
+
+The principle of operation is simple. Threads hold the GIL while they are executing. However, they release it when it locks for I/O operations. Each time a thread is forced to wait, other threads that are ready to run take their chance to run.
+
+When a thread starts running, it performs a GIL capture. After some time, the process scheduler decides that the current thread has done enough work and passes control to the next thread. Thread #2 sees that the GIL is captured, so it doesn't continue, but puts itself to sleep, yielding the processor to thread #1.
+
+But a thread cannot hold the GIL indefinitely. Prior to Python 3.3, the GIL switched every 100 machine code instructions. In later versions, the GIL can only be held by a thread for a maximum of 5ms. The GIL is also freed if the thread makes a system call, disk or network access.
+
+The problem is that due to the GIL, not all tasks can be solved in threads. On the contrary, their use most often reduces the performance of the program (for CPU-bound tasks). Using threads, you need to monitor access to shared resources: dictionaries, files, database connections.
+
+- The GIL makes it easy to integrate non-thread safe C libraries. Thanks to the GIL, we have so many fast modules and bindings for just about everything.
+- C libraries have access to the GIL control mechanism. So for example NumPy releases it on long operations.
+
+Essentially, the GIL in python renders useless the idea of using threads for parallelism in computational tasks. They will run consistently even on a multiprocessor system. On CPU Bound tasks, the program will not speed up, but only slow down, since now the threads will have to divide the processor time in half. At the same time, the I / O operation of the GIL will not slow down, since the thread releases the GIL before the system call.
+
+### Have you worked with asyncio. What is its feature
+
+Asynchronous programming in Python is a way of organizing parallel computing, in which one thread can perform several tasks at the same time without blocking. Unlike synchronous programming, where tasks are performed sequentially using blocking I/O operations, asynchronous programming allows you to efficiently use I/O wait time while executing other tasks.
+
+The main idea behind asynchronous programming in Python is the use of the event model. In this model, code is organized into event handlers that are called when certain events occur, such as the completion of an I/O operation or the arrival of a message.
+
+To implement asynchronous programming in Python, the asyncio mechanism, which appeared in Python 3.4, is used. It provides asynchronous versions of the standard I/O functions and allows you to organize event handlers using coroutines (`async/await`) that run within the event loop (event loop).
+
+The main advantages of asynchronous programming in Python are:
+
+- Efficient use of I/O wait time.
+- Ability to handle a large number of connections at the same time.
+- Reducing resource consumption by not creating a large number of threads.
+- Reducing the overhead of thread context switching.
+
+Flaws:
+
+- The complexity of debugging and writing code in an asynchronous paradigm can be higher than in a synchronous one.
+- Due to the asynchronous nature, some standard functions and libraries may not work correctly.
+
+Let's imagine that we are writing an HTTP or WebSocket server that handles each connection in a separate thread.
+
+Here, you can create 100, maybe even 500 threads to handle the required number of concurrent connections. For short requests, this will even work and allow you to handle a load of 5000 RPS on the cheapest DO instance for five bucks - not bad at all. If you have less, you may not need any AsyncIO/Tornado/Twisted here.
+
+But what if their number tends to infinity? Say, this is a big chat with lots of channels, where the number of concurrent participants is unlimited. In this situation, I would not risk creating so many threads to satisfy each user. And here's why:
+
+As mentioned above, while the GIL is held by one thread, the others will not work. The operating system scheduler doesn't know anything about GIL and will still give the processor to the threads that are blocked. Such a thread will, of course, see that the GIL is held and immediately fall asleep, but valuable time will be spent switching the processor context.
+
+Context switching is generally an expensive operation for the processor, requiring the resetting of registers, cache, and memory page mapping table. The more threads are running, the more the processor performs idle switches to the threads blocked by GIL before reaching the one that holds this GIL. Not very efficient.
+
+There are good old coroutines - what AsyncIO and Tornado now offer. They are also called coroutines or just user-level threads. A trendy thing now, but far from new, was used in the days when multitasking-unsupported OS was popular.
+
+Unlike threads, coroutines only perform useful work, and switching between them occurs only at the moment when the coroutine is waiting for the completion of some external operation.
+
+As with threads, async programming is useless for computations. The situation is even worse here because a thread stuck in calculations will eventually release the GIL, but blocking code in a coroutine will block the entire thread until it executes entirely. Unlike native threads, coroutines do not have a timer interrupt. Control transfer to the next coroutine occurs manually when the await (or yield, if generator-based coroutines are used) construction is explicitly called. Therefore, it is essential to ensure that there is no blocking code in async programs and only async calls are used, and all calculations occur in separate processes.
+
+Threads will be easier if you have a typical web application that does not depend on external services and has a relatively finite number of clients for whom response time will be predictably short.
+
+AsyncIO is suitable if the application spends most of its time reading / writing data, and not processing it. For example, you have a lot of slow requests - web sockets, long polling, or slow external synchronous backends, requests to which you don’t know when to complete.
+
+### What is async/await, what are they for and how to use them
+
+The `async` keyword comes before `def` to indicate that the method is asynchronous. The `await` keyword indicates that you are waiting for the coroutine to complete.
+
+```python
+import asyncio
+import aiohttp
+
+urls = ['http://www.google.com', 'http://www.yandex.ru', 'http://www.python.org']
+
+async def call_url(url):
+     print('Starting {}'.format(url))
+     response = await aiohttp.get(url)
+     data = await response.text()
+     print('{}: {} bytes: {}'.format(url, len(data), data))
+     return data
+
+futures = [call_url(url) for url in urls]
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(asyncio.wait(futures))
+```
+
+The program consists of an async method. During execution, it returns a coroutine, which is then pending.
+
+`async/await` is needed in order not to block the execution thread while waiting for some asynchronous event. The `async/await` construct essentially turns the procedure into a coroutine (coroutine): it stops its execution for the `await` time, waits for an asynchronous event, and resumes work.
+
+In the non-async version, the wait turns out to be blocking, or you need to manually do tricks: start the operation and subscribe to its end. Async makes code simpler and more linear.
+
+### How python implements multithreading. What modules
+
+In Python, `multithreading` can be implemented using the `threading` module or the `multiprocessing` module.
+
+The `threading` module allows you to create threads within a single process. These are native `Posix` threads. Such threads are executed by the operating system, not by the virtual machine. To create a thread, you need to define a class that inherits from the threading.Thread class and override the `run()` method, which will contain the code that will be executed in the thread. The class is then instantiated and the `start()` method is called, which starts the thread.
+
+Sample code for creating a thread using the threading module:
+
+```python
+import threading
+
+class MyThread(threading.Thread):
+    def run(self):
+        # Code running on the thread
+        print("Hello from thread")
+
+# Create a thread
+thread = MyThread()
+
+# Start a thread
+thread.start()
+
+# Wait for the thread to finish
+thread.join()
+```
+
+The `multiprocessing` module allows you to create processes in Python. To create a process, you need to define a function that will be executed in the process, and create an instance of the `multiprocessing.Process` class with this function as an argument. The `start()` method is then called, which starts the process.
+
+Sample code for creating a process using the `multiprocessing` module:
+
+```python
+import multiprocessing
+
+def worker():
+    # Code running on the process
+    print("Hello from process")
+
+# Create a process
+process = multiprocessing.Process(target=worker)
+
+# Start a process
+process.start()
+
+# Wait for the process to finish
+process.join()
+```
+
+Both modules allow you to create multiple threads/processes and execute them in parallel. At the same time, it is necessary to monitor the synchronization of access to shared resources, since changing them from different threads/processes can lead to errors and unexpected results. To solve this problem, you can use mutexes, locks, and other synchronization facilities that are provided by the threading and multiprocessing modules.
+
+### What is the difference between threading and multiprocessing
+
+Threads and multiprocessing are two approaches to achieve concurrency in a program. While they share some similarities, they have fundamental differences in how they work and what kind of problems they are best suited to solve.
+
+Threads are lightweight units of execution within a single process. Each thread shares the same memory space as the other threads in the same process, which allows them to share data and communicate with each other very easily. Threads are managed by the operating system's scheduler, which assigns a certain amount of CPU time to each thread, allowing them to run concurrently.
+
+One of the key advantages of threads is that they are fast and efficient, since they do not require the overhead of creating a new process. They are also very useful for tasks that involve a lot of I/O, such as network or disk operations, since threads can be blocked while waiting for I/O to complete, allowing other threads to run in the meantime.
+
+However, threads are not well-suited to problems that involve heavy CPU usage, since they are limited by the number of available CPU cores. This means that if a program with many threads is run on a machine with only a few cores, the threads will have to take turns using the CPU, resulting in slower overall performance.
+
+Multiprocessing, on the other hand, is the use of multiple processes to achieve concurrency. Each process has its own memory space and runs independently of the other processes, communicating with them through various inter-process communication mechanisms (e.g. pipes, sockets, shared memory). Since each process has its own memory space, they are not subject to the same data sharing issues as threads, making it easier to write correct and safe concurrent programs.
+
+Multiprocessing is well-suited to problems that involve heavy CPU usage, since each process can be assigned to a separate CPU core, allowing them to run truly concurrently. However, creating a new process incurs a significant overhead, both in terms of memory usage and startup time. This makes multiprocessing less efficient for tasks that involve a lot of I/O or small computations, where the overhead of creating new processes may outweigh the benefits of true concurrency.
+
+In summary, threads are best suited for tasks that involve a lot of I/O and benefit from lightweight concurrency, while multiprocessing is best suited for tasks that involve heavy CPU usage and benefit from true concurrency.
+
+### Which tasks are well parallelized, which ones are bad
+
+Tasks that generate long IO are well parallelized. When a thread hits a socket or disk wait, the interpreter abandons that thread and starts the next one. This means there will be no downtime due to waiting. On the contrary, if you go to the network in one thread (in a cycle), then each time you have to wait for a response.
+
+However, if the thread then processes the received data, then only it will be executed. This will not only not give an increase in speed, but also slow down the program due to switching to other threads.
+
+The short answer is that networking tasks fit well with threads. For example, download a hundred urls. Process the received data outside of threads.
+
+### You need to calculate 100 equations. Do it in threads or not
+
+- No, because there is no I/O in this task. The interpreter will only spend extra time switching threads. It is better to move complex mathematical problems into separate processes, or use the Celery framework for distributed tasks, or connect them as C-libraries.
+
+- Other answer:
+  If these equations are independent of each other and run independently, then it makes sense to use multithreading to calculate them. In this case, each equation can be calculated in a separate thread, which will speed up the overall calculation time.
+  However, if these equations have any dependencies or require shared resources (for example, access to the same file), then using multithreading can lead to errors and inefficiencies. In this case, it is better to perform calculations sequentially in the main thread.
+  In addition, it is worth considering the characteristics of the computer on which the calculations are performed. If your computer has multiple processors or cores, then multithreading may be more efficient. If the processor is single-threaded, then the use of multithreading may not give a significant increase in the speed of program execution.
+
+### Threads in Python are native threads or not
+
+Yes, in Python, threads are native, they are implemented in the standard library of the language. Specifically, the threading module provides classes and functions for working with threads in Python.
+
+Threads in Python are implemented using the pthread_create (POSIX Threads) system call, which creates a new thread of execution within a process. Thus, threads in Python are fully integrated into the operating system and use its task scheduling mechanisms.
+
+However, it's worth noting that Python also provides alternative approaches to parallel code execution, such as the multiprocessing module, which uses processes instead of threads. Depending on the specific task and its characteristics, the use of threads or processes may be more efficient or convenient.
+
+### What are greenlets. General concept. Implementation examples
+
+Greenlets are a lightweight concurrency library for Python that allows for cooperative multitasking of microthreads within a single thread of execution. A greenlet is a small independent execution context that can be switched between other greenlets in a cooperative manner.
+
+Greenlets are useful in situations where the overhead of creating and managing multiple threads is too high, but you still need to perform concurrent operations in your code. Greenlets can be used to perform I/O-bound tasks, such as network requests, without blocking the main thread of execution.
+
+One popular implementation of greenlets in Python is the gevent library, which provides a high-level interface for working with greenlets and includes support for network and I/O operations. Another implementation is the greenlet library, which provides a lower-level interface for creating and managing greenlets.
+
+Greenlet == Green thread == Green threads == lightweight threads inside a virtual machine. They can be called coroutines, coprocesses, actors, etc. platform dependent. The operating system does not see them. From the point of view of the OS, one process of the virtual machine is running, and what is inside it is unknown. Such threads are managed by the virtual machine itself: it generates, executes, and coordinates access to resources.
+
+Examples: coroutines in Go and Lua, lightweight processes in Erlang, the greenlet module for Python. The gevent module uses greenlets
+
+Here's an example of how you might use greenlets in Python:
+
+```python
+import gevent
+
+def worker(name):
+    for i in range(5):
+        print(f"{name} working on task {i}")
+        gevent.sleep(1)
+
+gevent.joinall([
+    gevent.spawn(worker, "Worker 1"),
+    gevent.spawn(worker, "Worker 2")
+])
+```
+
+In this example, we define a `worker` function that simulates doing some work by printing a message every second. We then use the `gevent.spawn` function to create two greenlets that will execute the `worker` function. Finally, we use `gevent.joinall` to wait for both greenlets to complete. The output of this program might look something like this:
+
+```python
+Worker 1 working on task 0
+Worker 2 working on task 0
+Worker 1 working on task 1
+Worker 2 working on task 1
+Worker 1 working on task 2
+Worker 2 working on task 2
+Worker 1 working on task 3
+Worker 2 working on task 3
+Worker 1 working on task 4
+Worker 2 working on task 4
+```
