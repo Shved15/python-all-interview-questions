@@ -2676,3 +2676,290 @@ Foo().hello()
 # With reflection
 getattr(globals()['Foo'](), 'hello')()
 ```
+
+# Django
+
+## What is Middleware, why, how it is implemented
+
+Middleware in Django is a component that can process HTTP requests and responses in an intermediate way. It allows you to modify the requests that are sent to your Django application, as well as the responses that are returned to the client. Middleware can perform various tasks such as authentication, caching, logging, changing request and response headers, and more.
+
+Middleware in Django works like a chain. Each middleware receives the request and can modify it, pass it to the next middleware, or pass it to the view handler. Then, each middleware can modify the response returned by the view, pass it to the previous middleware, or send it to the client.
+
+Django comes with a lot of built-in middleware that can be used for a variety of tasks. It is also possible to create your own middleware to solve specific problems.
+
+At the language level, this is an object with methods `process_request` and `process_response`. Methods must return the received object (request or response) for further processing, or throw an exception if something is wrong. In this case, further processing stops.
+
+To enable Middleware, just add the path to it to the `MIDDLEWARE` list.
+
+## Name the main middleware. What are they needed for
+
+Basic middleware in Django:
+
+1. `Authentication Middleware`: Checks if the user is authenticated. If not, it redirects it to the login page.
+2. `CSRF Middleware`: Protects against cross-site request forgery (CSRF) attacks.
+3. `Common Middleware`: Handles various HTTP requests, including handling static files, handling 404 and 500 errors, and setting security headers.
+4. `Session Middleware`: Handles user sessions.
+5. `Message Middleware`: Handles the messages to be passed to the user on the next request.
+
+## Describe how the CSRF middleware works
+
+For each request, the system generates a unique token and sets it in cookies. Each form has a hidden `csrf-token` field with the same token. When submitting a form using the `POST` method, Django checks that the form field and the value in the cookie match. If not, it means that the request is forged or sent from another domain.
+
+To free some view from checking (if it is an API, for example), it is enough to wrap it with the `csrf_except` decorator.
+
+The CSRF middleware and template tag provide easy-to-use protection against Cross-Site Request Forgery. This type of attack occurs when a malicious Web site contains a link, a form button, or some javascript that is designed to perform some action on your Web site using the credentials of an authorized user who visited the malicious site in their browser. It also includes a related type of attack, `login CSRF`, where the attacked site tricks the user's browser into logging into the site with someone else's credentials.
+
+The first defense against CSRF attacks is to ensure that GET requests (and other 'safe' methods defined in 9.1.1 Safe Methods, HTTP 1.1, [RFC 2616#section-9.1.1](https://tools.ietf.org/html/rfc2616.html#section-9.1.1)) are free from side effects. Requests via 'unsafe' methods such as `POST`, `PUT` and `DELETE` can be secured using the steps below.
+
+_How it works:_
+
+CSRF is based on the following things:
+
+1. A CSRF cookie that is set as a random number (Session Independent Random Word, as it's sometimes called) that other sites won't have access to. This cookie is set using `CsrfViewMiddleware`. It should be permanent, but since there is no way to set cookies that never expire, it is sent with every response that called django.middleware.csrf.get_token() (the function used internally to get the CSRF token).
+
+2. All POST forms contain a hidden `csrfmiddlewaretoken` field. The field value is equal to the CSRF cookie. This part is done by the template tag.
+
+3. All HTTP requests that are not `GET`, `HEAD`, `OPTIONS` or `TRACE` must contain a CSRF cookie and a 'csrfmiddlewaretoken' field with the correct value. Otherwise, the user will receive a 403 error. This check is done in `CsrfViewMiddleware`.
+
+4. In addition, for HTTPS requests, the “referer” (request source) is checked in CsrfViewMiddleware. This is necessary to prevent a MITM attack (Man-In-The-Middle), which is possible when using HTTPS and a token not tied to the session, because clients accept (unfortunately) the 'Set-Cookie' HTTP header, even though communication with the server is via HTTPS. (This check is not performed for HTTP requests because the "Referer" header is easily spoofed when using HTTP.) If the CSRF_COOKIE_DOMAIN setting is specified, the "referer" value will be compared against this value. The value supports sub-domains. For example, CSRF_COOKIE_DOMAIN = '.example.com' will allow POST requests from www.example.com and api.example.com. If the setting is not specified, "referer" must be equal to the Host HTTP header. To expand the list of available domains beyond the current host and cookie domain, use CSRF_TRUSTED_ORIGINS.
+
+This approach ensures that only forms submitted from trusted domains can submit POST data.
+
+GETs are deliberately ignored (and all other requests that are considered “safe” according to RFC 2616). These requests should never perform any potentially harmful actions, and CSRF attacks via a GET request should be harmless. RFC 2616 defines `POST`, `PUT` and `DELETE` as "unsafe".
+
+## What are signals? Why are they needed? What are the main
+
+Signals in Django are a way for certain senders to notify a set of receivers that some action has taken place. This can be useful for decoupling applications, allowing them to interact without necessarily having any direct dependencies.
+
+Signals are essentially a kind of event framework, where senders emit signals when something happens, and receivers handle those signals by executing some code in response.
+
+Some of the main built-in signals in Django include:
+
+- `pre_save` and `post_save`: These signals are sent before and after an object is saved to the database, respectively.
+- `pre_delete` and `post_delete`: These signals are sent before and after an object is deleted from the database, respectively.
+- `m2m_changed`: This signal is sent when a ManyToManyField on a model is changed.
+- `request_started` and request_finished: These signals are sent at the beginning and end of each HTTP request, respectively.
+  Signals are useful because they provide a way to decouple the code that sends a signal from the code that handles the signal. This can make it easier to write reusable code, since you can write a signal handler that can be used by multiple senders without those senders having to know about each other.
+
+In addition to the built-in signals, you can also create your own custom signals to use in your applications.
+
+Signals propagate synchronously. This means that by subscribing a hundred handlers to one signal, we will increase the time required to return a response.
+
+The main signals are the beginning of the request and its end, before saving the model and after, accessing the database.
+
+**Important:** model signals work individually, that is, for one model. Batch processing such as `queryset.all().delete()` or `queryset.all().update({'foo'=42})` will not fire delete or update events.
+
+## How m2m communication is implemented at the database level
+
+In Django, many-to-many (m2m) relationships are implemented using an intermediary table. This table is created automatically when you define a many-to-many field in your models. The table stores the relationships between the two tables as a pair of foreign keys.
+
+For example, let's say you have two models, Author and Book, and you want to create a many-to-many relationship between them. You can define the relationship in the following way:
+
+```python
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    books = models.ManyToManyField('Book')
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+```
+
+Django will create a third table to store the relationship between `Author` and `Book`. This table will have two foreign keys, one for `Author` and one for `Book`. The names of the foreign keys are generated automatically by Django.
+
+When you add an `Author` instance to a `Book` instance's `authors` attribute, Django creates a new row in the intermediary table with the foreign keys pointing to the `Author` and `Book` instances.
+
+When you query the `books` attribute of an `Author` instance, Django will automatically perform a `JOIN` operation between the `Author`, intermediary, and `Book` tables to retrieve the related `Book` instances.
+
+In summary, m2m communication in Django is implemented using an intermediary table with foreign keys pointing to the two tables involved in the relationship.
+
+## Is it better to submit a form - GET or POST
+
+It depends on the specific use case and what you want to achieve. In general, you should use GET requests when you want to retrieve data from the server, and use POST requests when you want to submit data to the server for processing.
+
+In Django, GET requests are typically used for retrieving data, such as displaying a list of items, filtering data based on user input, or performing a search. POST requests are typically used for creating or updating data, such as submitting a form or uploading a file.
+
+However, it's important to note that using GET requests to submit sensitive data, such as passwords or personal information, is not recommended. This is because GET requests can be cached by the browser or logged by intermediaries, potentially exposing the sensitive data.
+
+In summary, the choice of whether to use GET or POST requests in Django depends on the specific use case and the type of data being transmitted. It's important to carefully consider the potential security and performance implications of each option.
+
+The form can be submitted both ways. In the first case, the variables are attached to the query string after the question mark. In the second, they are transmitted in the request body.
+
+The technical limitation of the GET method is that they cannot transfer a file, unlike POST.
+
+It is desirable to submit the form using the POST method for the following reasons:
+
+- GET requests can be cached, especially in IE family browsers
+- GET requests end up in provider, server, browser history logs. The password and login in this case can light up in many places.
+- some viruses monitor the contents of the address bar and send them to third parties.
+
+## How Serializer works in Django REST Framework
+
+In Django REST Framework (DRF), `Serializer` is a key component for handling data serialization and deserialization. It provides a way to convert complex data types, such as querysets and model instances, to Python native data types that can be easily rendered into JSON, XML, or other content types.
+
+When a request is made to a DRF view, the framework automatically checks the request method (e.g., `GET`, `POST`, `PUT`, `DELETE`) to determine whether to serialize or deserialize data. If the request method is GET, the framework will serialize the data to send it to the client. If the request method is POST or PUT, the framework will deserialize the data received from the client into a Python object.
+
+To use the Serializer in DRF, you need to create a new serializer class that inherits from `serializers.Serializer` or `serializers.ModelSerializer`. You can define the fields that you want to serialize or deserialize using `SerializerMethodField`, `CharField`, `IntegerField`, `BooleanField`, and other similar fields. You can also define custom validation and data manipulation methods using the `validate()` and `to_representation()` methods.
+
+In addition, the Serializer class provides many built-in validation methods and fields that allow you to validate the incoming data against specific criteria. This ensures that the data is consistent with the model structure and other predefined business rules.
+
+Overall, Serializer in Django REST Framework is a powerful tool for handling data serialization and deserialization. It allows you to quickly and easily convert complex data types to native Python data types that can be easily rendered into JSON, XML, or other content types.
+
+Serializer converts information stored in the database and defined using Django models into a format that is easily and efficiently passed through the API.
+
+Django models intuitively represent the data stored in the database, but the API should convey the information in a less complex structure. Although the data will be represented as instances of the Model classes, it must be converted to JSON format in order to be passed through the API.
+
+The DRF serializer does this conversion. When the user submits information (such as creating a new instance) via the API, the serializer takes the data, validates it, and converts it into something that Django can fold into a model instance. Similarly, when the user accesses information via the API, the corresponding instances are passed to the serializer, which converts them into a format that can be easily passed to the user as JSON.
+
+The most common form a DRF serializer takes is one that is bound directly to a Django model:
+
+```python
+class ThingSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Thing
+    fields = (‘name’, )
+```
+
+The fields settings allow you to specify exactly which fields are available to this serializer. Alternatively, exclude can be set instead of fields, which will include all fields in the model except those specified in exclude.
+
+Serializers are an incredibly flexible and powerful component of DRF. Although connecting a serializer to a model is the most common, serializers can be used to create any Python data structure via an API, according to certain parameters.
+
+## What is Meta in Django classes and what is it for
+
+In Django, `Meta` is a class that is defined inside the model or form class to provide metadata about the class itself. It allows you to specify various options and settings that are not directly related to the model or form fields, but rather to the model or form as a whole.
+
+Some common use cases for `Meta` include:
+
+- Specifying the database table name for the model class
+- Defining model permissions and ordering
+- Configuring the default ordering of querysets returned by the model
+- Defining unique constraints and indexes for the model
+- Setting up custom validation rules and error messages for the form
+
+`Meta` options can be defined as class variables within the `Meta` class. Here's an example of how it can be used in a Django model:
+
+```python
+class MyModel(models.Model):
+    name = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'My Models'
+```
+
+In this example, the `Meta` class is used to specify the default ordering for querysets returned by the `MyModel` class, as well as to set a custom plural name for the model. The `ordering` option specifies that querysets should be ordered by the `created_at` field in descending order. The `verbose_name_plural` option sets the plural name for the model to "My Models" instead of the default "My Models".
+
+Django does a lot of its work through metaclasses.
+
+In short, metaclasses are classes that construct other classes. They are declared through the class attribute `__metaclass__` (in jung, through the compatibility layer with python 3 through the six module up to version 2).
+
+So when Django constructs your class, it does so with its metaclass. In order for her to know some parameters of your class when constructing, well, for example, a model or fields in your case, she looks for a class called Meta in your class.
+
+In general, all this magic with metaclasses is very important in jang and therefore it is better not to redefine the very logic of the formation of a class.
+
+## What Meta is responsible for in the serializer
+
+In Django REST Framework, the `Meta` class inside a serializer is used to provide additional metadata about the serializer.
+
+The `Meta` class can be used to define:
+
+- The model that the serializer is based on
+- The fields that should be included or excluded from the serialized output
+- The ordering of the fields in the serialized output
+- Custom validation or processing of the serialized data
+
+Here's an example of using Meta in a serializer:
+
+```python
+from rest_framework import serializers
+from myapp.models import MyModel
+
+class MySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyModel
+        fields = ['id', 'name', 'email']
+```
+
+In the above example, the `Meta` class is used to define that the `MySerializer` serializer should be based on the
+`MyModel` model. It also specifies that the `id`, `name`, and `email` fields should be included in the serialized output.
+
+## What is the difference between django and flask
+
+Django and Flask are two of the most popular frameworks for developing web applications in Python. Here are some of the main differences between them:
+
+1. Architecture: Django is a complete MVC framework where M is the model, V is the view, and C is the controller, which in Django is called a URL router. Flask, on the other hand, does not impose hard restrictions on the architecture, allowing the developer to define the structure of the application himself.
+
+2. Size and Complexity: Django is a large-sized framework that includes many built-in features and tools for a variety of tasks such as authentication, URL routing, database manipulation, and more. Flask, on the other hand, is a lightweight framework that provides only the bare essentials and everything else can be implemented using third-party packages.
+
+3. Databases: Django comes with an ORM (Object-Relational Mapping) that makes it easy to work with databases and allows you to work with them through an object-oriented interface. Flask does not have its own ORM and can work with any database package of the developer's choice.
+
+4. Administrative interface: Django comes with a built-in administrative interface that allows administrators to manage the data stored in the database, such as adding, deleting, or modifying entries in the database. Flask does not have such a built-in administrative interface.
+
+5. RESTful API: Django has built-in support for creating RESTful APIs through the Django REST framework. Flask also allows you to create RESTful APIs using third party libraries such as Flask-RESTful.
+
+6. Speed and Performance: Flask is faster and more lightweight than Django because Flask doesn't have built-in components that can slow down performance.
+
+The choice between Django and Flask depends on what task needs to be solved and what are the requirements for the application.
+
+You need to take your own tool for each task, Django is well suited for news sites, blogs, etc., due to the fact that it already has a lot out of the box (including the admin panel), and it was created specifically for this type of site. Flask, on the other hand, out of the box, has almost nothing and is better suited for any microservices or applications for which the technology stack that comes with Django is not suitable.
+
+## How Django's authentication system works
+
+Django's authentication system provides a secure way to manage user authentication in web applications. Here is a brief overview of how it works:
+
+1. User authentication begins when the user enters their login credentials (e.g. username and password) into a login form.
+2. When the login form is submitted, Django's authentication system verifies the user's credentials by checking them against the user model in the database.
+3. If the user's credentials are valid, Django creates a session for the user and stores the session key in a cookie on the user's browser.
+4. On subsequent requests, the user's browser sends the session cookie to the server, allowing Django to identify the user and retrieve their session data (e.g. user ID).
+5. Django's authentication system provides a variety of built-in views and utilities for handling common authentication tasks, such as logging in, logging out, and resetting passwords.
+   A6. dditionally, Django allows developers to customize the authentication system by creating their own authentication backends, which can provide custom authentication methods (e.g. social login, two-factor authentication) or integrate with external authentication systems (e.g. OAuth, LDAP).
+
+Overall, Django's authentication system provides a convenient and secure way to manage user authentication in web applications, with many built-in features and options for customization.
+
+Django comes with a user authentication system. It provides user accounts, groups, permissions and sessions based on cookies.
+
+The Django authentication system is responsible for both aspects: authentication and authorization. In short, authentication verifies the user, while authorization determines what the authenticated user can do. In what follows, the term “authentication” will be used to refer to both aspects ([User authentication in Django](https://docs.djangoproject.com/en/2.2/topics/auth/)).
+
+The authentication system consists of:
+
+- Users
+- Permissions: Binary (yes/no) flags that determine whether the user has the right to perform certain actions.
+- Groups: A general way to assign labels and rights to multiple users.
+- Customizable password hashing system
+- Tools for forms and views to authenticate users or restrict access to content
+- Plugin systems
+
+The Django authentication system tries to be very simple and does not provide some of the features common in other web authentication systems. Such features are implemented in third-party packages:
+
+- Password complexity check
+- Limit login attempts
+- Authentication through third-party services (OAuth, for example)
+
+## What are views and viewsets in django? what are their features and differences
+
+In Django, views are Python functions or classes that define how web pages or other content should be displayed to the user. Views are responsible for processing incoming requests, handling any errors, and returning an HTTP response.
+
+Django REST framework introduces ViewSets, which are classes that provide CRUD (Create, Read, Update, Delete) operations for APIs. ViewSets are similar to views in that they define how data should be displayed or handled, but they have several key differences:
+
+1. Functionality: ViewSets provide additional functionality beyond basic views, such as the ability to handle multiple HTTP methods on the same endpoint (e.g. GET and POST).
+2. Routing: ViewSets are used in conjunction with routers, which automatically generate URLs and link them to appropriate ViewSet methods.
+3. Code organization: ViewSets are organized by resource, making it easier to manage related code in a single place.
+4. Default methods: ViewSets provide default implementations for standard API actions, such as list(), retrieve(), create(), update(), and destroy().
+
+Overall, ViewSets provide a more structured and flexible approach to building APIs than traditional views. However, they may be more complex to work with and require additional configuration. The choice between using a View or a ViewSet largely depends on the specific requirements of the application.
+
+## What mechanism in django is responsible for working with templates and how it is implemented
+
+In Django, the template system is responsible for working with templates. It is implemented using the Django template language, which is a simple, yet powerful, syntax for rendering dynamic content in HTML files.
+
+The Django template language allows you to define placeholders, called template tags, which are replaced with actual content when the template is rendered. These tags can be used to include variables, perform logic operations, iterate over lists, and much more.
+
+To use the template system in Django, you need to define your templates in HTML files and then create a view that renders the template with the context data. The context data is a dictionary that contains the data you want to pass to the template.
+
+Views are Python functions that define the logic for rendering a template. They take a request object as input and return an HttpResponse object that contains the rendered HTML. Views can be written in two different ways: function-based views or class-based views.
+
+Function-based views are simple Python functions that take a request object as input and return an HttpResponse object. They are easy to write and understand, but can become complex as your application grows.
+
+Class-based views are more powerful and flexible than function-based views. They allow you to reuse common functionality across different views, and provide a consistent interface for handling different HTTP methods (GET, POST, PUT, DELETE, etc.). Class-based views are defined as Python classes that inherit from one of the built-in view classes provided by Django.
+
+In addition to views, Django also provides a set of built-in viewsets that make it easy to build APIs using Django REST framework. Viewsets are classes that define the CRUD (Create, Read, Update, Delete) operations for a specific model or set of models. They provide a consistent interface for handling HTTP requests and responses, and can be customized to handle different authentication and permission requirements.
