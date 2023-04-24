@@ -1489,3 +1489,184 @@ you will get not `IntegerField`, but `int`, and the value can be obtained direct
 This is possible because `models.Model` defines `__metaclass__` which will do some magic and turn the `Person` class we just defined with a simple expression into a complex database binding.
 
 Django makes something complicated look simple by exposing a simple API and using metaclasses that recreate the code from the API and do all the work behind the scenes.
+
+## Input Output
+
+### What is a file object
+
+A file object is an object that provides a file-oriented API (methods `read()`, `write()`, etc.) for accessing a resource. Depending on how it was created, a file object can provide access to a real file on disk or another kind of storage or data transfer device (standard input/output streams, memory buffers, sockets, etc.).
+
+More:
+
+In Python, a file object represents a file on disk or another source of data, such as a network connection or memory, that can be accessed as a sequence or stream of bytes.
+
+Python uses the built-in open() function to create a file object. This function opens a disk file or other data source and returns the associated file object. The file object provides methods for reading, writing, and manipulating the position in the file.
+
+A file object can be opened in different modes: for reading, writing, or appending data. It can also be binary or text, depending on the type of data that is stored in the file.
+
+Usage example:
+
+```python
+# Open file for reading
+file = open("example.txt", "r")
+
+# Read the contents of a file
+content = file.read()
+
+# Closing the file
+file.close()
+```
+
+This creates a file object that opens example.txt for reading. The read() method is used to read the contents of the file, and then the file is closed using the close() method.
+
+### What are the types of file objects
+
+At the level of data types in Python 2, there is no difference between text and binary files. When opening, you can specify text or binary mode, but this is a random match only with the output of lines when executed under Windows, and under Unix systems, where line prediction is not required, it is not calculated for anything.
+
+In Python 3, there are several types of file objects, depending on the source of the data:
+
+- Text file objects: These represent files that contain human-readable text. They can be opened for reading, writing, or appending using the open() function with the appropriate mode ("r", "w", or "a"). Text file objects support methods like read(), readline(), write(), and writelines().
+
+- Binary file objects: These represent files that contain non-textual data, such as images, audio, or video. They can be opened in binary mode ("rb", "wb", or "ab") using the open() function. Binary file objects support methods like read(), readline(), write(), and writelines(), but the data they read or write is represented as bytes rather than characters.
+
+- Buffered file objects: These are file objects that have an internal buffer, which allows them to read or write data more efficiently. They can be created using the io module's BufferedReader and BufferedWriter classes, which wrap around a file object and provide buffering functionality.
+
+- Raw file objects: These represent low-level file objects that provide access to the underlying operating system's file system. They can be created using the os module's open() function with the os.O_RDONLY, os.O_WRONLY, or os.O_RDWR flags. Raw file objects support methods like read(), write(), and seek(), but they do not perform any buffering or text encoding/decoding.
+
+Different kinds of streams are represented by the corresponding classes of the io module.
+
+The io module has been backported to the latest versions of Python 2, so Python 2 can also use an I/O system similar to Python 3 if desired.
+
+### What is the difference between text and binary files
+
+The main difference between text and binary files in Python is the way the data is stored and processed.
+
+Text files are stored as a sequence of characters encoded in a specific format (such as ASCII or UTF-8). When a text file is read, the data is automatically decoded into Unicode strings, which can be processed and manipulated using Python's string methods.
+
+Binary files, on the other hand, can contain any type of data, including non-textual data like images, audio, or video. When a binary file is read, the data is returned as a sequence of bytes, which can be processed using Python's bytes and bytearray types.
+
+Another difference is the way that the data is written to the file. Text files are written one character at a time, while binary files are written one byte at a time. This means that binary files are generally more efficient for storing large amounts of non-textual data, while text files are better suited for storing human-readable text.
+
+It's also important to note that different platforms may use different newline characters in text files (for example, Windows uses "\r\n" while Unix/Linux uses "\n"). Python's built-in file objects automatically handle these platform-specific differences when reading and writing text files.
+
+### How to use the open function
+
+Function signature in Python 2: `open(file, mode='r', buffering=-1)`.
+
+Function signature in Python 3 (and in Python 2 when using the io.open function):
+`open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`.
+
+Main parameters:
+
+- file – file name or file descriptor;
+- mode – file opening mode;
+- encoding - file encoding;
+- buffering - whether to use buffering: a negative number (by default, you do not need to specify explicitly) - the standard value for this type of file object, 0 - disable buffering, 1 - line buffering (for text files), another value - enable buffering and set the appropriate buffer size.
+
+Only the first one is required. Most often, the `open()` function is used with two parameters.
+
+mode can start with characters "r" (read), "w" (write, clear file if already exists), "x" (exceptional creation, fail if file already exists), "a" (append, write to end file).
+Also, the mode parameter can have a second letter to define the file type: "t" for text (default) and "b" for binary.
+You can also add a "+" symbol to open in read and write mode at the same time. The order of the last two characters does not matter: "rb+" and "r+b" specify the same mode.
+
+### Why you need to close files
+
+When finished working with a file, be sure to close it using the `close()` method, especially if it was opened for writing. When using buffered output, the data that is written to the file does not go to it immediately, but is written to the buffer.
+The contents of the buffer are written to the file when it is full or when the `flush()` or `close()` methods are called. Also, if a file is open for writing, it will be blocked from being opened for writing by other processes until it is closed. All open files are automatically closed when the corresponding file objects are removed from memory by the Python interpreter's garbage collector and when the interpreter itself exits, but files should be kept open for the minimum amount of time required.
+
+### What methods do tell and seek
+
+The `tell()` method returns the current read/write probability of the file. Method `search(offset, from)` to create it. The offset parameter specifies the indent, and from where is the point from which this indent counts: `io.SEEK_SET(0)` is the beginning of the file, `io.SEEK_CUR(1)` is the current position, `io.SEEK_END(2)` is the end file.
+
+More:
+
+In Python, the tell() and seek() methods are used to read and manipulate the current position of a file object's cursor.
+
+The tell() method returns the current position of the cursor in the file, as an integer representing the number of bytes from the beginning of the file. This method can be useful for keeping track of your position within a file while reading or writing data.
+
+The seek() method is used to move the cursor to a specific position within the file. It takes two arguments: the first is the offset from the reference point (which can be the beginning of the file, the current position of the cursor, or the end of the file), and the second is an optional parameter that specifies the reference point. The offset argument can be a positive or negative integer, and the whence argument can be one of the following constants defined in the io module:
+
+0 (default): the offset is relative to the beginning of the file
+1: the offset is relative to the current position of the cursor
+2: the offset is relative to the end of the file
+For example, to move the cursor to the beginning of a file, you could use file.seek(0). To move the cursor to the end of a file, you could use file.seek(0, 2).
+
+Together, the tell() and seek() methods allow you to read and manipulate the contents of a file in a flexible and efficient manner.
+
+### What StringIO and BytesIO do
+
+The `io.StringIO` and `io.BytesIO` classes are streams for reading from and writing to strings or byte strings in memory. They can be used to use strings and byte strings as text and binary files.
+
+More:
+
+`StringIO` and `BytesIO` are both classes in the Python io module that provide in-memory file-like objects that can be used for reading and writing data as if it were a file on disk.
+
+`StringIO` is used for working with string data. It creates a file-like object that behaves like a regular text file, allowing you to write strings to it, read strings from it, and move the cursor around using the `tell()` and `seek()` methods.
+
+For example, the following code creates a `StringIO` object, writes a string to it, moves the cursor to the beginning of the file, and then reads the contents of the file:
+
+```python
+from io import StringIO
+
+buffer = StringIO()
+buffer.write("Hello, world!")
+buffer.seek(0)
+print(buffer.read())  # prints "Hello, world!"
+```
+
+`BytesIO`, on the other hand, is used for working with binary data. It creates a file-like object that behaves like a regular binary file, allowing you to write bytes to it, read bytes from it, and move the cursor around using the `tell()` and `seek()` methods.
+
+For example, the following code creates a `BytesIO` object, writes some binary data to it, moves the cursor to the beginning of the file, and then reads the contents of the file:
+
+```python
+from io import BytesIO
+
+buffer = BytesIO()
+buffer.write(b"\x48\x65\x6c\x6c\x6f\x2c\x20\x77\x6f\x72\x6c\x64\x21")
+buffer.seek(0)
+print(buffer.read())  # prints b'Hello, world!'
+```
+
+Both `StringIO` and `BytesIO` are useful when you need to work with data in memory instead of on disk. They can be particularly useful in situations where you want to avoid the overhead of creating temporary files, or where you need to manipulate data as if it were a file but you don't want to write the changes to disk.
+
+### Whether file objects are context managers
+
+Yes, file objects in Python are context managers. This means that they support the context manager protocol, which allows you to automatically control the opening and closing of files in the `with` block. For example, to read the contents of a file, you can use the following code:
+
+```python
+with open('file.txt', 'r') as f:
+    contents = f.read()
+    print(contents)
+```
+
+In this example, the file object f is automatically closed when the `with` block exits.
+
+### What is serialization
+
+Serialization is the process of converting an object into a sequence of bytes or other data structure that can be stored in a file or transmitted over a network. Serialization allows you to save and restore the state of objects in a program, which can be useful in many cases, for example, for saving data to a database, transferring data over a network, or saving intermediate results of program execution.
+
+In Python, you can use the pickle module to serialize objects. It allows you to convert Python objects to and from a byte sequence. In addition, there are many other serialization modules and formats in Python, such as JSON, XML, YAML, Protocol Buffers, and more.
+Synonymous terms for marshaling/unmarshaling.
+
+### json.dumps / json.dump , json.loads / json.load
+
+The dumps function of the json module saves the JSON representation of an object to a string. The dump function is to a text file.
+The loads function of the json module loads an object from a string. The load function is from a text file.
+
+### What to do if you need to serialize data that is not supported by the standard json module
+
+You can use pickle or extend the JSONEncoder and JSONDecoder classes.
+
+### pickle.dumps / pickle.dump, pickle.loads / pickle.load
+
+The dump, dumps, load, and loads functions of the pickle module are similar in purpose to the corresponding functions of the JSON module, but operate on byte strings and binary files.
+
+The optional protocol parameter of these functions specifies the protocol version. The latest protocol version can be obtained as the pickle.HIGHEST_PROTOCOL constant, the current default version is pickle.DEFAULT_PROTOCOL.
+
+At the time of this writing, there are five versions of the protocol:
+
+- 0 and 1 are obsolete versions used in Python 2.2 and below;
+- 2 is the major version of the protocol for Python 2;
+- 3 - version of the protocol that appeared in Python 3, the standard protocol in Python 3 at the moment, cannot be deserialized in Python 2;
+- 4 - version of the protocol, introduced in Python 3.4, supports very large memory objects, supports more types of objects, some optimizations have been added.
+- 5 is the protocol version introduced in Python 3.8. It adds out-of-band data support and in-band data acceleration. PEP 574 describes the changes in more detail.
