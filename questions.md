@@ -25,14 +25,14 @@ x = 'abc' # here the interpreter does not swear, since the typing is dynamic
 - Strict - no automatic casts to another type (implicit conversions).
 - Non-strict - the presence of those.
 
-strong typing example (Python):
+Strict typing example (Python):
 
 ```python
 a = [5, 6]
 print(",".join(a)) # here the interpreter complains because join() expects a list of strings as input
 ```
 
-loose typing example (Javascript):
+Non-strict typing example (Javascript):
 
 ```javascript
 let a = "hello";
@@ -1238,3 +1238,121 @@ For a directory to be a package, it must contain an `__init__.py` file. It is au
 ### What can you say about the import package.item construct
 
 When using the from package import item statement, item can be a package, a module, or any name declared in the package. When using the import package.item statement, item must be a module or a package.
+
+## Exceptions
+
+### What is exception handling
+
+Handling _exceptional situations_ or handling _exceptions_ (eng. exception handling) - a programming language mechanism designed to describe the reaction of a program to run-time errors and other possible problems (exceptions) that may arise during program execution and lead to impossibility (meaninglessness) ) further development by the program of its basic algorithm.
+
+Python code can throw an exception using the raise keyword. After it, the object of the exception is indicated. You can also specify the class of the exception, in which case the constructor without parameters will be automatically called. raise can only throw instances of the BaseException class and its descendants, and (in Python 2) instances of old-type classes as exceptions.
+
+### Why they can use the try finally construct without except
+
+```python
+try:
+     # some code
+finally:
+     # some code
+```
+
+If an error occurs in the try block, then the finally block will still be executed and you can do a "cleanup" inside it, for example.
+
+### How to properly handle exceptions differently
+
+Except blocks are processed from top to bottom and control is transferred to no more than one handler. Therefore, if you need to handle exceptions that are in the inheritance hierarchy differently, you must first specify handlers for less common exceptions, and then for more common ones.
+This is also why _bare except_ can only be the last one (aka SyntaxError). Moreover, if you first place handlers for more general exceptions, then less general exception handlers will simply be ignored.
+
+### What happens if the error is not handled by the except block
+
+If none of the given except blocks catches the thrown exception, then it will be caught by the nearest outer try/except block that has a corresponding handler. If the program does not catch the exception at all, then the interpreter terminates the program and prints information about the exception to the standard error stream sys.stderr.
+There are two exceptions to this rule:
+
+- If an exception occurs in an object's destructor, program execution is not terminated and an "Exception ignored" warning is printed to the standard error stream with information about the exception.
+- When an exception SystemExit occurs, only the program is terminated without displaying information about the exception on the screen (does not apply to the previous paragraph, in the destructor the behavior of this exception will be the same as the others).
+
+### What to do if you need to catch an exception, perform actions and raise the same exception again
+
+In order to perform certain actions in the exception handler, and then pass the exception further, one level of handlers higher (that is, throw the same exception again), the raise keyword is used without parameters.
+
+```python
+try:
+     10
+except ZeroDivisionError:
+   # some logic
+   raise
+```
+
+### What is exception chaining
+
+In Python 3, when an exception is raised in an except block, the old exception is stored in the `__context__` data attribute, and if the new exception is not handled, it will print out that the new exception was thrown while handling the old one ("During handling of the above exception, another exception occurred:").
+Also, you can chain exceptions into one chain or replace old ones with new ones. To do this, use the construct `raise new_exception from old_exception` or `raise new_exception from None`.
+In the first case, the specified exception is stored in the `__cause__` attribute and the `__suppress_context__` attribute (which suppresses the exception being thrown from `__context__`) is set to True. Then, if the new exception is not handled, information will be displayed that the old exception is the cause of the new one ("The above exception was the direct cause of the following exception:").
+In the second case, `__suppress_context__` is set to True and `__cause__` to None. Then, when an exception is thrown, it will actually be replaced by a new one (although the old exception is still stored in `__context__`).
+
+There is no exception chaining in Python 2. Any exception thrown in the except block replaces the old one.
+
+### Why the else block is needed
+
+The else block is executed if no exceptions were thrown during the execution of the try block. It is intended to separate code that might throw an exception that should be handled in a given try/except block from code that might throw an exception of the same class that should be caught at a higher level, and to minimize the number of statements in the try block.
+
+### What can be passed to the exception constructor
+
+Exceptions can take any unnamed arguments as a constructor parameter. They are placed in the args data attribute as a tuple (an immutable list). The most common use is a single string parameter that contains the error message. All exceptions define a `__str__` method that calls str(self.args) by default.
+Python 2 also has a message attribute that puts `args[0]` if `len(args) == 1`
+
+### What are the exception classes
+
+- Basic:
+  - BaseException is the base class for all exceptions.
+  - Exception is a subclass of BaseException, the base class for all standard exceptions that do not indicate mandatory program termination, and all user-defined exceptions.
+  - StandardError (Python 2) - Base class for all built-in exceptions except StopIteration, GeneratorExit, KeyboardInterrupt and SystemExit.
+  - ArithmeticError is the base class for all exceptions related to arithmetic operations.
+  - BufferError is the base class for exceptions related to buffer operations.
+  - LookupError is the base class for exceptions related to an invalid collection key or index.
+  - EnvironmentError (Python 2) - base class for exceptions related to errors that occur outside the Python interpreter. In Python 3, its role is played by OSError.
+- Some of the specific standard exceptions:
+  - AssertionError - failure of the condition in the assert statement.
+  - AttributeError – attribute access error.
+  - FloatingPointError – operation error on floating point numbers.
+  - ImportError - error importing a module or a name from a module.
+  - IndexError - invalid index of a sequence (for example, a list).
+  - KeyboardInterrupt - termination of the program by pressing Ctrl + C in the console.
+  - MemoryError - lack of memory.
+  - NameError - name not found.
+  - NotImplementedError – action not implemented. Intended, among other things, to create abstract methods.
+  - OSError – system error.
+  - OverflowError - the result of an arithmetic operation is too large to be represented.
+  - RuntimeError is a generic runtime error that does not fit into any of the categories.
+  - SyntaxError - syntax error.
+  - IndentationError - a subclass of SyntaxError - invalid indentation.
+  - TabError - subclass of IndentationError - mixed use of tabs and spaces.
+  - SystemError - non-critical internal error of the interpreter. If this exception occurs, please file a bug report at [bugs.python.org](https://bugs.python.org/)
+  - SystemExit – an exception that is generated by the sys.exit() function. Serves to terminate the program.
+  - TypeError – data type mismatch error.
+  - UnboundLocalError - subclass of NameError - access to a non-existent local variable.
+  - ValueError - thrown when an object of the correct type is passed to a function or operation, but with an invalid value, and this situation cannot be described with a more precise exception, such as IndexError.
+  - ZeroDivisionError - division by zero.
+
+### In what cases can SyntaxError be handled
+
+A syntax error occurs when the Python parser encounters a piece of code that does not conform to the language specification and cannot be interpreted.
+Because, in the event of a syntax error in the main module, it occurs before program execution begins and cannot be caught, the primer in the Python documentation even separates syntax errors and exceptions. However, SyntaxError is also an exception that inherits from Exception, and there are situations where it can occur at runtime and be handled, namely:
+
+- syntax error in the imported module;
+- a syntax error in code that is represented as a string and passed to the eval or exec function.
+
+### Is it possible to create custom exceptions
+
+Can. They must be descendants of the Exception class. It is customary to name exceptions so that their class name ends with the word Error.
+
+### What warnings are for and how to create your own
+
+Warnings are usually displayed in situations where erroneous behavior is not guaranteed and the program can normally continue to run, but the user should be notified of something.
+The base class for warnings is Warning, which inherits from Exception.
+The Warning base class for user-defined warnings is UserWarning.
+
+### What is the warning module for?
+
+The warning module contains functions for working with warnings.
+The main function is warn, which takes one mandatory message parameter, which can be either a message string or an instance of the Warning class or subclass (in which case the category parameter is set automatically) and two optional parameters: category (default is UserWarning) - the warning class and stacklevel (default - 1) - nesting level of functions, starting from which it is necessary to display the contents of the call stack (useful, for example, for wrapper functions for displaying warnings, where stacklevel=2 should be set so that the warning refers to the place where this function was called, not the function itself).
