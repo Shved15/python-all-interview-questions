@@ -100,3 +100,8 @@
     - [What is the difference between \@foobar and \@foobar()](questions.md/#what-is-the-difference-between-foobar-and-foobar)
     - [What is a decorator factory](questions.md/#what-is-a-decorator-factory)
     - [Why do we need wraps](questions.md/#why-do-we-need-wraps)
+  - [Metaclasses](questions.md/#metaclasses)
+    - [What are metaclasses](questions.md/#what-are-metaclasses)
+    - [What is type. How metaclass lookup works when creating an object](questions.md/#what-is-type-how-metaclass-lookup-works-when-creating-an-object)
+    - [How metaclasses work](questions.md/#how-metaclasses-work)
+    - [Why use metaclasses at all](questions.md/#why-use-metaclasses-at-all)
