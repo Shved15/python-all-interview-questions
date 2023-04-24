@@ -1356,3 +1356,74 @@ The Warning base class for user-defined warnings is UserWarning.
 
 The warning module contains functions for working with warnings.
 The main function is warn, which takes one mandatory message parameter, which can be either a message string or an instance of the Warning class or subclass (in which case the category parameter is set automatically) and two optional parameters: category (default is UserWarning) - the warning class and stacklevel (default - 1) - nesting level of functions, starting from which it is necessary to display the contents of the call stack (useful, for example, for wrapper functions for displaying warnings, where stacklevel=2 should be set so that the warning refers to the place where this function was called, not the function itself).
+
+## Decorators
+
+- [Understanding decorators in Python, step by step. Step 1(rus)](https://habr.com/en/post/141411/)
+- [Understanding decorators in Python, step by step. Step 2(rus)](https://habr.com/en/post/141501/)
+
+### What are decorators. Why do we need
+
+A decorator in a broad sense is a design pattern when one object changes the behavior of another. In Python, a decorator is usually a function A that takes a function B and returns a function C. In this case, the C function uses the B function in itself.
+
+To decorate a function means to replace it with the result of the decorator.
+
+### What can be a decorator. What decorator can be applied to
+
+A decorator can be any callable object: a function, a lambda, a class, an instance of a class. In the latter case, define a `__call__` method.
+
+You can apply a decorator to any object. Most often to functions, methods and classes. Decorating is so common that a special `@` operator is dedicated to it.
+
+```python
+def auth_only(view):
+     ...
+
+@auth_only
+def dashboard(request):
+     ...
+```
+
+If the decor operator didn't exist, we would write the code above like this:
+
+```python
+def auth_only(view):
+     ...
+
+def dashboard(request):
+     ...
+
+dashboard = auth_only(dashboard)
+```
+
+### What is the difference between \@foobar and \@foobar()
+
+The first is the usual decoration with the foobar function.
+
+The second case is decorating with the function that foobar will return. In another way, this is called a parametric decorator or decorator factory. See next question.
+
+### What is a decorator factory
+
+This is a function that returns a decorator. For example, you need a decorator to check permissions. The validation logic is the same, but there can be many rights. In order not to produce copy-paste, we will write a factory of decorators.
+
+```python
+from functools import wraps
+
+def has_perm(perm):
+     def decorator(view):
+         @wraps(view)
+         def wrapper(request):
+             if perm in request.user.permissions:
+                 return view(request)
+             else:
+                 return HTTPRedirect('/login')
+         return wrapper
+     return decorator
+
+@has_perm('view_user')
+def users(request):
+     ...
+```
+
+### Why do we need wraps
+
+`wraps` - Python standard decorator, `functools` module. It assigns the same `__name__`, `__module__`, `__doc__` fields to the wrapper function as the original function you are decorating. This is necessary so that after decorating the wrapper function in stack traces looks like a decorated function.
