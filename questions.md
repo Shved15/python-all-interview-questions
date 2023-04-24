@@ -2343,3 +2343,329 @@ Worker 2 working on task 3
 Worker 1 working on task 4
 Worker 2 working on task 4
 ```
+
+## What are the options for implementing the Singleton pattern in python
+
+- [Creating a singleton in Python](https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python)
+
+**Decorator:**
+
+```python
+def singleton(class_):
+     instances = {}
+     def getinstance(*args, **kwargs):
+         if class_not in instances:
+             instances[class_] = class_(*args, **kwargs)
+         return instances[class_]
+     return getinstance
+
+@singleton
+class MyClass(BaseClass):
+     pass
+```
+
+_Pros:_
+
+- Decorators are often more intuitive than multiple inheritance.
+
+_Flaws:_
+
+- Although objects created using `MyClass()` will be true singleton objects, `MyClass` itself is a function, not a class, so you cannot call class methods from it.
+- Increases testing difficulty
+
+**Base class:**
+
+```python
+class Singleton(object):
+     _instance = None
+     def __new__(class_, *args, **kwargs):
+         if not isinstance(class_._instance, class_):
+             class_._instance = object.__new__(class_, *args, **kwargs)
+         return class_._instance
+
+class MyClass(Singleton, BaseClass):
+     pass
+```
+
+_Pros:_
+
+- It's real class.
+
+_Flaws:_
+
+- Multiple inheritance complicates the code. `__new__` can be overwritten during inheritance from the second base class?
+
+**Metaclasses:**
+
+```python
+class Singleton(type):
+     _instances = {}
+     def __call__(cls, *args, **kwargs):
+         if cls not in cls._instances:
+             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+         return cls._instances[cls]
+
+#Python2
+class MyClass(BaseClass):
+     __metaclass__ = Singleton
+
+#Python3
+class MyClass(BaseClass, metaclass=Singleton):
+     pass
+```
+
+_Pros:_
+
+- This is real class.
+- Automatically covers inheritance
+- We use metaclasses for their intended purpose
+
+_Flaws:_
+
+- Do they exist?
+
+**Module:**
+
+_Pros:_
+
+- Simplicity
+
+_Flaws:_
+
+- Not lazy-initialized
+
+## What tools do you know for checking codestyle
+
+- [Tools for analyzing Python code. Part 1(rus)](https://proglib.io/p/python-code-analysis/)
+- [Tools for analyzing Python code. Part 2(rus)](https://proglib.io/p/python-code-analysis-tools/)
+
+**Pycodestyle** is a simple console tool for analyzing Python code, specifically for checking code against PEP8. One of the oldest code analyzers, until 2016 was called pep8, but was renamed at the request of the creator of the Python language, Guido van Rossum.
+
+**Pydocstyle** checks if modules, classes, functions have docstring and if they conform to the official PEP257 convention.
+
+**Pylint** combined both the search for logical and stylistic errors. This powerful, highly customizable tool for analyzing Python code features a large number of checks and a variety of reports.
+
+**Vulture** is a small utility for finding "dead" code in Python programs. It uses the ast module of the standard library and creates abstract syntax trees for all source code files in a project. Next, a search is performed for all objects that have been defined but are not used. Vulture is useful for cleaning up and finding bugs in large base codes.
+
+**Flake8** - binding to the utilities included in it - pyflakes, pycodestyle, mccabe. Flake8 has the same core functionality as pylint. However, it has a number of differences and features:
+
+- The possibilities of statistical reports are limited to counting the number of each of the errors (--statistics) and their total number (--count).
+- To run in multiple threads (`-jobs=<num>`) the multiprocessing module is used, for this reason multi-threading will not work on Windows systems.
+- No ability to generate reports in json format; when called with the --bug-report key, only the header for the report is created, indicating the platform and versions of the incoming utilities.
+- Comments in code blocking output. Adding the comment # noqa to the line with the error will remove it from the report.
+- During editing, to suppress individual errors on the fly, you can list excluded errors in the key `--extend-ignore=<errors>`
+- Syntax check in doctest lines (-doctests).
+- Presence of Version Control Hooks. Integration with version control systems takes place literally with the help of two commands (git and mercurial are supported).
+- Extensibility. Flake8 for Python code analysis allows you to create and use plugins. Using plugins in Flake8, you can: add additional checks, use other report formats, or automatically fix errors found. PyPi has a large number of open-source plugins.
+
+**Prospector** is a tool for analyzing Python code. Combines the functionality of other Python analysis tools like pylint, pep8, mccabe, Pyflakes, Dodgy, pydocstyle (experimental, bugs are possible). Additionally, you can connect mypy, pyroma, vulture. The main feature of prospector is the presence of pre-installed profiles, which contain the settings of the utilities included in it, designed to suppress the most captious warnings and leave only important messages.
+
+**Pylama** is a code audit tool for Python and JavaScript. Serves as a wrapper for such utilities as: pydocstyle, pycodestyle, pyflakes, mccabe, pylint, radon (a tool for collecting and calculating various metrics from source code). gjslint is used to work with JavaScript code.
+
+**autopep8** modifies non-PEP8 compliant code. Checking for compliance with conventions is done using the pycodestyle utility. autopep8 has support for multithreading, recursive directory traversal, the ability to save settings in a file, set the range of lines to correct, error filtering, and directly modify the file being checked.
+
+**yapf** is similar to autopep8 but uses a different approach which is based on the "clang-format" developed by Daniel Jasper. The yapf-formatted code will not only respect the accepted conventions, but also look like it was written by a good programmer. The second important difference is the ability to set styles. To do this, use the --style key and pass the settings file or one of the predefined values (pep8, google, chromium, facebook) as an argument.
+
+**black** is a no-compromise formatter that works fast and saves programmers time and mental energy for more important things.
+
+## What is a list/dict/set comprehension
+
+In Python, comprehension is a concise way of creating lists, dictionaries, and sets. It is a syntax construct that allows for creating new collections by iterating over existing sequences.
+
+1. List comprehension: It is a way of creating a new list by performing some operations on each item of an existing list. The syntax of list comprehension is enclosed in square brackets and contains an expression followed by a `for` loop or multiple `for` loops and an optional `if` clause.
+
+Example:
+
+```python
+# Creating a new list of even numbers from an existing list
+old_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+new_list = [x for x in old_list if x % 2 == 0]
+print(new_list) # Output: [2, 4, 6, 8]
+```
+
+2. Dictionary comprehension: It is a way of creating a new dictionary by iterating over an existing sequence. The syntax of dictionary comprehension is enclosed in curly braces and contains a `key-value` pair expression followed by a `for` loop or multiple `for` loops and an optional `if` clause.
+
+Example:
+
+```python
+# Creating a dictionary from two lists
+keys = ['a', 'b', 'c']
+values = [1, 2, 3]
+new_dict = {k:v for k, v in zip(keys, values)}
+print(new_dict) # Output: {'a': 1, 'b': 2, 'c': 3}
+```
+
+3. Set comprehension: It is a way of creating a new set by performing some operations on each item of an existing set. The syntax of set comprehension is enclosed in curly braces and contains an expression followed by a `for` loop or multiple `for` loops and an optional `if` clause.
+
+Example:
+
+```python
+# Creating a new set of even numbers from an existing set
+old_set = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+new_set = {x for x in old_set if x % 2 == 0}
+print(new_set) # Output: {2, 4, 6, 8}
+```
+
+_Energetic_ - an iterable that builds all of its elements at once. In Python, inclusions are energetic operations. The opposite is _lazy_.
+
+## What's the difference between single and double underscore
+
+- [Understanding the underscore of Python](https://hackernoon.com/understanding-the-underscore-of-python-309d1a029edc)
+
+There are 5 use cases for underlining in Python:
+
+1. To store the value of the last expression in the REPL
+2. Ignoring value
+3. To define a special value for a function or variable
+   - single at the beginning or end of the name
+   - double at the beginning
+   - double at the beginning and end
+4. For use as a localization function
+5. To separate the characters of a number (`1_00 == 100`)
+
+More:
+
+`private` and `protected` methods:
+
+In Python, single underscore and double underscore have different purposes.
+
+- A single underscore before a method or attribute name indicates that it is not intended to be used outside of the class or module in which it is defined. This is not a limitation, but rather an agreement between programmers. For example:
+
+```python
+class MyClass:
+    def __init__(self):
+        self._my_attr = 42
+
+    def _my_method(self):
+        print("Hello from _my_method")
+
+obj = MyClass()
+print(obj._my_attr)     # Attribute access using single underscore
+obj._my_method()        # Method call using single underscore
+```
+
+A double underscore at the beginning of a method or attribute name makes it "private" in the sense that it cannot be directly accessed from outside the class. The double underscore also performs the "name mangling" mechanism, which changes the name of a method or attribute by prefixing it with two underscores and the class name. This is done to prevent name conflicts between classes. For example:
+
+```python
+class MyClass:
+    def __init__(self):
+        self.__my_attr = 42
+
+    def __my_method(self):
+        print("Hello from __my_method")
+
+obj = MyClass()
+print(obj.__my_attr)     # Error: Attribute not accessible from outside the class
+obj.__my_method()        # Error: Method not accessible from outside the class
+```
+
+However, a double-underscored attribute or method name can still be accessed from outside the class using the name mangling mechanism. For example:
+
+```python
+class MyClass:
+    def __init__(self):
+        self.__my_attr = 42
+
+    def __my_method(self):
+        print("Hello from __my_method")
+
+obj = MyClass()
+print(obj._MyClass__my_attr)     # Accessing an attribute with a mangling name
+obj._MyClass__my_method()        # Calling a method with a mangling name
+```
+
+Despite this, the use of names with double underscores should be avoided if necessary for backward compatibility with other versions of the code. Instead, it's better to use a single underscore to denote "internal
+
+## Difference between copy() and deepcopy()
+
+- [Deep vs Shallow Copies in Python](https://stackabuse.com/deep-vs-shallow-copies-in-python/)
+
+The `deepcopy()` deep copy creates a new and separate copy of the entire object or list with its own unique memory address. This means that any changes you make to the new copy of the object or list will not be reflected in the original. This process goes like this: first, a new list or object is created, and then all elements are recursively copied from the original to the new one.
+
+The `copy()` shallow copy also creates a separate new object or list, but instead of copying the child elements into a new object, it simply copies the references to their memory addresses. Therefore, if you make a change to the original object, it will be reflected in the copied object, and vice versa. In short, both copies depend on each other.
+
+## What is a garbage collector. What are its pros and cons
+
+- [All you need to know about the garbage collector in Python(rus)](https://habr.com/ru/post/417215/)
+
+GC (generational garbage collector) is a garbage collector, it was created primarily to detect and remove cyclic references.
+`gc` is a built-in module in python and can be turned off and started manually (or not started) if necessary. To understand why the GC was created, you need to understand how the memory manager works in Python and how this memory is released.
+
+Unlike other popular languages, Python does not free all memory back to the operating system as soon as it deletes an object. Instead, it uses an additional memory manager designed for small objects (less than 512 bytes). To work with such objects, it allocates large blocks of memory, in which many small objects will be stored in the future.
+
+As soon as one of the small objects is deleted - the memory from under it does not pass to the operating system, Python leaves it for new objects with the same size. If there are no objects left in one of the allocated memory blocks, then Python can release it to the operating system. Typically, block release happens when a script creates a lot of temporary objects.
+
+Thus, if a long-lived Python process starts consuming more memory over time, this does not mean that there is a memory leak problem in your code.
+
+The standard python interpreter (CPython) uses two garbage collection algorithms at once, reference counting and a generational garbage collector (hereinafter referred to as GC), better known as the standard gc module from Python.
+
+The reference counting algorithm is very simple and efficient, but it has one big drawback. It doesn't know how to define circular references. It is because of this that Python has an additional collector called the generational GC that keeps track of objects with potential circular references.
+
+In Python, the reference counting algorithm is fundamental and cannot be disabled, while GC is optional and can be disabled.
+
+Unlike the reference counting algorithm, circular GC does not run in real time and runs periodically. Each run of the collector creates micro-pauses in the code, so CPython (the standard interpreter) uses various heuristics to determine how often the garbage collector is run.
+
+The cyclic garbage collector divides all objects into 3 generations (generations). New objects fall into the first generation. If the new object survives the garbage collection process, then it is moved to the next generation. The higher the generation, the less often it is scanned for garbage. Since new objects often have a very short lifetime (are temporary), it makes sense to poll them more often than those that have already gone through several stages of garbage collection.
+
+Each generation has a special counter and trigger threshold, upon reaching which the garbage collection process is triggered. Each counter stores the number of allocations minus the number of deallocations in a given generation. As soon as any container object is created in Python, it checks these counters. If the conditions are met, then the garbage collection process begins.
+
+If several or more generations crossed the threshold at once, then the oldest generation is selected. This is due to the fact that older generations also scan all previous ones. To reduce garbage collection pauses for long-lived objects, the oldest generation has an additional set of conditions.
+
+The default trigger thresholds for generations are set to 700, 10, and 10 respectively, but you can always change them with the gc.get_threshold and gc.set_threshold functions.
+
+## What is introspection
+
+- [Introspection in Python](http://zetcode.com/lang/python/introspection/)
+
+_Introspection_ is the ability of a program to inspect the type or properties of an object while the program is running. You may wonder what type of object is it, is it an instance of a class. Some languages even let you know the inheritance hierarchy of an object. The possibility of introspection exists in languages such as Ruby, Java, PHP, Python, C++ and others. All in all, introspection is a very simple and very powerful phenomenon. Here are some examples of using introspection:
+
+```java
+// Java
+
+if(obj instanceof Person){
+    Person p = (Person)obj;
+    p.walk();
+}
+```
+
+```php
+//PHP
+
+if ($obj instanceof Person) {
+    // do whatever
+}
+```
+
+In Python, the most common form of introspection is to use the dir method to list an object's attributes:
+
+```python
+#Python
+
+class foo(object):
+   def __init__(self, val):
+     self.x = val
+   def bar(self):
+     return self.x
+
+...
+
+dir(foo(5))
+=> ['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', '__hash__', '__init__', '__module__',
+'__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__str__', '__weakref__', 'bar', 'x']
+```
+
+## What is reflection
+
+Introspection allows you to examine the attributes of an object at runtime, while reflection allows you to manipulate them. _Reflection_ is the ability of a computer program to learn and modify its structure and behavior (values, metadata, properties, and functions) at run time. In simple terms: it allows you to call methods of objects, create new objects, modify them without even knowing the names of interfaces, fields, methods at compile time. This nature of reflection makes it more difficult to implement in statically typed languages, since type errors occur at compile time rather than runtime (more on that here). However, it is possible because languages such as Java, C#, and others allow both introspection and reflection (but not C++, which only allows introspection).
+
+For the same reason, reflection is easier to implement in interpreted languages, because when functions, objects, and other data structures are created and called at runtime, some kind of memory allocation system is used. Interpreted languages usually provide such a system by default, while compiled languages will require an additional compiler and interpreter to ensure that reflection is correct.
+
+_Example_:
+
+```python
+# No reflection
+Foo().hello()
+
+# With reflection
+getattr(globals()['Foo'](), 'hello')()
+```
