@@ -1670,3 +1670,158 @@ At the time of this writing, there are five versions of the protocol:
 - 3 - version of the protocol that appeared in Python 3, the standard protocol in Python 3 at the moment, cannot be deserialized in Python 2;
 - 4 - version of the protocol, introduced in Python 3.4, supports very large memory objects, supports more types of objects, some optimizations have been added.
 - 5 is the protocol version introduced in Python 3.8. It adds out-of-band data support and in-band data acceleration. PEP 574 describes the changes in more detail.
+
+## Testing
+
+### Testing Pyramid
+
+```
+More Integration                      Faster
+    ˆ                                   ˆ
+    |                /\                 |
+    |               /  \                |
+    |              /    \               |
+    |             /      \              |
+    |            /E2 Tests\             |
+    |           /          \            |
+    |          /(UI Testing)\           |
+    |         /==============\          |
+    |        /                \         |
+    |       /   Integration    \        |
+    |      /       Tests        \       |
+    |     /======================\      |
+    |    /                        \     |
+    |   /        Unit Tests        \    |
+    |   =============================   |
+  More                               Slower
+Isolation
+```
+
+### What is mocking
+
+- [Mock module: Dummy mockups in testing(rus)](https://habr.com/ru/post/141209/)
+
+Mock in English means "imitation", "fake". The principle of its operation is simple: if you need to test a function, then everything that does not belong to it (for example, reading from a disk or from a network) can be replaced with dummy layouts. At the same time, the tested functions do not need to be adapted for tests: Mock replaces objects in other modules, even if the code does not accept them as parameters. That is, you can test without adapting to tests at all.
+
+### What to do if the function under test uses a remote connection to external services, which sometimes sees a timeout error, 404 and the like
+
+If we are talking about unit tests, then they should not call external resources, that is, make http requests and so on. Therefore, either lock the http client that uses the function to call the service, or, which is usually the best solution, pass what calls that service to the function as a dependency (unless, of course, we are testing the client itself to call the service).
+
+### What to do if the function under test takes a long time to perform repetitive operations inside it
+
+For example, inside a loop from 1 to 1000000, where something is read, written, calculated.
+
+Suppose this function has no problems with decomposition - this is a function that performs one action and breaking it into several others does not make any sense. In that case I would:
+
+- would make it possible to replace the upper bound of the loop from the test (via a parameter or a mock constant, setting, etc.)
+- if the function calls for calculations another resource-intensive function, third-party or from its codebase, then it would probably be locked up and checked that it is called with the necessary parameters
+- if possible, would prepare for the test such an incoming data set, in which it was performed quickly
+
+If the function does not meet the conditions described in the first sentence, you should first deal with its decomposition.
+
+### What types of tests do you know
+
+- [Pyramid of tests in practice(rus)](https://habr.com/en/post/358950/)
+- [Tests that a developer should write(rus)](https://medium.com/front-end-in-regions-grodno/%D1%82%D0%B5%D1%81%D1%82%D1%8B-%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B5-%D0%B4%D0%BE%D0%BB%D0%B6%D0%B5%D0%BD-%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%87%D0%B8%D0%BA-a04cab35f45b)
+- [Different types of testing and their features(rus)](https://techrocks.ru/2018/12/08/different-types-of-testing/)
+
+More:
+
+There are several types of testing in Python, the most common of which are:
+
+- Unit Testing - testing each individual "unit" of code (function, method, class) in isolation from the rest of the code. For unit testing in Python, the unittest standard library is used.
+
+- Integration Testing - testing the interaction between different components of the system, for example, between several modules or between a client and a server. For integration testing, you can use the pytest or unittest library.
+
+- Functional Testing - testing the functionality of the system as a whole. For functional testing, you can use the Selenium library, which allows you to automate testing of web applications.
+
+- Load Testing - testing the system at maximum load to evaluate its performance and stability. For load testing, you can use the Locust library.
+
+- Automated Testing - testing that is performed automatically, without human intervention. Automated testing can be applied to any of the above types of testing.
+
+- Security Testing - Testing a system for vulnerabilities and bugs that could lead to security breaches. For security testing in Python, you can use the Pytest Security library.
+
+#### Unit tests
+
+_What is checked?_
+Unit tests check whether each individual module (unit) of your code works correctly. Ideally, when planning and writing unit tests, you want to isolate functionality that can't be broken down into smaller pieces and test it.
+
+Unit tests should not test external dependencies or interactions. You definitely need to mock out api calls. Unit test purists will also insist on mocking database calls to make sure your code behaves correctly when given valid input from external sources. Unit tests need to be fast, otherwise they slow down development significantly.
+
+_When will they be launched?_
+You must write and run unit tests in parallel with your code.
+
+#### Integration tests
+
+This term is used more often for tests that directly cover the public API of the service. The focus is on checking the interaction of different systems according to the “service-client” principle.
+
+_What is checked?_
+Integration tests check the interaction between two (or more than two) separate units of your code.
+
+Your application is made up of individual modules that perform certain small functions. Each of them can work well in isolation, but break down in conjunction with others.
+
+Integration tests also verify that your code integrates with external dependencies, such as database connections or third-party APIs.
+
+_When will they be launched?_
+Integration tests are the next step after unit tests.
+
+_What if the tests fail?_
+Failing integration tests means that two (or more) features of your application don't work together. It could be two modules you wrote that clash because of some complex business logic. Also, the failure can happen due to the fact that the structure of the response of the third-party API has changed. Failing tests can be a warning about poor error handling in case of a database connection failure.
+
+#### Functional testing
+
+- Functional testing can be defined as testing individual functions of modules.
+- It refers to testing a software product on an individual level to verify its functionality.
+- It is very different from unit or integration testing; you can't write countless test cases for functional testing because it's more complex than unit testing.
+- Functional testing tools seek to test the functionality (operability) of software. Test cases are used to test the expected and unexpected results of software testing.
+- This type of testing is done more from the user's point of view. That is, it considers the user's expectation of the selected input type.
+- Selenium is one of the most common tools used for functional testing.
+
+#### System test, Service test
+
+Automated tests that verify the operation of the entire integrated system. In fact, they represent an extreme case of integration tests. System tests do not directly test business rules. Instead, they check that the components of the system are correctly connected to each other, and the interaction between them goes according to the original plan. Performance and throughput tests usually fall into this category.
+
+System testing is testing the program as a whole. For small projects, this is usually manual testing - launched, clicked, made sure that (does not) work. Can be automated. There are two approaches to automation.
+
+These tests are written by system architects and leading experts from the technical side. Typically, they are written in the same language and in the same environment as UI integration tests. System tests are run relatively infrequently (depending on how long they run), but the more often, the better.
+
+System tests cover 10% of the system. This is because they are designed to check the correctness of not the behavior of the system, but its design. The correct behavior of the underlying code and components has already been verified at the lower levels of the pyramid.
+
+#### Health check (Smoke test, Sanity check)
+
+This is a special case of an integration test. Usually these are very small tests that are run before the system is launched to make sure that third-party software is working, which is necessary for the correct functioning of our system. If such tests fail, we can notify the user about the problem or even stop the system from starting.
+
+Smoke testing - came from the field of equipment testing, if, after applying power, smoke and a burning smell appear, then the equipment is faulty.
+
+Also, smoke tests can accompany legacy code refactoring, because writing full-fledged unit tests can be very time-consuming.
+
+### Security testing
+
+Security testing in Python is an essential part of the software development process to ensure that the application is secure from vulnerabilities and attacks. Here are some common techniques and tools used for security testing in Python:
+
+1. Static code analysis: This technique involves analyzing the source code of an application for potential vulnerabilities before it is compiled or executed. There are many Python tools available for this, such as Bandit, Pylint, and PyCodeStyle.
+
+2. Dynamic code analysis: This technique involves analyzing the running code of an application to identify security flaws. This can be done by using Python testing frameworks, such as PyTest and Unittest, and security-specific tools, such as OWASP ZAP, Nmap, and Nessus.
+
+#### Regression testing
+
+It can be any kind of test described above, which is written after a problem has been discovered. The test must emulate exactly the steps to reproduce the problem. The presence of such a test after fixing the problem guarantees that exactly the same bug will not appear in the system again.
+
+_What is checked?_
+Regression tests test a set of scenarios that used to work and should be relatively stable.
+
+3. Penetration testing: This technique involves simulating attacks on the application to identify and exploit vulnerabilities. There are many Python-based penetration testing tools, such as Metasploit, The Social-Engineer Toolkit (SET), and Recon-ng.
+
+4. Fuzz testing: This technique involves generating random inputs to an application to identify vulnerabilities caused by unexpected input. Python tools, such as AFL and Radamsa, can be used for fuzz testing.
+
+5. Secure coding practices: Finally, it's important to adopt secure coding practices when writing Python code, such as input validation, secure storage of sensitive data, and secure authentication and authorization mechanisms.
+
+Overall, security testing is an important aspect of the software development process, and Python provides a range of tools and techniques to help ensure the security of your applications.
+
+### How integration testing differs from functional testing
+
+- [Comparison of integration and functional testing(rus)](http://juice-health.ru/program/software-testing/497-integration-and-functional-testing)
+
+Integration and functional testing are two phases in the software testing process. The former is done after unit testing and the latter is a black box testing method.
+
+_Functional testing is also referred to as E2E testing for browser testing._
