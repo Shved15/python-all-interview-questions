@@ -6658,3 +6658,167 @@ banana draw(visitor)
 #### Behavioral patterns. Outcome
 
 Some behavioral patterns are directly supported in Python; the rest are easy to implement yourself. The Chain of Responsibility, Mediator, and Observer patterns can be implemented in the traditional way or with coroutines, and they are all variations on the theme of decoupling communication between cooperating objects. The Command pattern can be used for lazy evaluation and implementation of the execute-cancel mechanism. Since Python is an interpreted language (at the bytecode level), the Interpreter pattern can be implemented using Python itself, and even isolate the interpreted code in a separate process. Support for the Iterator pattern (and - implicitly - for the Visitor pattern) is built into Python. The Memento pattern is well supported in the Python standard library (for example, using the `pickle` and `json` modules). The State, Strategy, and Template Method patterns do not have direct support, but they are all easy to implement.
+
+## LRU Cache. What is it
+
+- [LRU, cache eviction method(rus)](https://habr.com/en/post/136758/)
+
+LRU (Least Recently Used) Cache is a caching technique that stores a limited number of items in memory and removes the least recently used item when the cache reaches its limit. It is based on the assumption that if an item has not been accessed recently, it is less likely to be accessed again in the near future.
+
+In an LRU cache, each item has a time stamp that is updated whenever it is accessed. When a new item is added to the cache, if the cache is already at its limit, the least recently used item is removed to make room for the new item. This ensures that the most recently used items are always available in the cache, while the least recently used items are removed.
+
+Here's an example implementation of an LRU cache in Python using the `collections.OrderedDict` class:
+
+```python
+from collections import OrderedDict
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+
+    def get(self, key):
+        if key not in self.cache:
+            return -1
+        value = self.cache.pop(key)
+        self.cache[key] = value
+        return value
+
+    def put(self, key, value):
+        if key in self.cache:
+            self.cache.pop(key)
+        elif len(self.cache) >= self.capacity:
+            self.cache.popitem(last=False)
+        self.cache[key] = value
+```
+
+In this implementation, `capacity` is the maximum number of items that can be stored in the cache. The `cache` is an ordered dictionary where the keys are the cache keys and the values are the cache values.
+
+The `get` method returns the value associated with the given key if it exists in the cache, otherwise it returns -1. When the value is accessed, it is moved to the end of the ordered dictionary to mark it as the most recently used.
+
+The `put` method adds a new key-value pair to the cache. If the key already exists, the existing value is updated and moved to the end of the ordered dictionary. If the cache is already at capacity, the least recently used item (i.e., the item at the beginning of the ordered dictionary) is removed to make room for the new item. Finally, the new key-value pair is added to the end of the ordered dictionary to mark it as the most recently used.
+
+## MQ. What is it
+
+MQ, or message queue, is a communication pattern that enables different parts of a software system to communicate with each other asynchronously. It works by sending messages between separate components of a system via a message broker, which acts as a middleman between senders and receivers.
+
+In MQ, the sender and the receiver do not interact with each other directly; instead, they interact with the message broker, which is responsible for delivering the message to the appropriate receiver. The message broker ensures that messages are delivered in the order they were received, and it can also handle cases where the receiver is temporarily unavailable or busy.
+
+MQ is particularly useful in distributed systems, where components are distributed across multiple machines or networks. It enables these components to communicate with each other in a reliable and scalable way, without requiring direct connections between all components.
+
+Here's an example implementation of MQ using the Python library pika:
+
+```python
+import pika
+
+# Connect to the message broker
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+# Create a message queue called "hello"
+channel.queue_declare(queue='hello')
+
+# Define a callback function to handle incoming messages
+def callback(ch, method, properties, body):
+    print("Received message:", body)
+
+# Start consuming messages from the "hello" queue
+channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True)
+
+print("Waiting for messages...")
+
+# Start the event loop to receive messages
+channel.start_consuming()
+```
+
+In this example, we first establish a connection to the message broker using pika. We then declare a message queue called "hello". We define a callback function to handle incoming messages, and start consuming messages from the "hello" queue using basic_consume. Finally, we start the event loop to receive messages.
+
+To send a message to this queue, we can use the following code:
+
+```python
+# Connect to the message broker
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+# Send a message to the "hello" queue
+channel.basic_publish(exchange='', routing_key='hello', body='Hello, world!')
+
+print("Sent message: 'Hello, world!'")
+
+# Close the connection
+connection.close()
+```
+
+This code connects to the message broker, sends a message to the "hello" queue using basic_publish, and then closes the connection. When we run the consumer code, it will print out "Received message: Hello, world!" to the console.
+
+Message queues are essentially the link between the various processes in your applications and provide a robust and scalable interface for interacting with other connected systems and devices.
+A queue is a data structure with a first-in-first-out element access discipline. Adding an element is possible only to the end of the queue, selecting only from the beginning of the queue, while the selected element is removed from the queue.
+
+Ten reasons why message queues are a vital component for any architecture or application:
+
+- _Loose binding_ - message queues create implicit data exchange interfaces that allow processes to be independent of each other, i.e. you simply define the format of messages sent from one process to another.
+- _Redundancy_ - Queues allow you to avoid cases of wasteful use of process resources (for example, memory) as a result of storing raw (redundant) information.
+- _Scalability_ - message queues allow you to distribute information processing processes. Thus, they make it easy to scale up the speed at which messages are added to the queue and processed.
+- _Elasticity and the ability to withstand peak loads_ - message queues can act as a kind of buffer for the accumulation of data in the event of a peak load, thereby mitigating the load on the information processing system and preventing its failure.
+- _Fault Tolerance_ - Message queues allow you to separate processes from each other, so that if the process that processes messages from the queue crashes, then messages can be added to the queue for processing later, when the system recovers.
+- _Guaranteed delivery_ - using the message queue guarantees that the message will be delivered and processed in any case (as long as there is at least one handler).
+- _Guaranteed delivery order_ - most message queuing systems are able to provide guarantees that data will be processed in a certain order (most often in the order in which they arrived).
+- _Buffering_ - message queues allow you to send and receive messages while working with maximum efficiency, offering a buffer layer - the process of writing to the queue can be as fast as the message queue is able to do, and not the message handler.
+- - Understanding data flows \* - message queues allow you to identify bottlenecks in application data flows, you can easily determine which of the queues is clogged, which is idle and determine what needs to be done - add new message handlers or optimize the current architecture.
+- _Asynchronous Communication_ - Message Queues provide an asynchronous data processing capability that allows you to put a message on a queue without processing, allowing the system to process the message later when it can.
+
+## What ready-made MQ implementations do you know
+
+- [RabbitMQ vs. Kafka: two different approaches to messaging(rus)](https://habr.com/ru/company/itsumma/blog/416629/)
+- [Kafka VS RabbitMQ(rus)](https://medium.com/@vozerov/kafka-vs-rabbitmq-38e221cf511b)
+- [Selecting MQ for a high-load project(rus)](https://habr.com/en/post/326880/)
+
+There are many ready-made Message Queue (MQ) implementations available, both open-source and commercial. Some popular examples include:
+
+1. RabbitMQ - an open-source message broker that implements the Advanced Message Queuing Protocol (AMQP) and supports multiple messaging protocols.
+2. Apache ActiveMQ - an open-source message broker that supports a wide range of messaging protocols and integrates with other Apache projects such as Camel, CXF, and Karaf.
+3. IBM MQ - a commercial message broker that supports a range of messaging protocols and provides high availability and scalability features.
+4. Amazon Simple Queue Service (SQS) - a cloud-based message queue service provided by Amazon Web Services (AWS).
+   Google Cloud Pub/Sub - a cloud-based message queue service provided by Google Cloud Platform (GCP).
+5. Microsoft Azure Service Bus - a cloud-based messaging service provided by Microsoft Azure.
+
+6. RedisQueue
+
+7. Kafka
+
+8. rocketMQ
+
+9. zeroMQ
+
+These are just a few examples of the many available options for implementing a message queue system. The choice of implementation will depend on the specific requirements of the project, such as the scale of the application, the desired level of availability and reliability, and the need for specific features and integrations.
+
+## What is RPC
+
+Remote procedure call, less commonly Remote Procedure Call (RPC) is a class of technologies that allow computer programs to call functions or procedures in a different address space (on remote computers or in an independent third-party system on the same device). Typically, the implementation of RPC technology includes two components: a network protocol for client-server communication and an object (or structure, for non-objective RPC) serialization language. At the transport layer, RPCs use mainly TCP and UDP protocols, however, some are built on top of HTTP (which violates the ISO / OSI architecture, since HTTP is not originally a transport protocol).
+
+The salient features of a remote procedure call are:
+
+- Asymmetry, that is, one of the interacting parties is the initiator;
+- Synchronicity, that is, the execution of the calling procedure is suspended from the moment the request is issued and resumes only after the return from the called procedure.
+
+In Python, there are several libraries that provide implementation of RPC protocols. One of the most popular is the Pyro4 library. Pyro4 allows developers to expose Python objects and methods as remote procedures that can be called from other processes, or even from other machines over a network.
+
+## What is gRPC
+
+- [Python Microservices With gRPC](https://realpython.com/python-microservices-grpc/)
+
+gRPC is a high-performance, open-source, remote procedure call (RPC) framework that was originally developed by Google. It is designed to allow communication between microservices in a distributed system and is based on the Protocol Buffers data serialization format.
+
+gRPC supports various programming languages, including Python, and offers features such as bi-directional streaming, flow control, and built-in authentication and load balancing. It uses HTTP/2 for transport and supports different types of communication patterns such as unary, server streaming, client streaming, and bidirectional streaming.
+
+gRPC offers a simple and easy-to-use API for defining services and messages, which can be used to generate client and server code in various programming languages. It also offers features such as interceptors and middleware for extending and customizing the behavior of the framework.
+
+Out of the box has:
+
+- Protobuf as a tool for describing data types and serialization. Very cool and well-proven thing in practice. As a matter of fact, those who needed performance used to take Protobuf before, and then they bothered separately with transport. Now everything is included.
+- HTTP/2 as transport. And this is an incredibly powerful move! All the charm of full data compression, traffic control, initiation of events from the server, reusing one socket for several parallel requests is beauty.
+- Static paths - no more "service/collection/resource/request? parameter=value". Now only a "service", and what's inside - describe in terms of your model and its events.
+- No binding of methods to HTTP methods, no binding of return values to HTTP statuses. Write what you want.
+- SSL / TLS, OAuth 2.0, authentication through Google services, plus you can screw your own (for example, two-factor)
+- Support for 9 languages: C, C++, Java, Go, Node.js, Python, Ruby, Objective-C, PHP, C# plus, of course, no one forbids you to take and implement your own version even for brainfuck.
+- Support for gRPC in public APIs from Google. Already working for some services. No, REST versions, of course, will also remain. But judge for yourself, if you have a choice - use, say, a REST version from a mobile application that returns data in 1 second, or take a gRPC version that works 0.5 seconds with the same development costs - what will you choose? What will your competitor choose?

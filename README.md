@@ -241,3 +241,8 @@
       - [Template method](questions.md/#template-method)
       - [Visitor](questions.md/#visitor)
       - [Behavioral patterns. Outcom](questions.md/#behavioral-patterns-outcome)
+  - [LRU Cache. What is it](questions.md/#lru-cache-what-is-it)
+  - [MQ. What is it](questions.md/#mq-what-is-it)
+    - [What ready-made MQ implementations do you know](questions.md/#what-ready-made-mq-implementations-do-you-know)
+  - [What is RPC](questions.md/#what-is-rpc)
+  - [What is gRPC](questions.md/#what-is-grpc)
