@@ -650,7 +650,7 @@ To select a value using the `my_dict[search_key]` expression, Python calls the `
 
 When a hash function returns the same answer for different data.
 
-### Where search will be faster, and where search and why: dict, list, set, tuple
+### Where search will be faster, and where enumeration and why: dict, list, set, tuple
 
 The lookup will be faster in dict and set because they are hash tables and element access takes O(1). For list and tuple, the search will be performed in O(n) on average.
 
@@ -1247,7 +1247,7 @@ Handling _exceptional situations_ or handling _exceptions_ (eng. exception handl
 
 Python code can throw an exception using the raise keyword. After it, the object of the exception is indicated. You can also specify the class of the exception, in which case the constructor without parameters will be automatically called. raise can only throw instances of the BaseException class and its descendants, and (in Python 2) instances of old-type classes as exceptions.
 
-### Why they can use the try finally construct without except
+### Why exceptions can use the try finally construct without except
 
 ```python
 try:
@@ -1868,7 +1868,7 @@ Features of functional programming:
 
 - Recursion is a function call from itself, or through other functions.
 
-### Like Python with functional programming support
+### How is support for functional programming implemented in Python
 
 Python partially supports the functional programming paradigm and allows you to write code in a functional style. In addition, it contains certain features that are specific to functional languages or first appeared in functional languages (list inclusions, lambda functions, higher-order functions, etc.).
 
@@ -2128,7 +2128,7 @@ The advantage of using functions from the `operator` module is that they can be 
 
 ## GIL, threads, processes
 
-### What is GIL. What problems does he have
+### What is GIL. What problems does it have
 
 - [GlobalInterpreterLock](https://wiki.python.org/moin/GlobalInterpreterLock)
 - [How the GIL works in Python(rus)](https://habr.com/ru/post/84629/)
@@ -3338,3 +3338,153 @@ HTTP (HyperText Transfer Protocol) and HTTPS (HyperText Transfer Protocol Secure
 5. SEO: HTTPS is becoming increasingly important for search engine optimization (SEO), as search engines like Google give priority to secure websites in search results. This means that websites using HTTPS are more likely to rank higher in search results.
 
 In summary, HTTPS is a more secure and reliable version of HTTP, providing end-to-end encryption, authentication, and better SEO. However, it can be slower than HTTP due to the additional processing required for encryption and decryption of data.
+
+# General
+
+## OOP
+
+### Encapsulation
+
+_Encapsulation_ is a language mechanism that allows you to combine data and methods that work with this data into a single object and hide implementation details from the user.
+
+The true purpose of encapsulation is to collect in one place the knowledge related to the device of a certain entity, the rules for handling and operations with it. Encapsulation appeared much earlier than is commonly thought. Modules in C programs are encapsulation. Assembly subroutines are encapsulation. The opposite of encapsulation is spreading knowledge about how something works throughout the program.
+
+_Example_: Working with monetary values. It's no secret that in many e-commerce systems monetary values are implemented as floating point numbers. I think all of us are aware that simply adding two "integer" numbers represented as floating point variables can result in a "slightly non-integer" number. Therefore, with such an implementation, it is necessary to insert a call to the rounding function here and there. This is the smearing of knowledge about the structure of the entity throughout the program. Encapsulation in this case is to collect (hide) in one place the knowledge that money is represented as a floating point value, and that it constantly has to be rounded off during the most innocent operations. Hide so that when using the “money” entity, rounding is not even mentioned. With encapsulation, there will be no problem to change the implementation of "money" from a floating point number to a fixed point number.
+
+We can say that hiding is one of the tasks of encapsulation. But data hiding is not encapsulation in and of itself. It would also be wrong to say that encapsulation is hiding data. Because its tasks go beyond concealment.
+
+If we say that a given method encapsulates a certain algorithm, then we mean that a certain calculation takes place in this method, the details of which we do not need to know, but the results of which we can trust and use. We can also say that the object in which the data is encapsulated can hide it - that is, protect it from unauthorized access. Thus, it is still necessary and important to distinguish between the concept of encapsulation and data hiding, and it is important to see the line between them. Encapsulation is a technology for combining the actual data and methods for processing it. As a result, both the data itself and the algorithms for working with them become logically inseparable. A typical example from C++ is the fields and methods of a class.
+
+So, if encapsulation provides a kind of integrity to the object, then hiding - hides details about the process. To "customize" access to data in the class and to the class directly, so-called access modifiers are used. So the use of these access modifiers is hiding.
+
+In python:
+
+Encapsulation in Python refers to the concept of wrapping data and methods into a single unit, such as a class. This is done to control the access to the data and methods, and to prevent them from being accessed or modified accidentally from outside the class.
+
+In Python, encapsulation can be achieved by using access modifiers such as public, protected, and private. By default, all attributes and methods in a class are public, which means they can be accessed from anywhere in the program. However, you can use access modifiers to specify that certain attributes or methods should only be accessed from within the class or its subclasses.
+
+The private access modifier is achieved by prefixing the attribute or method name with two underscores (e.g. \_\_attribute). This makes it so that the attribute or method can only be accessed from within the class itself, and not from outside the class. Protected access is achieved by prefixing the attribute or method name with a single underscore (e.g. \_attribute), which indicates that it should only be accessed from within the class and its subclasses.
+
+### Inheritance
+
+_Inheritance_ is a language mechanism that allows you to describe a new class based on an existing one. In "true" OOP, it is necessary to ensure the implementation of polymorphism as an independent unit, it is not necessary and even harmful, because it is the cause of strong coupling. It is better to prefer composition to inheritance.
+In Python, inheritance is a mechanism that allows you to define a new class based on an existing class, which is called the parent or base class. The new class, called the child or derived class, inherits all the attributes and methods of the parent class and can also have additional attributes and methods of its own.
+
+To create a child class in Python, you use the keyword `class` followed by the name of the child class and the name of the parent class in parentheses. For example, if you have a parent class called `Animal`, you can create a child class called `Dog` as follows:
+
+```python
+class Animal:
+    def __init__(self, name):
+        self.name = name
+
+class Dog(Animal):
+    def bark(self):
+        print("Woof!")
+```
+
+In this example, the `Dog` class is defined as a child of the Animal class using the syntax `class Dog(Animal):`. This means that the `Dog` class inherits all the attributes and methods of the `Animal` class, including the `__init__` method which sets the name attribute.
+
+The `Dog` class also has an additional method called `bark` that is not present in the `Animal` class. This method can be used to make a dog `bark` by calling the bark method on an instance of the `Dog` class.
+
+When you create an instance of the `Dog` class, you can set the name attribute by calling the `__init__` method of the parent class, like this:
+
+```python
+my_dog = Dog("Fido")
+```
+
+In this example, the `my_dog` object is created as an instance of the `Dog` class with the name "Fido". Because the `Dog` class inherits the `__init__` method from the `Animal` class, the `name` attribute is set to "Fido" automatically.
+
+In summary, inheritance in Python allows you to create new classes that are based on existing classes, and inherit all their attributes and methods. This can help you write more efficient and reusable code by avoiding duplication and promoting code reuse.
+
+### Polymorphism
+
+Polymorphism in Python refers to the ability of objects of different classes to be used interchangeably, based on the fact that they share a common interface or base class. This allows you to write more flexible and reusable code, since you can write code that works with objects of a certain type, and then use it with objects of different types that share the same interface or base class.
+
+There are two main types of polymorphism in Python: runtime polymorphism and compile-time polymorphism.
+
+Runtime polymorphism, also known as dynamic polymorphism, is achieved through method overriding. Method overriding allows a subclass to provide its own implementation of a method that is already defined in its parent class. When a method is called on an object of the subclass, the subclass's implementation of the method is executed instead of the parent class's implementation.
+
+For example:
+
+```python
+class Animal:
+    def make_sound(self):
+        print("The animal makes a sound")
+
+class Dog(Animal):
+    def make_sound(self):
+        print("The dog barks")
+
+class Cat(Animal):
+    def make_sound(self):
+        print("The cat meows")
+
+# Create objects
+animal = Animal()
+dog = Dog()
+cat = Cat()
+
+# Call the make_sound method on each object
+animal.make_sound()  # The animal makes a sound
+dog.make_sound()     # The dog barks
+cat.make_sound()     # The cat meows
+```
+
+In this example, the `Animal` class defines a `make_sound` method that prints "The animal makes a sound". The `Dog` and `Cat` classes inherit from the `Animal` class and override the `make_sound` method with their own implementations. When the make_sound method is called on an object of the `Dog` or `Cat` class, their respective implementations are executed instead of the implementation in the parent `Animal` class.
+
+Compile-time polymorphism, also known as static polymorphism, is achieved through method overloading. Method overloading allows a class to define multiple methods with the same name, but with different parameter types. When a method is called, the appropriate version of the method is selected based on the types of the arguments that are passed in.
+
+However, it's worth noting that Python does not support method overloading in the same way as some other languages like Java and C++. In Python, you can define multiple methods with the same name, but the method that gets called is determined by the number and types of the arguments that are passed in, rather than by the parameter types.
+
+_Polymorphism_ has several forms:
+
+- Special (Ad-Hoc) (in some languages it is represented by the method overloading mechanism)
+- Parametric (in some languages represented by generics)
+- Subtype polymorphism (achieved using inheritance and upcast mechanisms). When people talk about polymorphism, they most often mean it.
+
+_Polymorphism_ - the ability for similar data types that are explicitly defined by the inheritance hierarchy to have different implementations (using method overriding and upcasting)
+
+Also in programming languages and type theory, polymorphism is the ability of a function to handle data of different types.
+
+### Abstraction
+
+_Abstraction_ says that we should highlight the important characteristics of the object. The idea is that we can determine the minimum necessary set of these characteristics in order to be able to solve the problem.
+Often confused with encapsulation, because both indirectly affect the formation of a type's public interface.
+A rather trivial paradigm and therefore often not stated as such.
+
+Abstraction in Python refers to the process of hiding the implementation details of a class or function and only exposing a simplified interface to the user. The purpose of abstraction is to make it easier for the user to work with the code by reducing complexity and providing a high-level view of the system.
+
+In Python, abstraction can be achieved through the use of abstract classes and interfaces. An abstract class is a class that cannot be instantiated, but can be subclassed to provide concrete implementations. An interface is a collection of method signatures that a class can implement to provide a specific functionality.
+
+The `abc` module in Python provides tools for working with abstract classes and interfaces. To create an abstract class, you can use the `abc.ABC` class as a base class, and then define abstract methods using the `@abstractmethod` decorator. Abstract methods are methods that are declared in the abstract class, but have no implementation. Instead, the implementation is provided by the concrete subclasses.
+
+For example:
+
+```python
+import abc
+
+class Animal(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def make_sound(self):
+        pass
+
+class Dog(Animal):
+    def make_sound(self):
+        print("The dog barks")
+
+class Cat(Animal):
+    def make_sound(self):
+        print("The cat meows")
+
+# Create objects
+dog = Dog()
+cat = Cat()
+
+# Call the make_sound method on each object
+dog.make_sound()  # The dog barks
+cat.make_sound()  # The cat meows
+```
+
+In this example, the `Animal` class is defined as an abstract class with an abstract method called `make_sound`. The `Dog` and `Cat` classes inherit from the Animal class and provide their own implementations of the `make_sound` method. When the `make_sound` method is called on an object of the `Dog` or `Cat` class, their respective implementations are executed.
+
+Abstraction can also be achieved through the use of interfaces, which are similar to abstract classes, but do not provide any implementation. Instead, they define a set of method signatures that a class must implement to provide a specific functionality. However, Python does not have built-in support for interfaces, so they are typically implemented using abstract classes or conventions.
