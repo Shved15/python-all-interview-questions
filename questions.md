@@ -3965,3 +3965,844 @@ class PaymentGateway(PaymentGatewayInterface):
 ```
 
 Now, both the `PaymentProcessor` and `PaymentGateway` classes depend on the `PaymentGatewayInterface` abstraction, rather than on each other. This makes the code more modular and flexible, and makes it easier to change the payment gateway implementation without affecting the `PaymentProcessor` class.
+
+## What design patterns do you know
+
+- [GitHub - pkolt/design_patterns: Design patterns](https://github.com/pkolt/design_patterns)
+- [GitHub - faif/python-patterns: A collection of design patterns/idioms in Python](https://github.com/faif/python-patterns)
+- [Python Design Patterns](https://python-patterns.guide/)
+
+### Creational
+
+Design patterns are general reusable solutions to commonly occurring problems in software design. Creational patterns, also known as "design patterns of object creation", are a subset of design patterns that deal with object creation mechanisms, trying to create objects in a manner suitable for the situation.
+
+Creational design patterns describe how to create objects. Usually an object is created by calling a constructor, but sometimes you need a lot of flexibility, and that's where spawn patterns are useful.
+
+#### Abstract factory
+
+The Abstract Factory design pattern is a creational pattern that provides an interface for creating families of related or dependent objects without specifying their concrete classes. It allows a client to create objects without needing to know the specifics of their implementations, making it easier to switch between different implementations and making the code more flexible and maintainable.
+
+In Python, the Abstract Factory pattern can be implemented using abstract classes or interfaces to define the factory interface and concrete classes to implement the specific products. Here's an example implementation:
+
+```python
+from abc import ABC, abstractmethod
+
+# abstract factory interface
+class AbstractFactory(ABC):
+    @abstractmethod
+    def create_product_a(self):
+        pass
+
+    @abstractmethod
+    def create_product_b(self):
+        pass
+
+# concrete factory 1
+class ConcreteFactory1(AbstractFactory):
+    def create_product_a(self):
+        return ConcreteProductA1()
+
+    def create_product_b(self):
+        return ConcreteProductB1()
+
+# concrete factory 2
+class ConcreteFactory2(AbstractFactory):
+    def create_product_a(self):
+        return ConcreteProductA2()
+
+    def create_product_b(self):
+        return ConcreteProductB2()
+
+# abstract product A
+class AbstractProductA(ABC):
+    @abstractmethod
+    def do_something(self):
+        pass
+
+# concrete product A1
+class ConcreteProductA1(AbstractProductA):
+    def do_something(self):
+        return "Product A1"
+
+# concrete product A2
+class ConcreteProductA2(AbstractProductA):
+    def do_something(self):
+        return "Product A2"
+
+# abstract product B
+class AbstractProductB(ABC):
+    @abstractmethod
+    def do_something_else(self):
+        pass
+
+# concrete product B1
+class ConcreteProductB1(AbstractProductB):
+    def do_something_else(self):
+        return "Product B1"
+
+# concrete product B2
+class ConcreteProductB2(AbstractProductB):
+    def do_something_else(self):
+        return "Product B2"
+
+# client code
+def client_code(factory):
+    product_a = factory.create_product_a()
+    product_b = factory.create_product_b()
+    print(product_a.do_something())
+    print(product_b.do_something_else())
+
+# using concrete factory 1
+client_code(ConcreteFactory1())
+
+# using concrete factory 2
+client_code(ConcreteFactory2())
+```
+
+In this example, the `AbstractFactory` interface defines the methods for creating abstract `ProductA` and `ProductB` objects. The concrete `ConcreteFactory1` and `ConcreteFactory2` classes implement this interface to create specific implementations of `ProductA` and `ProductB`.
+
+The `AbstractProductA` and `AbstractProductB` abstract classes define the interface for the specific product objects, while the `ConcreteProductA1`, `ConcreteProductA2`, `ConcreteProductB1`, and `ConcreteProductB2` concrete classes implement those interfaces.
+
+Finally, the client code uses the `AbstractFactory` interface to create and use specific `ProductA` and `ProductB` objects, without needing to know the details of their implementations.
+
+For example, in a GUI system, there may be an abstract widget factory that is inherited by three concrete factories: MacWidgetFactory, XfceWidgetFactory, WindowsWidgetFactory, each of which provides methods for creating the same objects (make_button(), make_spinbox(), etc.), stylized, however, as is customary on a particular platform. This makes it possible to create a generic create_dialog() function that takes a factory instance as an argument and creates a dialog box that looks like OS X, Xfce, or Windows, depending on which factory we passed in.
+
+Abstract factory classes are often implemented using factory methods, but can also be implemented using the prototype pattern.
+
+```python
+"""
+*What is this pattern about?
+In Java and other languages, the Abstract Factory Pattern serves to provide an interface for
+creating related/dependent objects without need to specify their
+actual class.
+The idea is to abstract the creation of objects depending on business
+logic, platform choice, etc.
+In Python, the interface we use is simply a callable, which is "builtin" interface
+in Python, and in normal circumstances we can simply use the class itself as
+that callable, because classes are first class objects in Python.
+*What does this example do?
+This particular implementation abstracts the creation of a pet and
+does so depending on the factory we chose (Dog or Cat, or random_animal)
+This works because both Dog/Cat and random_animal respect a common
+interface (callable for creation and .speak()).
+Now my application can create pets abstractly and decide later,
+based on my own criteria, dogs over cats.
+*Where is the pattern used practically?
+*References:
+https://sourcemaking.com/design_patterns/abstract_factory
+http://ginstrom.com/scribbles/2007/10/08/design-patterns-python-style/
+*TL;DR
+Provides a way to encapsulate a group of individual factories.
+"""
+
+import random
+
+
+class PetShop:
+
+    """A pet shop"""
+
+    def __init__(self, animal_factory=None):
+        """pet_factory is our abstract factory.  We can set it at will."""
+
+        self.pet_factory = animal_factory
+
+    def show_pet(self):
+        """Creates and shows a pet using the abstract factory"""
+
+        pet = self.pet_factory()
+        print("We have a lovely {}".format(pet))
+        print("It says {}".format(pet.speak()))
+
+
+class Dog:
+    def speak(self):
+        return "woof"
+
+    def __str__(self):
+        return "Dog"
+
+
+class Cat:
+    def speak(self):
+        return "meow"
+
+    def __str__(self):
+        return "Cat"
+
+
+# Additional factories:
+
+# Create a random animal
+def random_animal():
+    """Let's be dynamic!"""
+    return random.choice([Dog, Cat])()
+
+
+# Show pets with various factories
+if __name__ == "__main__":
+
+    # A Shop that sells only cats
+    cat_shop = PetShop(Cat)
+    cat_shop.show_pet()
+    print("")
+
+    # A shop that sells random animals
+    shop = PetShop(random_animal)
+    for i in range(3):
+        shop.show_pet()
+        print("=" * 20)
+
+# OUTPUT #
+# We have a lovely Cat
+# It says meow
+#
+# We have a lovely Dog
+# It says woof
+# ====================
+# We have a lovely Cat
+# It says meow
+# ====================
+# We have a lovely Cat
+# It says meow
+# ====================
+```
+
+#### Builder
+
+The Builder design pattern is a creational pattern that separates the construction of a complex object from its representation, allowing for different representations to be created using the same construction process. The pattern involves creating a builder class that defines a series of methods for creating parts of the complex object, and a director class that uses the builder to construct the final object.
+
+In Python, the Builder pattern can be implemented using a builder class and a director class. The builder class defines the methods for creating parts of the complex object, and the director class uses the builder to construct the final object.
+
+Here's an example implementation of the Builder pattern in Python:
+
+```python
+class Car:
+    def __init__(self):
+        self.engine = None
+        self.tires = None
+        self.seats = None
+
+class Builder:
+    def build_engine(self):
+        pass
+
+    def build_tires(self):
+        pass
+
+    def build_seats(self):
+        pass
+
+    def get_result(self):
+        pass
+
+class Director:
+    def __init__(self, builder):
+        self.builder = builder
+
+    def construct_car(self):
+        self.builder.build_engine()
+        self.builder.build_tires()
+        self.builder.build_seats()
+
+    def get_car(self):
+        return self.builder.get_result()
+
+class CarBuilder(Builder):
+    def __init__(self):
+        self.car = Car()
+
+    def build_engine(self):
+        self.car.engine = "V8"
+
+    def build_tires(self):
+        self.car.tires = "Michelin"
+
+    def build_seats(self):
+        self.car.seats = "Leather"
+
+    def get_result(self):
+        return self.car
+```
+
+In this example, the `Car` class represents the complex object that we want to create, and the `Builder` class defines the methods for creating its parts. The `Director` class uses the `Builder` to construct the final `Car` object, while the `CarBuilder` class provides a concrete implementation of the `Builder` interface.
+
+To use the `Builder` pattern, we first create an instance of the `CarBuilder` class, which implements the `Builder` interface. We then create an instance of the `Director` class, passing in the `CarBuilder` instance as a parameter. Finally, we call the `construct_car` method on the `Director` instance to build the `Car` object, and then call the `get_car` method to retrieve the finished `Car` object.
+
+```python
+car_builder = CarBuilder()
+director = Director(car_builder)
+director.construct_car()
+car = director.get_car()
+```
+
+This implementation of the Builder pattern allows us to create different types of `Car` objects with different engine types, tire brands, and seat materials, while keeping the construction process the same for all types of `Car` objects.
+
+---
+
+The Builder is similar to the Abstract Factory pattern in that both are designed to create complex objects composed of other objects. But it differs in that it not only provides methods for constructing a complex object, but also stores its complete representation inside itself.
+
+This pattern allows for the same compositional structure as the Abstract Factory (i.e. complex objects made up of several simpler ones) but is particularly useful in situations where the representation of a composite object must be separated from composition algorithms.
+
+Separates the construction of a complex object from its representation, so that different representations can result from the same construction process. It differs from an abstract factory in that it focuses on the step-by-step construction of an object. A builder returns an object in the last step, while an abstract factory returns an object immediately. The builder is often used to create a builder pattern.
+
+```python
+"""
+*What is this pattern about?
+It decouples the creation of a complex object and its representation,
+so that the same process can be reused to build objects from the same
+family.
+This is useful when you must separate the specification of an object
+from its actual representation (generally for abstraction).
+*What does this example do?
+The first example achieves this by using an abstract base
+class for a building, where the initializer (__init__ method) specifies the
+steps needed, and the concrete subclasses implement these steps.
+In other programming languages, a more complex arrangement is sometimes
+necessary. In particular, you cannot have polymorphic behaviour in a constructor in C++ -
+see https://stackoverflow.com/questions/1453131/how-can-i-get-polymorphic-behavior-in-a-c-constructor
+- which means this Python technique will not work. The polymorphism
+required has to be provided by an external, already constructed
+instance of a different class.
+In general, in Python this won't be necessary, but a second example showing
+this kind of arrangement is also included.
+*Where is the pattern used practically?
+*References:
+https://sourcemaking.com/design_patterns/builder
+*TL;DR
+Decouples the creation of a complex object and its representation.
+"""
+
+
+# Abstract Building
+class Building:
+    def __init__(self):
+        self.build_floor()
+        self.build_size()
+
+    def build_floor(self):
+        raise NotImplementedError
+
+    def build_size(self):
+        raise NotImplementedError
+
+    def __repr__(self):
+        return 'Floor: {0.floor} | Size: {0.size}'.format(self)
+
+
+# Concrete Buildings
+class House(Building):
+    def build_floor(self):
+        self.floor = 'One'
+
+    def build_size(self):
+        self.size = 'Big'
+
+
+class Flat(Building):
+    def build_floor(self):
+        self.floor = 'More than One'
+
+    def build_size(self):
+        self.size = 'Small'
+
+
+# In some very complex cases, it might be desirable to pull out the building
+# logic into another function (or a method on another class), rather than being
+# in the base class '__init__'. (This leaves you in the strange situation where
+# a concrete class does not have a useful constructor)
+
+
+class ComplexBuilding:
+    def __repr__(self):
+        return 'Floor: {0.floor} | Size: {0.size}'.format(self)
+
+
+class ComplexHouse(ComplexBuilding):
+    def build_floor(self):
+        self.floor = 'One'
+
+    def build_size(self):
+        self.size = 'Big and fancy'
+
+
+def construct_building(cls):
+    building = cls()
+    building.build_floor()
+    building.build_size()
+    return building
+
+
+def main():
+    """
+    >>> house = House()
+    >>> house
+    Floor: One | Size: Big
+    >>> flat = Flat()
+    >>> flat
+    Floor: More than One | Size: Small
+    # Using an external constructor function:
+    >>> complex_house = construct_building(ComplexHouse)
+    >>> complex_house
+    Floor: One | Size: Big and fancy
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+```
+
+#### Factory method
+
+The Factory Method is a design pattern that provides an interface for creating objects but allows subclasses to alter the type of objects that will be created. It falls under the category of creational patterns in object-oriented programming.
+
+In this pattern, we create an interface that defines a method for creating objects, but we let the subclasses decide which class to instantiate. This allows us to encapsulate the object creation logic and delegate the responsibility to the subclasses.
+
+Here's an example implementation of the Factory Method pattern in Python:
+
+```python
+from abc import ABC, abstractmethod
+
+class Animal(ABC):
+    @abstractmethod
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return "Woof"
+
+class Cat(Animal):
+    def speak(self):
+        return "Meow"
+
+class AnimalFactory:
+    def get_animal(self, animal_type):
+        if animal_type == 'dog':
+            return Dog()
+        elif animal_type == 'cat':
+            return Cat()
+        else:
+            return None
+```
+
+In the code above, we define an abstract class `Animal` with an abstract method `speak()`. We then define two concrete classes `Dog` and `Cat` that inherit from `Animal` and implement the `speak()` method in their own way.
+
+Finally, we define the `AnimalFactory` class that has a `get_animal()` method. This method takes an `animal_type` parameter and returns an object of the appropriate type. If the `animal_type` is not recognized, the method returns `None`.
+
+With this implementation, we can create a new `AnimalFactory` object and use it to create `Dog` and `Cat` objects:
+
+```python
+factory = AnimalFactory()
+dog = factory.get_animal('dog')
+cat = factory.get_animal('cat')
+```
+
+The `dog` and `cat` objects are created by the `AnimalFactory` object based on the `animal_type` parameter passed to the `get_animal()` method. This allows us to create objects without knowing the exact class of the object at compile time.
+
+---
+
+The Factory Method pattern is used when we want subclasses to choose which class to instantiate when an object is requested. This is useful on its own, but can be taken further and used when the class is not known in advance (for example, it depends on information read from a file or user input).
+
+An abstract factory is often implemented using factory methods.
+Factory methods are often called inside template methods.
+
+```python
+"""*What is this pattern about?
+A Factory is an object for creating other objects.
+*What does this example do?
+The code shows a way to localize words in two languages: English and
+Greek. "get_localizer" is the factory function that constructs a
+localizer depending on the language chosen. The localizer object will
+be an instance from a different class according to the language
+localized. However, the main code does not have to worry about which
+localizer will be instantiated, since the method "localize" will be called
+in the same way independently of the language.
+*Where can the pattern be used practically?
+The Factory Method can be seen in the popular web framework Django:
+http://django.wikispaces.asu.edu/*NEW*+Django+Design+Patterns For
+example, in a contact form of a web page, the subject and the message
+fields are created using the same form factory (CharField()), even
+though they have different implementations according to their
+purposes.
+*References:
+http://ginstrom.com/scribbles/2007/10/08/design-patterns-python-style/
+*TL;DR
+Creates objects without having to specify the exact class.
+"""
+
+
+class GreekLocalizer:
+    """A simple localizer a la gettext"""
+
+    def __init__(self):
+        self.translations = {"dog": "σκύλος", "cat": "γάτα"}
+
+    def localize(self, msg):
+        """We'll punt if we don't have a translation"""
+        return self.translations.get(msg, msg)
+
+
+class EnglishLocalizer:
+    """Simply echoes the message"""
+
+    def localize(self, msg):
+        return msg
+
+
+def get_localizer(language="English"):
+    """Factory"""
+    localizers = {
+        "English": EnglishLocalizer,
+        "Greek": GreekLocalizer,
+    }
+    return localizers[language]()
+
+
+def main():
+    """
+    # Create our localizers
+    >>> e, g = get_localizer(language="English"), get_localizer(language="Greek")
+    # Localize some text
+    >>> for msg in "dog parrot cat bear".split():
+    ...     print(e.localize(msg), g.localize(msg))
+    dog σκύλος
+    parrot parrot
+    cat γάτα
+    bear bear
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+```
+
+#### Prototype
+
+The Prototype design pattern is a creational pattern that allows creating new objects by cloning existing ones, rather than creating new objects from scratch. This can be useful when creating new objects is expensive or when we need to create objects that are similar to existing ones.
+
+In the Prototype pattern, we have a prototype object that serves as a blueprint for creating new objects. This prototype object is cloned to create new objects, rather than creating new objects from scratch. The cloning process can be shallow or deep, depending on the requirements.
+
+To implement the Prototype pattern in Python, we can use the built-in `copy` module, which provides the `copy()` and `deepcopy()` functions for creating shallow and deep copies of objects, respectively. We can also define our own clone() method in the prototype object to customize the cloning process.
+
+Here's an example implementation of the Prototype pattern in Python:
+
+```python
+import copy
+
+class Prototype:
+    def __init__(self):
+        self._objects = {}
+
+    def register_object(self, name, obj):
+        self._objects[name] = obj
+
+    def unregister_object(self, name):
+        del self._objects[name]
+
+    def clone(self, name, **kwargs):
+        obj = copy.deepcopy(self._objects.get(name))
+        obj.__dict__.update(kwargs)
+        return obj
+
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __str__(self):
+        return f"{self.name} ({self.age})"
+
+p1 = Person("John", 30)
+
+proto = Prototype()
+proto.register_object("person", p1)
+
+p2 = proto.clone("person")
+print(p2)  # Output: John (30)
+
+p3 = proto.clone("person", name="Jane")
+print(p3)  # Output: Jane (30)
+```
+
+In this example, we define a `Person` class that represents an object that we want to clone. We then define a `Prototype` class that manages the prototype objects and provides a `clone()` method for creating new objects.
+
+We register a prototype object of `Person` class with the `Prototype` class and then use it to create new objects using the `clone()` method. We can also pass keyword arguments to the `clone()` method to customize the cloned object. The resulting objects are clones of the original object, but with the updated attributes.
+
+---
+
+The Prototype pattern is used to create a new object by cloning the original one and then modifying the clone.
+
+Ways to create a new object in Python:
+
+```python
+classPoint:
+     __slots__ = ('x', 'y',)
+
+     def __init__(self, x, y):
+         self.x = x
+         self.y = y
+
+# With this classic definition of the Point class, there are seven ways to create a new point
+
+def make_object(cls, *args, **kwargs):
+     return cls(*args, **kwargs)
+
+point1 = Point(1, 2)
+point2 = eval('{}({}, {})'.format('Point', 2, 4)) # Dangerous
+point3 = getattr(sys.modules[__name__], 'Point')(3, 6)
+point4 = globals()['Point'](4, 8)
+point5 = make_object(Point, 5, 10)
+point6 = copy.deepcopy(point5)
+point6.x = 6
+point6.y = 12
+point7 = point1.__class__(7, 14)
+```
+
+When creating point6, we use the classic prototype-based approach: we first clone an existing object, and then we initialize and configure it. To create point7, we take an object of the point1 class and pass other arguments to it.
+
+In point6, we see that Python already has built-in support for prototypes in the form of the copy.deepcopy() function. However, the point7 example shows that Python has better features: instead of cloning an existing object and modifying the clone, Python provides access to an object of the existing object's class, so we can create a new object directly, which is much more efficient than cloning.
+
+A prototype is a pattern that generates objects. Specifies the kinds of objects to create using a prototype instance, and creates new objects by copying this prototype.
+
+```python
+"""
+*What is this pattern about?
+This patterns aims to reduce the number of classes required by an
+application. Instead of relying on subclasses it creates objects by
+copying a prototypical instance at run-time.
+This is useful as it makes it easier to derive new kinds of objects,
+when instances of the class have only a few different combinations of
+state, and when instantiation is expensive.
+*What does this example do?
+When the number of prototypes in an application can vary, it can be
+useful to keep a Dispatcher (aka, Registry or Manager). This allows
+clients to query the Dispatcher for a prototype before cloning a new
+instance.
+Below provides an example of such Dispatcher, which contains three
+copies of the prototype: 'default', 'objecta' and 'objectb'.
+*TL;DR
+Creates new object instances by cloning prototype.
+"""
+
+
+class Prototype:
+
+    value = 'default'
+
+    def clone(self, **attrs):
+        """Clone a prototype and update inner attributes dictionary"""
+        # Python in Practice, Mark Summerfield
+        obj = self.__class__()
+        obj.__dict__.update(attrs)
+        return obj
+
+
+class PrototypeDispatcher:
+    def __init__(self):
+        self._objects = {}
+
+    def get_objects(self):
+        """Get all objects"""
+        return self._objects
+
+    def register_object(self, name, obj):
+        """Register an object"""
+        self._objects[name] = obj
+
+    def unregister_object(self, name):
+        """Unregister an object"""
+        del self._objects[name]
+
+
+def main():
+    """
+    >>> dispatcher = PrototypeDispatcher()
+    >>> prototype = Prototype()
+    >>> d = prototype.clone()
+    >>> a = prototype.clone(value='a-value', category='a')
+    >>> b = prototype.clone(value='b-value', is_checked=True)
+    >>> dispatcher.register_object('objecta', a)
+    >>> dispatcher.register_object('objectb', b)
+    >>> dispatcher.register_object('default', d)
+    >>> [{n: p.value} for n, p in dispatcher.get_objects().items()]
+    [{'objecta': 'a-value'}, {'objectb': 'b-value'}, {'default': 'default'}]
+    """
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
+```
+
+#### Singleton
+
+The Singleton (Singleton) pattern is used when you need a class that must have a single instance in the entire program.
+
+Many patterns (abstract factory, builder, prototype) can be implemented using singleton pattern.
+
+The cookbook provides a simple Singleton class that any class can inherit to become a singleton.
+
+```python
+"""
+Yet one singleton realization on Python without metaclass. Singleton may has __init__ method which will call only when first object create.
+http://code.activestate.com/recipes/577208-singletonsubclass-with-once-initialization/
+"""
+
+
+class Singleton(object):
+
+     def __new__(cls,*dt,**mp):
+         if not hasattr(cls,'_inst'):
+             cls._inst = super(Singleton, cls).__new__(cls,dt,mp)
+         else:
+             def init_pass(self,*dt,**mp):pass
+             cls.__init__ = init_pass
+
+         return cls._inst
+
+if __name__ == '__main__':
+
+
+     class A(Singleton):
+
+         def __init__(self):
+             """Super constructor
+                 There is we can open file or create connection to the database
+             """
+             print "A init"
+
+
+     a1 = A()
+     a2 = A()
+```
+
+And the Borg class, which will give the same result in a very different way.
+
+```python
+"""
+*What is this pattern about?
+The Borg pattern (also known as the Monostate pattern) is a way to
+implement singleton behavior, but instead of having only one instance
+of a class, there are multiple instances that share the same state. In
+other words, the focus is on sharing state instead of sharing instance
+identity.
+*What does this example do?
+To understand the implementation of this pattern in Python, it is
+important to know that, in Python, instance attributes are stored in a
+attribute dictionary called __dict__. Usually, each instance will have
+its own dictionary, but the Borg pattern modifies this so that all
+instances have the same dictionary.
+In this example, the __shared_state attribute will be the dictionary
+shared between all instances, and this is ensured by assigining
+__shared_state to the __dict__ variable when initializing a new
+instance (i.e., in the __init__ method). Other attributes are usually
+added to the instance's attribute dictionary, but, since the attribute
+dictionary itself is shared (which is __shared_state), all other
+attributes will also be shared.
+*Where is the pattern used practically?
+Sharing state is useful in applications like managing database connections:
+https://github.com/onetwopunch/pythonDbTemplate/blob/master/database.py
+*References:
+https://fkromer.github.io/python-pattern-references/design/#singleton
+*TL;DR
+Provides singleton-like behavior sharing state between instances.
+"""
+
+
+class Borg:
+    __shared_state = {}
+
+    def __init__(self):
+        self.__dict__ = self.__shared_state
+        self.state = 'Init'
+
+    def __str__(self):
+        return self.state
+
+
+class YourBorg(Borg):
+    pass
+
+
+def main():
+    """
+    >>> rm1 = Borg()
+    >>> rm2 = Borg()
+    >>> rm1.state = 'Idle'
+    >>> rm2.state = 'Running'
+    >>> print('rm1: {0}'.format(rm1))
+    rm1: Running
+    >>> print('rm2: {0}'.format(rm2))
+    rm2: Running
+    # When the `state` attribute is modified from instance `rm2`,
+    # the value of `state` in instance `rm1` also changes
+    >>> rm2.state = 'Zombie'
+    >>> print('rm1: {0}'.format(rm1))
+    rm1: Zombie
+    >>> print('rm2: {0}'.format(rm2))
+    rm2: Zombie
+    # Even though `rm1` and `rm2` share attributes, the instances are not the same
+    >>> rm1 is rm2
+    False
+    # Shared state is also modified from a subclass instance `rm3`
+    >>> rm3 = YourBorg()
+    >>> print('rm1: {0}'.format(rm1))
+    rm1: Init
+    >>> print('rm2: {0}'.format(rm2))
+    rm2: Init
+    >>> print('rm3: {0}'.format(rm3))
+    rm3: Init
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+```
+
+However, the easiest way to get singleton functionality in Python is to create a module with global state stored in private variables and provide public functions to access it. For example, to get exchange rates, we need a function that will return a dictionary (the key is the name of the currency, the value is the exchange rate). You may need to call this function several times, but in most cases you need to retrieve rates from somewhere once. The Loner pattern will help to implement this.
+
+```python
+import re
+import urllib.request
+
+
+_URL = "http://www.bankofcanada.ca/stats/assets/csv/fx-seven-day.csv"
+
+
+def get(refresh=False):
+    if refresh:
+        get.rates = {}
+    if get.rates:
+        return get.rates
+    with urllib.request.urlopen(_URL) as file:
+        for line in file:
+            line = line.rstrip().decode("utf-8")
+            if not line or line.startswith(("#", "Date")):
+                continue
+            name, currency, *rest = re.split(r"/s*,/s*", line)
+            key = "{} ({})".format(name, currency)
+            try:
+                get.rates[key] = float(rest[-1])
+            except ValueError as err:
+                print("error {}: {}".format(err, line))
+    return get.rates
+get.rates = {}
+
+
+if __name__ == "__main__":
+    import sys
+    if sys.stdout.isatty():
+        print(get())
+    else:
+        print("Loaded OK")
+```
+
+Here we create the rates dictionary as an attribute of the Rates.get() function - this is our private value. When the public get() function is called for the first time (and also when called with the refresh=True parameter), we load the list of courses; otherwise, we simply return the last loaded courses.
+
+#### Creational patterns. Outcome
+
+All generative design patterns are implemented trivially in Python. The Singleton pattern can be implemented directly with a module, but the Prototype pattern is generally useless (although it can be implemented with the copy module), since Python provides dynamic access to class objects. Of the generative patterns, the Factory and Builder are the most useful, and there are several ways to implement them.
