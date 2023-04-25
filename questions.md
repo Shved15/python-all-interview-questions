@@ -4806,3 +4806,673 @@ Here we create the rates dictionary as an attribute of the Rates.get() function 
 #### Creational patterns. Outcome
 
 All generative design patterns are implemented trivially in Python. The Singleton pattern can be implemented directly with a module, but the Prototype pattern is generally useless (although it can be implemented with the copy module), since Python provides dynamic access to class objects. Of the generative patterns, the Factory and Builder are the most useful, and there are several ways to implement them.
+
+### Structural
+
+Structural design patterns are design patterns that are concerned with object composition and class inheritance. These patterns are used to form large object structures and provide new functionality through the composition of objects and classes. Structural patterns also help to make a system more flexible by creating a stable interface between components, allowing the components to be modified or replaced without affecting the system as a whole.
+
+Structural patterns describe how some objects are composed of other, larger ones. There are three main areas covered: customizing interfaces, adding functionality, and working with collections of objects.
+
+#### Adapter
+
+The Adapter pattern is a structural design pattern that allows incompatible interfaces of classes to work together by creating a wrapper around one of the existing classes. It converts the interface of a class into another interface that clients expect, without changing the original code. The Adapter pattern is useful when we have two classes with incompatible interfaces, and we need to use one class's functionality with the other class.
+
+The main components of the Adapter pattern are:
+
+1. Target: The interface that is used by the client code and needs to be adapted.
+2. Adapter: The class that implements the Target interface and wraps the Adaptee object.
+3. Adaptee: The class that has the functionality that needs to be adapted to work with the Target interface.
+
+Here is an example implementation of the Adapter pattern in Python:
+
+```python
+class Target:
+    """ The Target interface """
+    def request(self) -> str:
+        pass
+
+
+class Adaptee:
+    """ The Adaptee class """
+    def specific_request(self) -> str:
+        return "Adaptee request"
+
+
+class Adapter(Target):
+    """ The Adapter class """
+    def __init__(self, adaptee: Adaptee):
+        self.adaptee = adaptee
+
+    def request(self) -> str:
+        return f"Adapter: (TRANSLATED) {self.adaptee.specific_request()}"
+
+
+def client_code(target: Target) -> None:
+    """ Client code that uses the Target interface """
+    print(target.request())
+
+
+if __name__ == "__main__":
+    adaptee = Adaptee()
+    adapter = Adapter(adaptee)
+
+    print("Adaptee interface is incompatible with the client.")
+    print("But with adapter client can call it's method.")
+
+    client_code(adapter)
+```
+
+In this example, the `Adaptee` class has a `specific_request()` method that is incompatible with the `Target` interface's `request()` method. We create an `Adapter` class that takes an instance of `Adaptee` and implements the `Target` interface by calling the `Adaptee`'s `specific_request()` method in its own `request()` method. Finally, we have a `client_code()` function that uses the `Target` interface and can call the `Adapter`'s `request()` method to get the desired output.
+
+---
+
+```python
+"""
+*What is this pattern about?
+The Adapter pattern provides a different interface for a class. We can
+think about it as a cable adapter that allows you to charge a phone
+somewhere that has outlets in a different shape. Following this idea,
+the Adapter pattern is useful to integrate classes that couldn't be
+integrated due to their incompatible interfaces.
+*What does this example do?
+The example has classes that represent entities (Dog, Cat, Human, Car)
+that make different noises. The Adapter class provides a different
+interface to the original methods that make such noises. So the
+original interfaces (e.g., bark and meow) are available under a
+different name: make_noise.
+*Where is the pattern used practically?
+The Grok framework uses adapters to make objects work with a
+particular API without modifying the objects themselves:
+http://grok.zope.org/doc/current/grok_overview.html#adapters
+*References:
+http://ginstrom.com/scribbles/2008/11/06/generic-adapter-class-in-python/
+https://sourcemaking.com/design_patterns/adapter
+http://python-3-patterns-idioms-test.readthedocs.io/en/latest/ChangeInterface.html#adapter
+*TL;DR
+Allows the interface of an existing class to be used as another interface.
+"""
+
+
+class Dog:
+    def __init__(self):
+        self.name = "Dog"
+
+    def bark(self):
+        return "woof!"
+
+
+class Cat:
+    def __init__(self):
+        self.name = "Cat"
+
+    def meow(self):
+        return "meow!"
+
+
+class Human:
+    def __init__(self):
+        self.name = "Human"
+
+    def speak(self):
+        return "'hello'"
+
+
+class Car:
+    def __init__(self):
+        self.name = "Car"
+
+    def make_noise(self, octane_level):
+        return "vroom{0}".format("!" * octane_level)
+
+
+class Adapter:
+    """
+    Adapts an object by replacing methods.
+    Usage:
+    dog = Dog()
+    dog = Adapter(dog, make_noise=dog.bark)
+    """
+
+    def __init__(self, obj, **adapted_methods):
+        """We set the adapted methods in the object's dict"""
+        self.obj = obj
+        self.__dict__.update(adapted_methods)
+
+    def __getattr__(self, attr):
+        """All non-adapted calls are passed to the object"""
+        return getattr(self.obj, attr)
+
+    def original_dict(self):
+        """Print original object dict"""
+        return self.obj.__dict__
+
+
+def main():
+    """
+    >>> objects = []
+    >>> dog = Dog()
+    >>> print(dog.__dict__)
+    {'name': 'Dog'}
+    >>> objects.append(Adapter(dog, make_noise=dog.bark))
+    >>> objects[0].__dict__['obj'], objects[0].__dict__['make_noise']
+    (<...Dog object at 0x...>, <bound method Dog.bark of <...Dog object at 0x...>>)
+    >>> print(objects[0].original_dict())
+    {'name': 'Dog'}
+    >>> cat = Cat()
+    >>> objects.append(Adapter(cat, make_noise=cat.meow))
+    >>> human = Human()
+    >>> objects.append(Adapter(human, make_noise=human.speak))
+    >>> car = Car()
+    >>> objects.append(Adapter(car, make_noise=lambda: car.make_noise(3)))
+    >>> for obj in objects:
+    ...    print("A {0} goes {1}".format(obj.name, obj.make_noise()))
+    A Dog goes woof!
+    A Cat goes meow!
+    A Human goes 'hello'
+    A Car goes vroom!!!
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.ELLIPSIS)
+```
+
+#### Bridge
+
+The Bridge pattern is a structural design pattern that decouples an abstraction from its implementation, allowing them to vary independently. It is useful when you want to avoid creating a massive number of subclasses to handle different variations of a component.
+
+The pattern consists of two main components: the abstraction and the implementation. The abstraction defines the high-level interface for a client to interact with, while the implementation defines the low-level details that the abstraction relies on.
+
+The key benefit of the Bridge pattern is that it allows for the separation of concerns between the abstraction and the implementation. This means that changes to one component will not affect the other, making it easier to maintain and extend the system over time.
+
+Here is an example of the Bridge pattern in Python:
+
+```python
+# Implementor interface
+class Renderer:
+    def render_circle(self, radius):
+        pass
+
+# Concrete Implementor A
+class VectorRenderer(Renderer):
+    def render_circle(self, radius):
+        print(f"Drawing a circle of radius {radius} using vector graphics")
+
+# Concrete Implementor B
+class RasterRenderer(Renderer):
+    def render_circle(self, radius):
+        print(f"Drawing a circle of radius {radius} using raster graphics")
+
+# Abstraction
+class Shape:
+    def __init__(self, renderer):
+        self.renderer = renderer
+
+    def draw(self):
+        pass
+
+    def resize(self, factor):
+        pass
+
+# Refined Abstraction
+class Circle(Shape):
+    def __init__(self, x, y, radius, renderer):
+        super().__init__(renderer)
+        self.x = x
+        self.y = y
+        self.radius = radius
+
+    def draw(self):
+        self.renderer.render_circle(self.radius)
+
+    def resize(self, factor):
+        self.radius *= factor
+```
+
+In this example, we have two concrete implementors - `VectorRenderer` and `RasterRenderer` - that implement the `Renderer` interface. We also have an abstraction - `Shape` - that takes a `Renderer` object in its constructor.
+
+The `Circle` class is a refined abstraction that inherits from `Shape` and adds additional properties for its coordinates and radius. When we call the draw method on a `Circle` object, it delegates the rendering of the circle to its `Renderer` object.
+
+By using the `Bridge` pattern in this way, we can easily switch out different implementations of `Renderer` without affecting the `Shape` or `Circle` classes. For example, if we wanted to add a new `3DRenderer`, we could create a new concrete implementor that implements the `Renderer` interface and use it with our existing abstractions.
+
+---
+
+```python
+"""
+*References:
+http://en.wikibooks.org/wiki/Computer_Science_Design_Patterns/Bridge_Pattern#Python
+*TL;DR
+Decouples an abstraction from its implementation.
+"""
+
+
+# ConcreteImplementor 1/2
+class DrawingAPI1:
+    def draw_circle(self, x, y, radius):
+        print('API1.circle at {}:{} radius {}'.format(x, y, radius))
+
+
+# ConcreteImplementor 2/2
+class DrawingAPI2:
+    def draw_circle(self, x, y, radius):
+        print('API2.circle at {}:{} radius {}'.format(x, y, radius))
+
+
+# Refined Abstraction
+class CircleShape:
+    def __init__(self, x, y, radius, drawing_api):
+        self._x = x
+        self._y = y
+        self._radius = radius
+        self._drawing_api = drawing_api
+
+    # low-level i.e. Implementation specific
+    def draw(self):
+        self._drawing_api.draw_circle(self._x, self._y, self._radius)
+
+    # high-level i.e. Abstraction specific
+    def scale(self, pct):
+        self._radius *= pct
+
+
+def main():
+    """
+    >>> shapes = (CircleShape(1, 2, 3, DrawingAPI1()), CircleShape(5, 7, 11, DrawingAPI2()))
+    >>> for shape in shapes:
+    ...    shape.scale(2.5)
+    ...    shape.draw()
+    API1.circle at 1:2 radius 7.5
+    API2.circle at 5:7 radius 27.5
+    """
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
+```
+
+#### Composite
+
+The Composite pattern is a structural design pattern that allows you to treat individual objects and compositions of objects uniformly, by creating a hierarchical tree-like structure of objects. It composes objects into tree structures to represent part-whole hierarchies. With the Composite pattern, you can work with complex object hierarchies in a simple and intuitive way, just like working with a single object.
+
+The Composite pattern is based on two classes: the Component class, which is the base class for all the objects in the hierarchy, and the Composite class, which represents the internal nodes in the tree structure. The Component class defines the common interface for all objects in the tree, and the Composite class defines the interface for the objects that have children.
+
+To implement the Composite pattern in Python, you can create a Component interface or an abstract base class that defines the common interface for all the objects in the hierarchy. Then, you can create two types of classes: Leaf classes and Composite classes. Leaf classes represent the individual objects in the tree, and Composite classes represent the internal nodes in the tree.
+
+Here's an example of the Composite pattern implemented in Python:
+
+```python
+from abc import ABC, abstractmethod
+
+class Component(ABC):
+    """The base Component class"""
+
+    @abstractmethod
+    def operation(self) -> str:
+        pass
+
+
+class Leaf(Component):
+    """A Leaf node class"""
+
+    def operation(self) -> str:
+        return "Leaf"
+
+
+class Composite(Component):
+    """A Composite node class"""
+
+    def __init__(self) -> None:
+        self._children = []
+
+    def add(self, component: Component) -> None:
+        self._children.append(component)
+
+    def remove(self, component: Component) -> None:
+        self._children.remove(component)
+
+    def operation(self) -> str:
+        results = []
+        for child in self._children:
+            results.append(child.operation())
+        return f"Branch({'+'.join(results)})"
+```
+
+In this example, the Component class is defined as an abstract base class that has a single method, `operation()`. The Leaf class represents the individual objects in the tree, and the Composite class represents the internal nodes in the tree. The Composite class has a list of children, and it implements the `add()`, `remove()`, and `operation()` methods.
+
+You can use the Composite pattern to create a tree-like structure of objects and treat them uniformly, without worrying about the difference between individual objects and collections of objects. The Composite pattern is useful when you need to work with complex object hierarchies that have a part-whole relationship.
+
+#### Decorator
+
+The Decorator pattern is a structural design pattern that allows objects to add new behaviors dynamically by wrapping them with decorator objects. It allows for adding new functionality to an existing object without altering its structure. This pattern follows the Open-Closed Principle, which states that classes should be open for extension but closed for modification.
+
+The Decorator pattern involves creating a set of decorator classes that are used to wrap concrete components. The concrete components can be classes, objects, or data structures. Decorator objects have the same interface as the components they decorate, which allows them to be used interchangeably.
+
+The Decorator pattern consists of four main components:
+
+1. Component: An abstract class or interface that defines the methods to be implemented by the concrete components and decorators.
+2. Concrete Component: A class that provides the basic implementation of the component interface.
+3. Decorator: An abstract class or interface that defines the methods to be implemented by the concrete decorators. It holds a reference to a component object and has the same interface as the component it decorates.
+4. Concrete Decorator: A class that implements the decorator interface and adds new functionality to the component it decorates.
+
+Here's an example of how to implement the Decorator pattern in Python:
+
+```python
+# Define the base component class
+class Component:
+    def operation(self):
+        pass
+
+# Define the concrete component class
+class ConcreteComponent(Component):
+    def operation(self):
+        return "ConcreteComponent"
+
+# Define the base decorator class
+class Decorator(Component):
+    def __init__(self, component):
+        self._component = component
+
+    def operation(self):
+        return self._component.operation()
+
+# Define concrete decorator classes
+class ConcreteDecoratorA(Decorator):
+    def operation(self):
+        return f"ConcreteDecoratorA({self._component.operation()})"
+
+class ConcreteDecoratorB(Decorator):
+    def operation(self):
+        return f"ConcreteDecoratorB({self._component.operation()})"
+
+# Create objects and call methods
+component = ConcreteComponent()
+decoratorA = ConcreteDecoratorA(component)
+decoratorB = ConcreteDecoratorB(decoratorA)
+print(decoratorB.operation())
+```
+
+In this example, we have a base component class called `Component`, which defines the interface for objects that can be decorated. We also have a concrete component class called `ConcreteComponent`, which implements the behavior of the base component.
+
+We then define a base decorator class called `Decorator`, which holds a reference to a component object and implements the same interface as the component. We also define two concrete decorator classes called `ConcreteDecoratorA` and `ConcreteDecoratorB`, which add functionality to the component by calling its methods and doing some additional work.
+
+Finally, we create a component object, wrap it with two decorators, and call the operation method on the outermost decorator.
+
+#### Facade
+
+The Facade pattern is a structural design pattern that provides a simplified interface to a complex system of classes, libraries, or frameworks. It hides the complexity of the underlying system and provides a higher-level interface to the client. This helps to decouple the client from the subsystems, making it easier to use and maintain.
+
+The Facade pattern involves creating a Facade class that provides a simplified interface to a complex subsystem. The Facade class delegates client requests to the appropriate subsystem objects and returns the results to the client.
+
+The Python standard library has several modules for working with compressed files - gzip, tar+gzip, zip. All of them have different interfaces. If we want to have one unified interface for working with archives, we can use the Facade pattern.
+
+The Facade and Adapter patterns seem similar at first glance. The difference is that a Facade builds a simple interface on top of a complex one, while an Adapter builds a unified interface on top of some other (not necessarily complex) one. Both of these patterns can be used together. For example, define an interface for working with archive files, write an adapter for each format, and build a facade on top of them so that users don't have to worry about which particular file format is used.
+
+Here's an example implementation of the Facade pattern in Python:
+
+```python
+"""
+Example from https://en.wikipedia.org/wiki/Facade_pattern#Python
+*What is this pattern about?
+The Facade pattern is a way to provide a simpler unified interface to
+a more complex system. It provides an easier way to access functions
+of the underlying system by providing a single entry point.
+This kind of abstraction is seen in many real life situations. For
+example, we can turn on a computer by just pressing a button, but in
+fact there are many procedures and operations done when that happens
+(e.g., loading programs from disk to memory). In this case, the button
+serves as an unified interface to all the underlying procedures to
+turn on a computer.
+*Where is the pattern used practically?
+This pattern can be seen in the Python standard library when we use
+the isdir function. Although a user simply uses this function to know
+whether a path refers to a directory, the system makes a few
+operations and calls other modules (e.g., os.stat) to give the result.
+*References:
+https://sourcemaking.com/design_patterns/facade
+https://fkromer.github.io/python-pattern-references/design/#facade
+http://python-3-patterns-idioms-test.readthedocs.io/en/latest/ChangeInterface.html#facade
+*TL;DR
+Provides a simpler unified interface to a complex system.
+"""
+
+
+# Complex computer parts
+class CPU:
+    """
+    Simple CPU representation.
+    """
+    def freeze(self):
+        print("Freezing processor.")
+
+    def jump(self, position):
+        print("Jumping to:", position)
+
+    def execute(self):
+        print("Executing.")
+
+
+class Memory:
+    """
+    Simple memory representation.
+    """
+    def load(self, position, data):
+        print("Loading from {0} data: '{1}'.".format(position, data))
+
+
+class SolidStateDrive:
+    """
+    Simple solid state drive representation.
+    """
+    def read(self, lba, size):
+        return "Some data from sector {0} with size {1}".format(lba, size)
+
+
+class ComputerFacade:
+    """
+    Represents a facade for various computer parts.
+    """
+    def __init__(self):
+        self.cpu = CPU()
+        self.memory = Memory()
+        self.ssd = SolidStateDrive()
+
+    def start(self):
+        self.cpu.freeze()
+        self.memory.load("0x00", self.ssd.read("100", "1024"))
+        self.cpu.jump("0x00")
+        self.cpu.execute()
+
+
+def main():
+    """
+    >>> computer_facade = ComputerFacade()
+    >>> computer_facade.start()
+    Freezing processor.
+    Loading from 0x00 data: 'Some data from sector 100 with size 1024'.
+    Jumping to: 0x00
+    Executing.
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.ELLIPSIS)
+```
+
+#### Flyweight
+
+The Flyweight design pattern is a structural pattern that is used to reduce the memory usage of an application. It allows for sharing of common parts of objects between multiple objects, thereby reducing the overall memory usage of the application.
+
+The pattern achieves this by separating the intrinsic state of an object, which is shared among multiple objects, from the extrinsic state of an object, which is unique to each object. The intrinsic state is stored in a separate Flyweight object, which is shared among multiple objects.
+
+The flyweight is designed to handle a large number of relatively small objects, when many of these objects are duplicates. The implementation of the pattern assumes that each unique object is presented only once, and this instance is given to the request. In Python, it is easily implemented via a dictionary.
+
+In Python, the approach to implementing flyweights is natural due to the presence of object references. For example, if we had a long list of strings with a lot of duplicates, then by storing references to objects (that is, variables) and not literal strings, we could significantly save memory
+
+Here is an example implementation of the Flyweight pattern in Python:
+
+```python
+red, green, blue = 'red', 'green', 'blue'
+x = (red, green, blue, red, green, blue, green)
+```
+
+```python
+"""
+*What is this pattern about?
+This pattern aims to minimise the number of objects that are needed by
+a program at run-time. A Flyweight is an object shared by multiple
+contexts, and is indistinguishable from an object that is not shared.
+The state of a Flyweight should not be affected by it's context, this
+is known as its intrinsic state. The decoupling of the objects state
+from the object's context, allows the Flyweight to be shared.
+*What does this example do?
+The example below sets-up an 'object pool' which stores initialised
+objects. When a 'Card' is created it first checks to see if it already
+exists instead of creating a new one. This aims to reduce the number of
+objects initialised by the program.
+*References:
+http://codesnipers.com/?q=python-flyweights
+https://python-patterns.guide/gang-of-four/flyweight/
+*Examples in Python ecosystem:
+https://docs.python.org/3/library/sys.html#sys.intern
+*TL;DR
+Minimizes memory usage by sharing data with other similar objects.
+"""
+
+import weakref
+
+
+class Card:
+    """The Flyweight"""
+
+    # Could be a simple dict.
+    # With WeakValueDictionary garbage collection can reclaim the object
+    # when there are no other references to it.
+    _pool = weakref.WeakValueDictionary()
+
+    def __new__(cls, value, suit):
+        # If the object exists in the pool - just return it
+        obj = cls._pool.get(value + suit)
+        # otherwise - create new one (and add it to the pool)
+        if obj is None:
+            obj = object.__new__(Card)
+            cls._pool[value + suit] = obj
+            # This row does the part we usually see in `__init__`
+            obj.value, obj.suit = value, suit
+        return obj
+
+    # If you uncomment `__init__` and comment-out `__new__` -
+    #   Card becomes normal (non-flyweight).
+    # def __init__(self, value, suit):
+    #     self.value, self.suit = value, suit
+
+    def __repr__(self):
+        return "<Card: {}{}>".format(self.value, self.suit)
+
+
+def main():
+    """
+    >>> c1 = Card('9', 'h')
+    >>> c2 = Card('9', 'h')
+    >>> c1, c2
+    (<Card: 9h>, <Card: 9h>)
+    >>> c1 == c2
+    True
+    >>> c1 is c2
+    True
+    >>> c1.new_attr = 'temp'
+    >>> c3 = Card('9', 'h')
+    >>> hasattr(c3, 'new_attr')
+    True
+    >>> Card._pool.clear()
+    >>> c4 = Card('9', 'h')
+    >>> hasattr(c4, 'new_attr')
+    False
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+```
+
+#### Proxy
+
+The Proxy pattern is a design pattern that provides a surrogate or placeholder for another object to control access to it. It falls under the category of structural patterns.
+
+In the Proxy pattern, a proxy object acts as an intermediary between the client and the real object, hiding the details of the real object and providing additional functionality such as lazy initialization, access control, and caching.
+
+The Proxy pattern is useful when the real object is resource-intensive, or when there are multiple clients accessing the same object and the access needs to be controlled or coordinated. It is also useful when the real object is not available or needs to be replaced with a different implementation without affecting the client code.
+
+The book "Design Patterns" describes 4 such cases:
+
+1. remote proxy, when access to a remote object is proxied by a local object;
+2. virtual proxy, which allows you to create lightweight objects instead of heavy ones, and create the latter only when necessary;
+3. a security proxy that provides different levels of access, depending on the rights of the client;
+4. a smart reference that performs "additional actions when accessing an object" (can also be implemented using the @property descriptor)
+
+Here is an example of implementing the Proxy pattern in Python:
+
+```python
+"""
+*TL;DR
+Provides an interface to resource that is expensive to duplicate.
+"""
+
+import time
+
+
+class SalesManager:
+    def talk(self):
+        print("Sales Manager ready to talk")
+
+
+class Proxy:
+    def __init__(self):
+        self.busy = 'No'
+        self.sales = None
+
+    def talk(self):
+        print("Proxy checking for Sales Manager availability")
+        if self.busy == 'No':
+            self.sales = SalesManager()
+            time.sleep(0.1)
+            self.sales.talk()
+        else:
+            time.sleep(0.1)
+            print("Sales Manager is busy")
+
+
+class NoTalkProxy(Proxy):
+    def talk(self):
+        print("Proxy checking for Sales Manager availability")
+        time.sleep(0.1)
+        print("This Sales Manager will not talk to you", "whether he/she is busy or not")
+
+
+if __name__ == '__main__':
+    p = Proxy()
+    p.talk()
+    p.busy = 'Yes'
+    p.talk()
+    p = NoTalkProxy()
+    p.talk()
+    p.busy = 'Yes'
+    p.talk()
+
+# OUTPUT #
+# Proxy checking for Sales Manager availability
+# Sales Manager ready to talk
+# Proxy checking for Sales Manager availability
+# Sales Manager is busy
+# Proxy checking for Sales Manager availability
+# This Sales Manager will not talk to you whether he/she is busy or not
+# Proxy checking for Sales Manager availability
+# This Sales Manager will not talk to you whether he/she is busy or not
+```
+
+#### Structural patterns. Outcome
+
+The Adapter and Facade patterns make it easy to reuse classes in new contexts, while the Bridge pattern allows you to inject complex functionality from one class into another. The Composite makes it easy to create object hierarchies, although this is not particularly necessary in Python, since dictionaries are enough for this purpose. The decorator is so useful that Python has direct support for it, and the decorator idea is even extended to classes. The use of object references means that the language itself has a built-in variation on the Flyweight pattern. And the Proxy pattern in Python is especially easy to implement.
