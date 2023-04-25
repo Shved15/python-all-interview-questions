@@ -6822,3 +6822,187 @@ Out of the box has:
 - SSL / TLS, OAuth 2.0, authentication through Google services, plus you can screw your own (for example, two-factor)
 - Support for 9 languages: C, C++, Java, Go, Node.js, Python, Ruby, Objective-C, PHP, C# plus, of course, no one forbids you to take and implement your own version even for brainfuck.
 - Support for gRPC in public APIs from Google. Already working for some services. No, REST versions, of course, will also remain. But judge for yourself, if you have a choice - use, say, a REST version from a mobile application that returns data in 1 second, or take a gRPC version that works 0.5 seconds with the same development costs - what will you choose? What will your competitor choose?
+
+# Frontend
+
+## What is html and css and their basic concepts
+
+HTML (Hypertext Markup Language) and CSS (Cascading Style Sheets) are the two foundational technologies used for creating websites. HTML is used to structure content on a web page, while CSS is used to style and layout that content.
+
+HTML is a markup language that uses a set of tags to define the structure and content of a web page. It provides a way to create headings, paragraphs, lists, images, and links on a web page. HTML tags are used to define the structure of a page, including headings, paragraphs, and lists, and can also be used to embed images and videos, create forms, and more.
+
+CSS, on the other hand, is used to style and layout the content defined by HTML. It is a language that allows web developers to define colors, fonts, sizes, spacing, and more. CSS uses selectors to target specific HTML elements and apply styling rules to them. For example, a developer might use a CSS selector to target all of the headings on a web page and define their font size and color.
+
+Both HTML and CSS are essential for creating modern web pages that are both visually appealing and easy to navigate. By separating the content and structure of a web page from its presentation, developers can create flexible, responsive designs that work well on a wide range of devices and screen sizes.
+
+Some basic concepts of HTML include:
+
+- Tags: HTML tags are used to define the structure and content of a web page. They are enclosed in angle brackets (<>) and typically come in pairs, with the opening tag defining the beginning of an element and the closing tag defining the end of that element.
+- Attributes: HTML attributes provide additional information about an element, such as its ID, class, or style.
+- Elements: HTML elements are composed of a pair of tags (opening and closing) that define a specific part of a web page's structure and content.
+- Nesting: HTML elements can be nested inside one another to create a hierarchical structure for a web page.
+
+Some basic concepts of CSS include:
+
+- Selectors: CSS selectors are used to target specific HTML elements and apply styling rules to them. Selectors can be based on element type, class, ID, attribute, or relationship to other elements.
+- Properties: CSS properties define the specific style rules to be applied to an HTML element. They include properties for color, font, size, margin, padding, and more.
+- Values: CSS values define the specific settings for each property, such as a color value or a size value.
+- Cascade: CSS styles can be inherited from parent elements and overridden by more specific selectors or inline styles. The order of precedence for CSS rules is known as the cascade.
+  Overall, HTML and CSS are essential tools for any web developer, whether working on the frontend or the backend of a website. A solid understanding of these technologies is crucial for creating effective, responsive web designs that look great and function well for users.
+
+## What is Javascript and what are its basic concepts. How does it interact with Python
+
+JavaScript is a scripting language used primarily for creating dynamic web content and client-side scripting on web pages. It is a high-level, interpreted language that runs in a browser and is designed to be lightweight and easy to use. JavaScript has several important concepts, including variables, data types, functions, conditionals, loops, objects, and arrays.
+
+Variables in JavaScript are used to store data values, and data types include strings, numbers, booleans, and objects. Functions are blocks of code that can be called upon to perform specific tasks, and conditionals and loops are used to control the flow of the program based on certain conditions or for repeating code.
+
+Python and JavaScript can also communicate with each other through APIs or web services.
+
+In summary, JavaScript is a programming language used for client-side scripting on web pages, and it has several important concepts including variables, data types, functions, conditionals, loops, objects, and arrays. CSS is a stylesheet language used to describe the presentation of HTML or XML documents, including layouts and visual effects. Python and JavaScript can interact with each other through various methods, including using a server-side language, libraries, or APIs.
+
+## What is AJAX and how does it interact with python
+
+Ajax stands for Asynchronous JavaScript and XML. It's a technique used in web development to make asynchronous requests to a web server using JavaScript and retrieve data without the need to reload the entire web page.
+
+In an Ajax request, JavaScript code sends a request to the web server and receives a response in the background without requiring the user to manually refresh the page. This can greatly improve the user experience by making web applications more responsive and interactive.
+
+Python can be used on the server-side to process Ajax requests and respond with the required data. For example, a Python web application may have a URL endpoint that responds to an Ajax request with a JSON object containing data requested by the user. Python web frameworks such as Flask and Django have built-in support for handling Ajax requests and returning responses in various formats such as JSON or XML.
+
+Overall, Ajax is a powerful technique for building interactive and dynamic web applications, and it can be used effectively in combination with Python on the server-side to create high-performance web applications.
+
+## What is api. In what format is the data exchanged between the Server and the Client
+
+An API, or Application Programming Interface, is a set of protocols and tools that allow different software applications to communicate with each other. It specifies how software components should interact and what data should be exchanged between them. APIs are often used by web developers to allow third-party applications to access their web services or data.
+
+The data exchanged between the server and the client through an API is typically in a standardized format such as JSON (JavaScript Object Notation) or XML (eXtensible Markup Language). JSON is a lightweight data format that is easy to read and write, and is often used by APIs built with JavaScript or Python. XML is a more verbose format that is used in some legacy systems.
+
+When a client application makes a request to an API, it sends a request to the server with specific parameters or data. The server then processes the request and returns a response in the specified data format. The client application can then use the response data in its own application or display it to the user.
+
+## What format is the data in json
+
+Data in JSON (JavaScript Object Notation) format is in the form of a text string that contains structured data in the format of key-value pairs. They can be represented as arrays or objects, which can contain other arrays and nested objects.
+
+An example of a JSON object representing information about a person:
+
+```json
+{
+  "name": "John Smith",
+  "age": 35,
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zip": "12345"
+  },
+  "phoneNumbers": [
+    {
+      "type": "home",
+      "number": "555-555-1234"
+    },
+    {
+      "type": "work",
+      "number": "555-555-5678"
+    }
+  ]
+}
+```
+
+## What are media queries in CSS and what are they used for?
+
+Media queries in CSS is a technique that allows you to change styles depending on the characteristics of the device on which the web page is displayed. This allows you to create responsive websites that can be optimized for different screens and different types of devices such as desktops, laptops, tablets and smartphones.
+
+Media queries allow you to set different CSS properties for different types of devices. For example, you can change the size of the text, background, position of elements, and so on. depending on the screen size of the device on which the page is displayed.
+
+```css
+@media (max-width: 600px) {
+  body {
+    font-size: 14px;
+    background-color: #f2f2f2;
+  }
+}
+```
+
+Python is used most often on the server side of web development and is not directly related to media queries. However, on the server side, it is possible to generate HTML code using media queries, depending on the type of device on which the page is displayed.
+
+## What are cookies. Why they are, how to work with them and where they are stored
+
+Cookies are small text files that are stored on a user's computer by a web browser when they visit a website. They are used to store information about the user's browsing behavior and preferences, such as login credentials, shopping cart contents, and language preferences.
+
+Cookies work by being sent from the web server to the user's browser, where they are stored on the user's computer. When the user visits the same website again, the browser sends the cookies back to the server along with the user's request. This allows the server to remember information about the user and customize their experience.
+
+There are two main types of cookies: session cookies and persistent cookies. Session cookies are temporary and are deleted when the user closes their browser, while persistent cookies are stored on the user's computer for a specified period of time.
+
+To work with cookies in web development, developers use the document.cookie object in JavaScript to create, read, and delete cookies. Cookies can also be set and managed on the server-side using various programming languages such as Python.
+
+Cookies are stored in a specific location on the user's computer depending on the browser and operating system being used. In general, they are stored in a browser's "cookie jar" which is a database of cookies. The location of this cookie jar varies by browser and operating system.
+
+## Can the server change (add, remove) cookies
+
+Yes, the server can change, add, or remove cookies. When the client makes a request to the server, it sends the cookies that are stored for that domain. The server can then read, modify, or delete the cookies and send back the updated cookies in the response headers.
+
+To modify or delete a cookie, the server sends a new cookie with the same name as the existing cookie, but with updated or empty values, and with the same expiration and domain attributes as the original cookie. When the client receives the new cookie, it replaces the old cookie with the updated one or deletes it if the new cookie has an empty value.
+
+It's worth noting that some browsers may restrict or block the modification of cookies through HTTP headers for security reasons, such as the HttpOnly flag. In that case, the server can still modify cookies through JavaScript using the document.cookie property.
+
+## What is JWT (JSON Web Token)
+
+A JSON Web Token, or JWT (pronounced "jot"), is a standardized, in some cases signed, and/or encrypted data packaging format that is used to securely transfer information between two parties.
+
+JWT defines a specific structure of information that is sent over the network. It comes in two forms, serialized and deserialized. The first is used directly to transfer data with requests and responses. On the other hand, in order to read and write information to a token, it needs to be deserialized.
+
+JWT stands for JSON Web Token. It’s one of the most used means of authentication in web applications but also helps with authorization and information exchanges.
+
+According to RFC 7519, a JWT is a JSON object defined as a safe way of transmitting information between two parties. Information transmitted by JWT is digitally signed so it can be verified and trusted.
+
+A JWT contains three parts—a header (x), a payload (y), and a signature (z)—that are separated by a dot:
+
+> xxxxx.yyyyy.zzzzz
+
+- Header
+  The header of the JWT consists of two parts: the type of token and the signing algorithm being
+  used. The signing algorithm is used to ensure that the message is authentic and not altered. Here’s an example of a header:
+
+```json
+{
+  "alg": "RSA",
+  "typ": "JWT"
+}
+```
+
+Signing algorithms are algorithms used to sign tokens issued for your application or API.
+
+- Payload
+  The payload is the second part that contains the claims. According to the official JWT documentation (https://jwt.io/introduction), claims are statements about an entity (typically, the user) and additional data.
+  Here’s an example of a payload:
+
+```json
+{
+  "id": "d1397699-f37b-4de0-8e00-948fa8e9bf2c",
+  "name": "John Doe",
+  "admin": true
+}
+```
+
+In the preceding example, we have three claims: the ID of the user, the name of the user, and also a Boolean for the type of user.
+
+- Signature
+  The signature of a JWT is the encoded header, the encoded payload plus a secret, and an
+  algorithm specified in the header, all of them combined and signed.
+  For example, it’s possible to create a signature the following way using the RSA algorithm:
+
+```json
+RSA(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  secret)
+```
+
+The role of the signature is to track whether information has been changed.
+
+Each time a user successfully logs in, a JWT is created and returned. The JWT will be represented as credentials used to access protected resources. The fact that it’s possible to store data in a JWT makes it vulnerable. That’s why you should specify an expiration time when creating a JWT.
+To make it simple, two types of tokens:
+
+- An access token: Used to access resources and handle authorization
+- A refresh token: Used to retrieve a new access token
+  But why use two tokens? As we stated earlier, a JWT is generated when users log in. Moreover, JWTs used to access resources should have a short lifespan. This means that after the JWT has expired, the user has to log in again and again – and no user wants the login page to appear every 5 minutes.
+  That’s where a refresh token is useful. It’ll contain the essential information needed to verify the user and generate a new access token.
