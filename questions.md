@@ -5476,3 +5476,1185 @@ if __name__ == '__main__':
 #### Structural patterns. Outcome
 
 The Adapter and Facade patterns make it easy to reuse classes in new contexts, while the Bridge pattern allows you to inject complex functionality from one class into another. The Composite makes it easy to create object hierarchies, although this is not particularly necessary in Python, since dictionaries are enough for this purpose. The decorator is so useful that Python has direct support for it, and the decorator idea is even extended to classes. The use of object references means that the language itself has a built-in variation on the Flyweight pattern. And the Proxy pattern in Python is especially easy to implement.
+
+### Behavioral
+
+Behavioral patterns in programming are design patterns that focus on communication between objects and how they collaborate to accomplish complex behaviors and responsibilities. These patterns primarily deal with algorithms and the assignment of responsibilities between objects. They aim to simplify communication between objects and reduce coupling, increasing flexibility and reusability in software design. Some of them have direct support in the Python syntax.
+
+#### Chain of responsobility
+
+The Chain of Responsibility is a behavioral design pattern that allows passing requests along a chain of objects to handle them. Each object in the chain can handle the request or pass it to the next object in the chain. This pattern provides loose coupling between the sender and the receiver of the request, allowing multiple objects to handle the request without knowing the chain structure and reducing the coupling between objects.
+
+The Chain of Responsibility pattern consists of three main parts: the Handler interface, the ConcreteHandler classes, and the Client class.
+
+The Handler interface defines the common interface for handling requests. It also contains a reference to the next object in the chain.
+
+The ConcreteHandler classes implement the Handler interface and handle requests they are responsible for. They can also forward requests to the next object in the chain if they cannot handle them.
+
+The Client class creates the chain of objects and sends requests to the first object in the chain.
+
+The chain of responsibility pattern is designed to break the connection between the sender of a request and the recipient who processes this request. Instead of directly calling one function from another, the first function sends a request to a chain of recipients. The first recipient in the chain can either process the request and break the chain (without passing the request further), or pass the request on to the next recipient. The second recipient has the same choice, and so on, until the request reaches the last recipient (which may reject the request or throw an exception).
+
+Imagine a user interface that receives events to process. Some events come from the user (such as mouse and keyboard events), others come from the system (such as timer events).
+
+Here's an example implementation of the Chain of Responsibility pattern in Python:
+
+```python
+"""
+*What is this pattern about?
+The Chain of responsibility is an object oriented version of the
+`if ... elif ... elif ... else ...` idiom, with the
+benefit that the condition–action blocks can be dynamically rearranged
+and reconfigured at runtime.
+This pattern aims to decouple the senders of a request from its
+receivers by allowing request to move through chained
+receivers until it is handled.
+Request receiver in simple form keeps a reference to a single successor.
+As a variation some receivers may be capable of sending requests out
+in several directions, forming a `tree of responsibility`.
+*TL;DR
+Allow a request to pass down a chain of receivers until it is handled.
+"""
+
+import abc
+
+
+class Handler(metaclass=abc.ABCMeta):
+
+    def __init__(self, successor=None):
+        self.successor = successor
+
+    def handle(self, request):
+        """
+        Handle request and stop.
+        If can't - call next handler in chain.
+        As an alternative you might even in case of success
+        call the next handler.
+        """
+        res = self.check_range(request)
+        if not res and self.successor:
+            self.successor.handle(request)
+
+    @abc.abstractmethod
+    def check_range(self, request):
+        """Compare passed value to predefined interval"""
+
+
+class ConcreteHandler0(Handler):
+    """Each handler can be different.
+    Be simple and static...
+    """
+
+    @staticmethod
+    def check_range(request):
+        if 0 <= request < 10:
+            print("request {} handled in handler 0".format(request))
+            return True
+
+
+class ConcreteHandler1(Handler):
+    """... With it's own internal state"""
+
+    start, end = 10, 20
+
+    def check_range(self, request):
+        if self.start <= request < self.end:
+            print("request {} handled in handler 1".format(request))
+            return True
+
+
+class ConcreteHandler2(Handler):
+    """... With helper methods."""
+
+    def check_range(self, request):
+        start, end = self.get_interval_from_db()
+        if start <= request < end:
+            print("request {} handled in handler 2".format(request))
+            return True
+
+    @staticmethod
+    def get_interval_from_db():
+        return (20, 30)
+
+
+class FallbackHandler(Handler):
+    @staticmethod
+    def check_range(request):
+        print("end of chain, no handler for {}".format(request))
+        return False
+
+
+def main():
+    """
+    >>> h0 = ConcreteHandler0()
+    >>> h1 = ConcreteHandler1()
+    >>> h2 = ConcreteHandler2(FallbackHandler())
+    >>> h0.successor = h1
+    >>> h1.successor = h2
+    >>> requests = [2, 5, 14, 22, 18, 3, 35, 27, 20]
+    >>> for request in requests:
+    ...     h0.handle(request)
+    request 2 handled in handler 0
+    request 5 handled in handler 0
+    request 14 handled in handler 1
+    request 22 handled in handler 2
+    request 18 handled in handler 1
+    request 3 handled in handler 0
+    end of chain, no handler for 35
+    request 27 handled in handler 2
+    request 20 handled in handler 2
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.ELLIPSIS)
+```
+
+#### Command
+
+The Command pattern is a behavioral design pattern that encapsulates a request as an object, thereby allowing you to parameterize clients with different requests, queue or log requests, and support undoable operations. In this pattern, a command object is used to represent a single action or a transaction. The command object contains all the information necessary for the action to be taken, including the method to be called, the arguments to be passed to the method, and any other relevant information.
+
+The main participants in this pattern are the `Command`, `Invoker`, `Receiver`, and `Client`. The `Command` defines the interface for executing an operation. The `Invoker` asks the `Command` to carry out the request. The `Receiver` is the object that performs the action when the command is executed. The `Client` creates the `Command` and sets its `Receiver`.
+
+Here is an example implementation of the Command pattern in Python:
+
+```python
+# Command interface
+class Command:
+    def execute(self):
+        pass
+
+# Concrete command classes
+class LightOnCommand(Command):
+    def __init__(self, light):
+        self.light = light
+
+    def execute(self):
+        self.light.turn_on()
+
+class LightOffCommand(Command):
+    def __init__(self, light):
+        self.light = light
+
+    def execute(self):
+        self.light.turn_off()
+
+# Receiver class
+class Light:
+    def turn_on(self):
+        print("Light turned on")
+
+    def turn_off(self):
+        print("Light turned off")
+
+# Invoker class
+class Switch:
+    def __init__(self, on_command, off_command):
+        self.on_command = on_command
+        self.off_command = off_command
+
+    def turn_on(self):
+        self.on_command.execute()
+
+    def turn_off(self):
+        self.off_command.execute()
+
+# Client code
+light = Light()
+on_command = LightOnCommand(light)
+off_command = LightOffCommand(light)
+switch = Switch(on_command, off_command)
+
+switch.turn_on()
+switch.turn_off()
+```
+
+In this example, we have a Command interface and two Concrete Command classes: `LightOnCommand` and `LightOffCommand`. The Receiver is the `Light` class, which has methods for turning the light on and off. The Invoker is the `Switch` class, which has methods for turning the light on and off by calling the execute method of the appropriate Command object. Finally, the Client creates the Command objects and sets their Receiver.
+
+#### Interpreter
+
+The Interpreter pattern is a behavioral design pattern that defines a language or syntax, and it uses an interpreter to evaluate and execute the instructions written in that language. This pattern is particularly useful when you have to interpret and execute specific language syntax, such as mathematical expressions or queries.
+
+The Interpreter pattern consists of three main components: the Context, the Abstract Expression, and the Concrete Expression. The Context contains the information that the interpreter will use to evaluate the expressions. The Abstract Expression defines the interface for the expressions, and the Concrete Expression implements the interface and evaluates the expression.
+
+Here's an example implementation of the Interpreter pattern in Python that evaluates a simple arithmetic expression:
+
+```python
+class Context:
+    def __init__(self):
+        self.variables = {}
+
+    def get_value(self, variable):
+        return self.variables.get(variable, 0)
+
+    def set_value(self, variable, value):
+        self.variables[variable] = value
+
+class AbstractExpression:
+    def interpret(self, context):
+        pass
+
+class NumberExpression(AbstractExpression):
+    def __init__(self, number):
+        self.number = number
+
+    def interpret(self, context):
+        return self.number
+
+class PlusExpression(AbstractExpression):
+    def __init__(self, left_expression, right_expression):
+        self.left_expression = left_expression
+        self.right_expression = right_expression
+
+    def interpret(self, context):
+        return self.left_expression.interpret(context) + self.right_expression.interpret(context)
+
+class MinusExpression(AbstractExpression):
+    def __init__(self, left_expression, right_expression):
+        self.left_expression = left_expression
+        self.right_expression = right_expression
+
+    def interpret(self, context):
+        return self.left_expression.interpret(context) - self.right_expression.interpret(context)
+
+context = Context()
+a = NumberExpression(5)
+b = NumberExpression(10)
+c = PlusExpression(a, b)
+d = MinusExpression(c, a)
+
+print(d.interpret(context)) # Output: 10
+```
+
+In this example, we have a Context class that contains a dictionary of variables and their values. We also have three types of expressions: NumberExpression, PlusExpression, and MinusExpression. NumberExpression represents a simple numeric value, while PlusExpression and MinusExpression represent binary arithmetic operations.
+
+To evaluate an expression, we call its `interpret` method, passing in the context object as a parameter. The expression then recursively evaluates its sub-expressions until the final value is computed.
+
+---
+
+At its most primitive level, an application receives strings from the user, or from another program, that need to be interpreted (and possibly executed) in some way.
+
+An example of a widespread implementation of such requirements is the creation of domain-specific languages (DSLs).
+
+```python
+"""
+Interpreter - a pattern of class behavior.
+For a given language, defines a representation of its grammar,
+as well as an interpreter of the sentences of this language.
+"""
+
+
+class RomanNumeralInterpreter(object):
+     """Roman numeral interpreter"""
+     def __init__(self):
+         self.grammar = {
+             'I': 1,
+             'V': 5
+             'X': 10
+             'L': 50
+             'C': 100
+             'D': 500
+             'M': 1000
+         }
+
+     def interpret(self, text):
+         numbers = map(self.grammar.get, text) # strings to values
+         if None in numbers:
+             raise ValueError('Invalid value: %s' % text)
+         result = 0 # accumulate the result
+         temp = None # remember the last value
+         while numbers:
+             num = numbers.pop(0)
+             if temp is None or temp >= num:
+                 result += number
+             else:
+                 result += (num - temp * 2)
+             temp = num
+         return result
+
+
+interp = RomanNumeralInterpreter()
+print interp.interpret('MMMCMXCIX') == 3999 # True
+print interp.interpret('MCMLXXXVIII') == 1988 # True
+```
+
+#### Iterator
+
+The iterator pattern is a design pattern that allows the sequential traversal of elements in a collection without exposing its underlying representation. It provides a way to access the elements of an aggregate object sequentially without exposing its underlying implementation.
+
+In this pattern, an iterator is responsible for iterating over a collection of objects and returning them one at a time. The collection could be any type of data structure, such as an array, list, tree, or graph. The iterator provides a uniform interface for traversing the elements of the collection regardless of its implementation.
+
+The iterator pattern has the following components:
+
+1. Iterator: Defines the interface for the iterator. It includes methods such as next(), hasNext(), and remove().
+
+2. ConcreteIterator: Implements the iterator interface and keeps track of the current position in the collection.
+
+3. Aggregate: Defines the interface for the collection of objects.
+
+4. ConcreteAggregate: Implements the collection interface and creates an iterator object.
+
+It's so useful that Python has built-in support for it, and it also provides special methods that we can implement in our own classes to support iteration seamlessly.
+
+Iteration can be supported in three ways: by following the sequence protocol, by using a variant of the iter() built-in function with two arguments, or by following the iterator protocol.
+
+Here's an example implementation of the iterator pattern in Python:
+
+```python
+class MyList:
+    def __init__(self):
+        self.items = []
+
+    def add(self, item):
+        self.items.append(item)
+
+    def __iter__(self):
+        return MyListIterator(self)
+
+class MyListIterator:
+    def __init__(self, mylist):
+        self.mylist = mylist
+        self.index = 0
+
+    def __next__(self):
+        if self.index >= len(self.mylist.items):
+            raise StopIteration
+        item = self.mylist.items[self.index]
+        self.index += 1
+        return item
+
+if __name__ == '__main__':
+    mylist = MyList()
+    mylist.add('apple')
+    mylist.add('banana')
+    mylist.add('orange')
+
+    for item in mylist:
+        print(item)
+```
+
+In this example, `MyList` is the aggregate and `MyListIterator` is the iterator. The `MyList` class has an `add()` method for adding items to the list and an `__iter__()` method that returns an instance of `MyListIterator`. The `MyListIterator` class keeps track of the current index and returns the next item in the list when the `__next__()` method is called.
+
+When the code is executed, it prints out the items in the list: "apple", "banana", and "orange". The for loop iterates over the items in the list using the iterator.
+
+#### Mediator
+
+The Mediator design pattern is a behavioral pattern that promotes loose coupling between objects by introducing a mediator object that handles the communication between them. In other words, it allows objects to communicate with each other through a mediator instead of directly with each other. This helps to reduce the dependencies between objects, which in turn simplifies the design and makes it easier to maintain.
+
+The Mediator pattern consists of several key components:
+
+- Mediator: an interface or abstract class that defines the communication protocol between objects.
+- Concrete Mediator: a class that implements the Mediator interface and manages the communication between the objects.
+- Colleague: an interface or abstract class that defines the interface of the objects that will communicate with each other through the mediator.
+- Concrete Colleague: a class that implements the Colleague interface and communicates with other objects through the mediator.
+
+The mediator provides a loose coupling of the system, eliminating the need for objects to explicitly refer to each other and thereby allowing you to independently change the interactions between them.
+
+Here is an example implementation of the Mediator pattern in Python:
+
+```python
+class Mediator:
+    def send(self, message, colleague):
+        pass
+
+class ConcreteMediator(Mediator):
+    def __init__(self, colleague1, colleague2):
+        self._colleague1 = colleague1
+        self._colleague2 = colleague2
+
+    def send(self, message, colleague):
+        if colleague == self._colleague1:
+            self._colleague2.notify(message)
+        else:
+            self._colleague1.notify(message)
+
+class Colleague:
+    def __init__(self, mediator):
+        self._mediator = mediator
+
+    def send(self, message):
+        self._mediator.send(message, self)
+
+    def notify(self, message):
+        pass
+
+class ConcreteColleague1(Colleague):
+    def notify(self, message):
+        print("ConcreteColleague1 received message:", message)
+
+class ConcreteColleague2(Colleague):
+    def notify(self, message):
+        print("ConcreteColleague2 received message:", message)
+
+# Create objects and call methods
+mediator = ConcreteMediator(ConcreteColleague1(mediator), ConcreteColleague2(mediator))
+colleague1 = mediator._colleague1
+colleague2 = mediator._colleague2
+colleague1.send("Hello from ConcreteColleague1!")
+colleague2.send("Hi from ConcreteColleague2!")
+```
+
+In this example, we have a Mediator interface and a ConcreteMediator class that manages the communication between two Colleague objects. The Colleague interface and the ConcreteColleague classes define the interface of the objects that will communicate with each other through the mediator. The ConcreteColleague1 and ConcreteColleague2 classes implement the Colleague interface and communicate with other objects through the mediator.
+
+We create the objects, set up the mediator, and then send messages between the colleagues through the mediator. The mediator handles the communication between the colleagues and ensures that they do not have to interact with each other directly.
+
+---
+
+One more example:
+
+```python
+import collections
+
+
+def main():
+    form = Form()
+    test_user_interaction_with(form)
+
+
+class Form:
+
+    def __init__(self):
+        self.create_widgets()
+        self.create_mediator()
+
+
+    def create_widgets(self):
+        self.nameText = Text()
+        self.emailText = Text()
+        self.okButton = Button("OK")
+        self.cancelButton = Button("Cancel")
+
+
+    def create_mediator(self):
+        self.mediator = Mediator(((self.nameText, self.update_ui),
+                (self.emailText, self.update_ui),
+                (self.okButton, self.clicked),
+                (self.cancelButton, self.clicked)))
+        self.update_ui()
+
+
+    def update_ui(self, widget=None):
+        self.okButton.enabled = (bool(self.nameText.text) and
+                                 bool(self.emailText.text))
+
+
+    def clicked(self, widget):
+        if widget == self.okButton:
+            print("OK")
+        elif widget == self.cancelButton:
+            print("Cancel")
+
+
+class Mediator:
+
+    def __init__(self, widgetCallablePairs):
+        self.callablesForWidget = collections.defaultdict(list)
+        for widget, caller in widgetCallablePairs:
+            self.callablesForWidget[widget].append(caller)
+            widget.mediator = self
+
+
+    def on_change(self, widget):
+        callables = self.callablesForWidget.get(widget)
+        if callables is not None:
+            for caller in callables:
+                caller(widget)
+        else:
+            raise AttributeError("No on_change() method registered for {}"
+                    .format(widget))
+
+
+class Mediated:
+
+    def __init__(self):
+        self.mediator = None
+
+
+    def on_change(self):
+        if self.mediator is not None:
+            self.mediator.on_change(self)
+
+
+class Button(Mediated):
+
+    def __init__(self, text=""):
+        super().__init__()
+        self.enabled = True
+        self.text = text
+
+
+    def click(self):
+        if self.enabled:
+            self.on_change()
+
+
+    def __str__(self):
+        return "Button({!r}) {}".format(self.text,
+                "enabled" if self.enabled else "disabled")
+
+
+class Text(Mediated):
+
+    def __init__(self, text=""):
+        super().__init__()
+        self.__text = text
+
+
+    @property
+    def text(self):
+        return self.__text
+
+
+    @text.setter
+    def text(self, text):
+        if self.text != text:
+            self.__text = text
+            self.on_change()
+
+
+    def __str__(self):
+        return "Text({!r})".format(self.text)
+
+
+def test_user_interaction_with(form):
+    form.okButton.click()           # Ignored because it is disabled
+    print(form.okButton.enabled)    # False
+    form.nameText.text = "Fred"
+    print(form.okButton.enabled)    # False
+    form.emailText.text = "fred@bloggers.com"
+    print(form.okButton.enabled)    # True
+    form.okButton.click()           # OK
+    form.emailText.text = ""
+    print(form.okButton.enabled)    # False
+    form.cancelButton.click()       # Cancel
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Memento
+
+The Memento pattern is a behavioral design pattern that allows capturing and restoring the state of an object without violating its encapsulation. This pattern enables an object to save its state at a certain point in time and restore that state later if needed. The Memento pattern consists of three parts: the Originator, which is the object whose state needs to be saved and restored; the Memento, which is an object that stores the state of the Originator; and the Caretaker, which is an object that is responsible for the management of the Memento.
+
+The Memento pattern is useful in situations where you need to save and restore the state of an object, such as when implementing undo-redo functionality in an application. It helps you to achieve separation of concerns by keeping the state management separate from the object's behavior.
+
+Python has out-of-the-box support for this pattern; using the `pickle` module, we can serialize and deserialize arbitrary Python objects (with some restrictions, such as not being able to serialize a file object).
+
+Even in those rare cases where we run into a serialization limitation, it is always possible to add our own support for this mechanism, for example by implementing the special methods `__getstate__()` and `__setstate__()` and possibly the `__getnewargs__()` method. Similarly, if we want to use the JSON format for our classes, we can extend the encoder and decoder by looking for the `json` module.
+
+You could come up with your own format and protocols, but this makes little sense, since Python already provides advanced support for this pattern.
+
+Here's an example implementation of the Memento pattern in Python:
+
+```python
+"""
+http://code.activestate.com/recipes/413838-memento-closure/
+*TL;DR
+Provides the ability to restore an object to its previous state.
+"""
+
+from copy import copy
+from copy import deepcopy
+
+
+def memento(obj, deep=False):
+    state = deepcopy(obj.__dict__) if deep else copy(obj.__dict__)
+
+    def restore():
+        obj.__dict__.clear()
+        obj.__dict__.update(state)
+
+    return restore
+
+
+class Transaction:
+    """A transaction guard.
+    This is, in fact, just syntactic sugar around a memento closure.
+    """
+
+    deep = False
+    states = []
+
+    def __init__(self, deep, *targets):
+        self.deep = deep
+        self.targets = targets
+        self.commit()
+
+    def commit(self):
+        self.states = [memento(target, self.deep) for target in self.targets]
+
+    def rollback(self):
+        for a_state in self.states:
+            a_state()
+
+
+class Transactional:
+    """Adds transactional semantics to methods. Methods decorated  with
+    @Transactional will rollback to entry-state upon exceptions.
+    """
+
+    def __init__(self, method):
+        self.method = method
+
+    def __get__(self, obj, T):
+        def transaction(*args, **kwargs):
+            state = memento(obj)
+            try:
+                return self.method(obj, *args, **kwargs)
+            except Exception as e:
+                state()
+                raise e
+
+        return transaction
+
+
+class NumObj:
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return '<%s: %r>' % (self.__class__.__name__, self.value)
+
+    def increment(self):
+        self.value += 1
+
+    @Transactional
+    def do_stuff(self):
+        self.value = '1111'  # <- invalid value
+        self.increment()  # <- will fail and rollback
+
+
+def main():
+    """
+    >>> num_obj = NumObj(-1)
+    >>> print(num_obj)
+    <NumObj: -1>
+    >>> a_transaction = Transaction(True, num_obj)
+    >>> try:
+    ...    for i in range(3):
+    ...        num_obj.increment()
+    ...        print(num_obj)
+    ...    a_transaction.commit()
+    ...    print('-- committed')
+    ...    for i in range(3):
+    ...        num_obj.increment()
+    ...        print(num_obj)
+    ...    num_obj.value += 'x'  # will fail
+    ...    print(num_obj)
+    ... except Exception:
+    ...    a_transaction.rollback()
+    ...    print('-- rolled back')
+    <NumObj: 0>
+    <NumObj: 1>
+    <NumObj: 2>
+    -- committed
+    <NumObj: 3>
+    <NumObj: 4>
+    <NumObj: 5>
+    -- rolled back
+    >>> print(num_obj)
+    <NumObj: 2>
+    >>> print('-- now doing stuff ...')
+    -- now doing stuff ...
+    >>> try:
+    ...    num_obj.do_stuff()
+    ... except Exception:
+    ...    print('-> doing stuff failed!')
+    ...    import sys
+    ...    import traceback
+    ...    traceback.print_exc(file=sys.stdout)
+    -> doing stuff failed!
+    Traceback (most recent call last):
+    ...
+    TypeError: ...str...int...
+    >>> print(num_obj)
+    <NumObj: 2>
+    """
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.ELLIPSIS)
+```
+
+#### Observer
+
+The Observer pattern is a design pattern in which an object, called the subject, maintains a list of its dependents, called observers, and notifies them automatically of any state changes, usually by calling one of their methods. This allows multiple objects to be notified and updated when there is a change in the state of the subject, without the subject having to know anything about the observers.
+
+The Observer pattern consists of two main components:
+
+1. Subject: The subject is the object that is being observed. It maintains a list of observers and provides methods for adding and removing observers.
+
+2. Observer: The observer is the object that is notified when the subject changes. It provides a method that the subject calls to notify it of any changes.
+
+The benefits of using the Observer pattern include:
+
+1. Loose coupling between the subject and the observers.
+2. The ability to add and remove observers dynamically.
+3. A separation of concerns between the subject and the observers.
+
+The Observer pattern maintains many-to-many dependency relationships between objects, for example, when the state of one object changes, all related objects are notified. Today, perhaps the most common example of this pattern and its variations is the model-view-controller (MVC) paradigm. In this paradigm, the model describes the data, one or more views render the data, and one or more controllers mediate between the input (eg, user interaction) and the model. And any changes in the model are automatically reflected in the views associated with it.
+
+The MVC approach has one popular simplification - use only models and views, but leave the views to both render the data and pass the model as inputs; in other words, views are co-located with controllers. In terms of the Observer pattern, this means that the views are observers and the model is the observed object.
+
+Examples include triggers in databases, Django's signaling system, the signals and slots mechanism in the QT library, and the many uses of WebSockets technology.
+
+Here is an example of implementing the Observer pattern in Python
+
+```python
+class Subject:
+    def __init__(self):
+        self._observers = []
+
+    def attach(self, observer):
+        self._observers.append(observer)
+
+    def detach(self, observer):
+        self._observers.remove(observer)
+
+    def notify(self):
+        for observer in self._observers:
+            observer.update(self)
+
+class ConcreteSubject(Subject):
+    def __init__(self):
+        super().__init__()
+        self._state = None
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        self._state = value
+        self.notify()
+
+class Observer:
+    def update(self, subject):
+        pass
+
+class ConcreteObserverA(Observer):
+    def update(self, subject):
+        print(f"ConcreteObserverA: {subject.state}")
+
+class ConcreteObserverB(Observer):
+    def update(self, subject):
+        print(f"ConcreteObserverB: {subject.state}")
+
+subject = ConcreteSubject()
+observerA = ConcreteObserverA()
+observerB = ConcreteObserverB()
+
+subject.attach(observerA)
+subject.attach(observerB)
+
+subject.state = 123
+
+subject.detach(observerB)
+
+subject.state = "hello"
+```
+
+In this example, we have a `Subject` class that maintains a list of observers and provides methods for adding and removing observers. We also have a `ConcreteSubject` class that inherits from `Subject` and defines a state variable. Whenever the state variable is changed, the `notify()` method is called, which in turn calls the `update()` method of each attached observer.
+
+We also have an `Observer` class that defines the `update()` method, which is called by the subject whenever there is a change in state. Finally, we have two `ConcreteObserver` classes that inherit from `Observer` and define their own implementation of the `update()` method.
+
+When we run this code, we get the following output:
+
+```python
+ConcreteObserverA: 123
+ConcreteObserverB: 123
+ConcreteObserverA: hello
+```
+
+This demonstrates how both observers are notified and updated when the state of the subject changes.
+
+#### State
+
+The State pattern is a behavioral design pattern that allows an object to change its behavior when its internal state changes. The pattern is used to define a state machine where an object's behavior is determined by its state. The State pattern is useful when an object has multiple possible states and transitions between states are complex.
+
+In this pattern, the state of an object is encapsulated in a separate state object, and the object delegates the behavior to the state object. The state object, in turn, can change the object's behavior by changing its state.
+
+The State pattern consists of several components:
+
+Context: The object that has a state and delegates the behavior to the state object.
+State: The interface that defines the behavior of the object.
+ConcreteState: The implementation of the State interface that defines the behavior of the object for a specific state.
+
+The State pattern is designed to create objects whose behavior changes when the state changes; this means that the object has modes of operation. From the outside, it seems that the class of the object has changed.
+
+There are two main approaches to handling state stored within a class. The first is the use of state-sensitive methods. The second is the use of state-defined methods
+
+Here is an example implementation of the State pattern in Python:
+
+```python
+class State:
+    def write_name(self, name):
+        pass
+
+class LowerCaseState(State):
+    def write_name(self, name):
+        print(name.lower())
+
+class UpperCaseState(State):
+    def write_name(self, name):
+        print(name.upper())
+
+class Context:
+    def __init__(self):
+        self.state = None
+
+    def set_state(self, state):
+        self.state = state
+
+    def write_name(self, name):
+        self.state.write_name(name)
+
+# Usage
+context = Context()
+
+lowercase_state = LowerCaseState()
+context.set_state(lowercase_state)
+context.write_name("John")
+
+uppercase_state = UpperCaseState()
+context.set_state(uppercase_state)
+context.write_name("John")
+```
+
+In this example, the `State` interface defines the `write_name` method, which is implemented by `LowerCaseState` and `UpperCaseState`. The `Context` class delegates the behavior to the current state object, which can be changed by calling `set_state`. Finally, we create an instance of the `Context` class and set its state to `LowerCaseState` and `UpperCaseState` to print the name in lower and upper case, respectively.
+
+Another example:
+
+```python
+"""
+State (State) - a pattern of behavior of objects.
+Allows an object to vary its behavior based on its internal state.
+From the outside, it seems that the class of the object has changed.
+"""
+
+
+class LampStateBase(object):
+     """Lamp status"""
+     def get_color(self):
+         raise NotImplementedError()
+
+
+class GreenLampState(LampStateBase):
+     def get_color(self):
+         return 'Green'
+
+
+class RedLampState(LampStateBase):
+     def get_color(self):
+         return 'Red'
+
+
+class BlueLampState(LampStateBase):
+     def get_color(self):
+         return 'Blue'
+
+
+class Lamp(object):
+     def __init__(self):
+         self._current_state = None
+         self._states = self.get_states()
+
+     def get_states(self):
+         return [GreenLampState(), RedLampState(), BlueLampState()]
+
+     def next_state(self):
+         if self._current_state is None:
+             self._current_state = self._states[0]
+         else:
+             index = self._states.index(self._current_state)
+             if index < len(self._states) - 1:
+                 index += 1
+             else:
+                 index = 0
+             self._current_state = self._states[index]
+         return self._current_state
+
+     def light(self):
+         state = self.next_state()
+         print state.get_color()
+
+
+lamp = Lamp()
+[lamp.light() for i in range(3)]
+#Green
+#Red
+# Blue
+[lamp.light() for i in range(3)]
+#Green
+#Red
+# Blue
+```
+
+#### Strategy
+
+The Strategy pattern is a behavioral design pattern that allows you to define a family of algorithms, encapsulate each one as an object, and make them interchangeable at runtime. This pattern lets the algorithm vary independently from the clients that use it.
+
+In other words, the Strategy pattern defines a set of interchangeable algorithms, encapsulates each one as an object, and makes them available for use by a client object. The client object can then choose the appropriate algorithm for its specific needs, without needing to know the details of the algorithm's implementation.
+
+The key components of the Strategy pattern are:
+
+1. The Strategy interface: This defines the interface for the algorithms that will be encapsulated by the strategy objects.
+
+2. Concrete Strategy classes: These are the various implementations of the Strategy interface.
+
+3. The Context class: This class maintains a reference to a Strategy object and delegates some work to it.
+
+Here is an example implementation of the Strategy pattern in Python:
+
+```python
+# Define the Strategy interface
+class Strategy:
+    def do_algorithm(self, data):
+        pass
+
+# Define Concrete Strategy classes
+class ConcreteStrategyA(Strategy):
+    def do_algorithm(self, data):
+        return sorted(data)
+
+class ConcreteStrategyB(Strategy):
+    def do_algorithm(self, data):
+        return reversed(sorted(data))
+
+# Define the Context class
+class Context:
+    def __init__(self, strategy):
+        self._strategy = strategy
+
+    def execute_strategy(self, data):
+        result = self._strategy.do_algorithm(data)
+        print(result)
+
+# Use the Context class to execute different strategies
+data = [1, 5, 3, 2, 4]
+
+context = Context(ConcreteStrategyA())
+context.execute_strategy(data)  # Output: [1, 2, 3, 4, 5]
+
+context = Context(ConcreteStrategyB())
+context.execute_strategy(data)  # Output: [5, 4, 3, 2, 1]
+```
+
+In this example, we first define the `Strategy` interface which defines the method `do_algorithm()`. Then, we create two concrete strategy classes, `ConcreteStrategyA` and `ConcreteStrategyB`, which implement the `do_algorithm()` method in different ways. Finally, we define the `Context` class which maintains a reference to a strategy object and uses it to execute a specific strategy.
+
+In the main part of the code, we create a list of numbers and use the `Context` class to execute the `ConcreteStrategyA` strategy and then the `ConcreteStrategyB` strategy on this list. The output of each strategy is printed to the console.
+
+#### Template method
+
+The Template Method pattern is a behavioral design pattern that allows you to define the skeleton of an algorithm in a base class, while allowing subclasses to provide specific implementations of certain steps of the algorithm. In this pattern, the base class defines the overall structure of the algorithm, including the order of steps and the flow of control, while the subclasses provide concrete implementations for certain steps. This pattern promotes code reuse and enables you to change the implementation of the individual steps without changing the overall structure of the algorithm.
+
+The Template Method pattern involves the following components:
+
+- Abstract Class: This is the base class that defines the overall structure of the algorithm. It contains abstract methods that represent the steps of the algorithm that the subclasses are responsible for implementing. It also contains a template method that calls these abstract methods in a specific order to carry out the algorithm.
+
+- Concrete Class: These are the subclasses that provide concrete implementations for the abstract methods defined in the abstract class.
+
+Here is an example implementation of the Template Method pattern in Python:
+
+```python
+from abc import ABC, abstractmethod
+
+class AbstractClass(ABC):
+
+    def template_method(self):
+        self._step_one()
+        self._step_two()
+        self._step_three()
+
+    @abstractmethod
+    def _step_one(self):
+        pass
+
+    @abstractmethod
+    def _step_two(self):
+        pass
+
+    @abstractmethod
+    def _step_three(self):
+        pass
+
+class ConcreteClassA(AbstractClass):
+
+    def _step_one(self):
+        print("ConcreteClassA: Step 1")
+
+    def _step_two(self):
+        print("ConcreteClassA: Step 2")
+
+    def _step_three(self):
+        print("ConcreteClassA: Step 3")
+
+class ConcreteClassB(AbstractClass):
+
+    def _step_one(self):
+        print("ConcreteClassB: Step 1")
+
+    def _step_two(self):
+        print("ConcreteClassB: Step 2")
+
+    def _step_three(self):
+        print("ConcreteClassB: Step 3")
+
+def client_code(abstract_class):
+    abstract_class.template_method()
+
+client_code(ConcreteClassA())
+client_code(ConcreteClassB())
+```
+
+In this example, we define an abstract class `AbstractClass` that contains the `template_method()` which calls the abstract methods `_step_one()`, `_step_two()`, and `_step_three()`. The `ConcreteClassA` and `ConcreteClassB` are the concrete implementations of the abstract methods `_step_one()`, `_step_two()`, and `_step_three()`. The `client_code()` function takes an object of the `AbstractClass` as its argument and calls its `template_method()` method to execute the algorithm.
+
+When we run this code, we get the following output:
+
+```python
+ConcreteClassA: Step 1
+ConcreteClassA: Step 2
+ConcreteClassA: Step 3
+ConcreteClassB: Step 1
+ConcreteClassB: Step 2
+ConcreteClassB: Step 3
+```
+
+As we can see, the `template_method()` in the `AbstractClass` defines the overall structure of the algorithm, while the concrete implementations in `ConcreteClassA` and `ConcreteClassB` provide the specific steps for the algorithm. This allows us to reuse the code in `AbstractClass` for multiple implementations, and also makes it easy to modify the specific steps without changing the overall structure of the algorithm.
+
+#### Visitor
+
+The Visitor pattern is a behavioral design pattern that separates the algorithm from the object structure on which it operates. It defines a way to add new operations to existing object structures without modifying those structures. The pattern is useful when you have a complex object structure and you want to perform various operations on its elements without cluttering them with those operations.
+
+In the Visitor pattern, you define a Visitor interface with a visit() method for each element of the object structure. Each ConcreteVisitor implements the visit() method for a specific type of element. The object structure is composed of elements that implement an accept() method that takes a Visitor as an argument. When the accept() method is called on an element, it calls the appropriate visit() method on the Visitor, passing itself as an argument.
+
+The Visitor pattern is useful when you have a complex object structure that is difficult to change and you want to add new operations to it. The pattern makes it easy to add new operations to existing object structures without modifying those structures. However, the pattern can be complex and requires a lot of code, especially if you have many types of elements in your object structure.
+
+The Visitor pattern is used when you need to apply some function to each element of a collection or aggregator object. This is not the same as the typical use of the Iterator pattern - where we iterate over a collection or aggregate and call some method on each element - because in the "visitor" case, the external function is called, not the method.
+
+Python has built-in support for this pattern. For example, the construction `new_list = map(function, old_sequence)` means that `function()` is called for each element of `old_sequence`, resulting in a `new_list`
+
+Here's an example implementation of the Visitor pattern in Python:
+
+```python
+class Element:
+    def accept(self, visitor):
+        visitor.visit(self)
+
+class ConcreteElementA(Element):
+    def operationA(self):
+        pass
+
+class ConcreteElementB(Element):
+    def operationB(self):
+        pass
+
+class Visitor:
+    def visitConcreteElementA(self, element):
+        pass
+
+    def visitConcreteElementB(self, element):
+        pass
+
+class ConcreteVisitorA(Visitor):
+    def visitConcreteElementA(self, element):
+        element.operationA()
+
+    def visitConcreteElementB(self, element):
+        pass
+
+class ConcreteVisitorB(Visitor):
+    def visitConcreteElementA(self, element):
+        pass
+
+    def visitConcreteElementB(self, element):
+        element.operationB()
+
+# Usage
+elements = [ConcreteElementA(), ConcreteElementB()]
+
+visitorA = ConcreteVisitorA()
+for element in elements:
+    element.accept(visitorA)
+
+visitorB = ConcreteVisitorB()
+for element in elements:
+    element.accept(visitorB)
+```
+
+In this example, the Element interface defines the accept() method that takes a Visitor as an argument. The ConcreteElementA and ConcreteElementB classes implement the Element interface and provide their own operations.
+
+The Visitor interface defines the visit() method for each type of ConcreteElement. The ConcreteVisitorA and ConcreteVisitorB classes implement the Visitor interface and provide their own implementations of the visit() method for each type of ConcreteElement.
+
+Finally, we create a list of ConcreteElements and pass each one to a ConcreteVisitor. The accept() method is called on each ConcreteElement, passing in the appropriate ConcreteVisitor. The ConcreteVisitor's visit() method is called on each ConcreteElement, performing the appropriate operation.
+
+Another example:
+
+```python
+"""
+Visitor - a pattern of behavior of objects.
+Describes an operation to be performed on each object in some structure.
+The visitor pattern allows you to define a new operation without changing the classes of these objects.
+"""
+
+
+class FruitVisitor(object):
+     """Visitor"""
+     def draw(self, fruit):
+         methods = {
+             Apple: self.draw_apple,
+             Pear: self.draw_pear,
+         }
+         draw = methods.get(type(fruit), self.draw_unknown)
+         draw(fruit)
+
+     def draw_apple(self, fruit):
+         print 'Apple'
+
+     def draw_pear(self, fruit):
+         print 'Pear'
+
+     def draw_unknown(self, fruit):
+         print 'Fruit'
+
+
+class Fruit(object):
+     """Fruits"""
+     def draw(self, visitor):
+         visitor draw(self)
+
+
+class Apple(Fruit):
+     """Apple"""
+
+
+class Pear(Fruit):
+     """Pear"""
+
+
+class Banana(Fruit):
+     """Banana"""
+
+
+visitor = FruitVisitor()
+
+apple = apple()
+apple.draw(visitor)
+# Apple
+
+pear = pear()
+pear.draw(visitor)
+# Pear
+
+banana = banana()
+banana draw(visitor)
+# Fruit
+```
+
+#### Behavioral patterns. Outcome
+
+Some behavioral patterns are directly supported in Python; the rest are easy to implement yourself. The Chain of Responsibility, Mediator, and Observer patterns can be implemented in the traditional way or with coroutines, and they are all variations on the theme of decoupling communication between cooperating objects. The Command pattern can be used for lazy evaluation and implementation of the execute-cancel mechanism. Since Python is an interpreted language (at the bytecode level), the Interpreter pattern can be implemented using Python itself, and even isolate the interpreted code in a separate process. Support for the Iterator pattern (and - implicitly - for the Visitor pattern) is built into Python. The Memento pattern is well supported in the Python standard library (for example, using the `pickle` and `json` modules). The State, Strategy, and Template Method patterns do not have direct support, but they are all easy to implement.
