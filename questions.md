@@ -3488,3 +3488,480 @@ cat.make_sound()  # The cat meows
 In this example, the `Animal` class is defined as an abstract class with an abstract method called `make_sound`. The `Dog` and `Cat` classes inherit from the Animal class and provide their own implementations of the `make_sound` method. When the `make_sound` method is called on an object of the `Dog` or `Cat` class, their respective implementations are executed.
 
 Abstraction can also be achieved through the use of interfaces, which are similar to abstract classes, but do not provide any implementation. Instead, they define a set of method signatures that a class must implement to provide a specific functionality. However, Python does not have built-in support for interfaces, so they are typically implemented using abstract classes or conventions.
+
+## What programming principles do you know
+
+### KISS
+
+The KISS principle is a design principle in software engineering that stands for "Keep It Simple, Stupid." The principle states that systems should be kept as simple as possible, and unnecessary complexity should be avoided. The KISS principle is a common sense approach that emphasizes simplicity over complexity.
+
+In programming, the KISS principle suggests that code should be written in a clear and concise manner, with a focus on readability and maintainability. This means avoiding unnecessary features, functions, and classes, and using simple and straightforward logic wherever possible. Code that follows the KISS principle is usually easier to understand, debug, and modify, and is less likely to contain bugs.
+
+In Python, the KISS principle is implemented through the use of simple and intuitive syntax and a rich standard library that provides a wide range of functionality out of the box. Python's syntax is designed to be easy to read and write, with a focus on minimizing unnecessary syntax and boilerplate code.
+
+Some specific examples of how the KISS principle is implemented in Python include:
+
+1. Concise syntax for common operations: Python provides concise syntax for common operations, such as list comprehension, which allows for easy creation of lists based on existing lists.
+
+2. Use of built-in functions: Python provides a large number of built-in functions that perform common operations, such as sorting and filtering, without the need for custom code.
+
+3. Clear and concise documentation: Python's documentation is written in a clear and concise manner, making it easy for developers to quickly find the information they need.
+
+4. Emphasis on readability: Python emphasizes readability by enforcing indentation and whitespace rules that make code easier to read and understand.
+
+Overall, the KISS principle is an important design principle in software engineering that emphasizes simplicity and clarity over complexity. In Python, the KISS principle is implemented through the use of intuitive syntax, a rich standard library, and a focus on readability and maintainability.
+
+Examples of violating this principle include writing a separate function just to perform the addition operation, or using the bitwise operator (right shift >> 1) to divide integers by 2. The latter is certainly more efficient than the usual (/2), but this greatly reduces the clarity of the code. Using this approach, you are doing clever coding (“abstruse coding”) and over-optimization (over-optimization). Both are not good for the health of your code in the long run.
+
+### DRY
+
+DRY stands for "Don't Repeat Yourself." The DRY concept is a principle of software engineering that states that code should be written in a way that avoids repetition and promotes reuse. The idea is to eliminate duplicate code and create a single source of truth for each piece of information or logic.
+
+In Python, the DRY concept is implemented in several ways. Here are some examples:
+
+1. Functions: Functions in Python are a key way to implement DRY. Instead of writing the same code multiple times, you can define a function that encapsulates the logic and call it whenever you need it.
+
+2. Modules: Python modules are another way to implement DRY. Modules are files that contain functions, classes, and other objects that can be imported and reused in other programs.
+
+3. Object-Oriented Programming: Object-oriented programming (OOP) is another approach that can help implement DRY. By defining classes and objects, you can encapsulate logic and data in a reusable way.
+
+4. List Comprehensions: Python's list comprehensions provide a concise way to create new lists based on existing lists. By using list comprehensions, you can avoid writing repetitive code to create new lists.
+
+5. Template Strings: Python's template strings provide a way to reuse common text strings with placeholders for dynamic content. By using templates, you can avoid duplicating the same text in multiple places.
+
+Overall, the DRY concept is an important principle of software engineering that can help improve code quality and maintainability. In Python, the DRY concept is implemented through the use of functions, modules, object-oriented programming, list comprehensions, and template strings, among other techniques.
+
+### YAGNI
+
+The YAGNI principle is a design principle in software engineering that stands for "You Ain't Gonna Need It." The principle states that developers should avoid implementing functionality until it is actually needed. The idea is to avoid spending time and resources on features that may not be useful or necessary.
+
+In programming, the YAGNI principle suggests that code should be written with a focus on solving the immediate problem at hand, without worrying about potential future requirements. This means avoiding premature optimization, over-engineering, and unnecessary complexity.
+
+In Python, the YAGNI principle is implemented through a focus on simplicity and minimalism. Python's design philosophy emphasizes the importance of writing code that is easy to read, write, and maintain. The Python community values pragmatic solutions that get the job done without unnecessary complexity.
+
+Here are some specific examples of how the YAGNI principle is implemented in Python:
+
+1. Simple and concise syntax: Python's syntax is designed to be simple and concise, making it easy to read and write code. This simplicity helps ensure that code is focused on the task at hand and doesn't include unnecessary complexity.
+
+2. Minimalist approach to modules and packages: Python's module and package system is designed to be minimalist and focused on solving specific problems. This helps ensure that modules and packages are focused on specific tasks and don't include unnecessary functionality.
+
+3. Iterative development: Python's emphasis on iterative development and rapid prototyping encourages developers to focus on solving immediate problems rather than worrying about potential future requirements.
+
+4. TDD (Test Driven Development): Python's support for TDD encourages developers to write tests that focus on immediate requirements, which helps ensure that code is focused on solving the current problem and avoids over-engineering for future requirements.
+
+Overall, the YAGNI principle is an important design principle in software engineering that emphasizes the importance of focusing on solving immediate problems without worrying about potential future requirements. In Python, the YAGNI principle is implemented through a focus on simplicity and minimalism, iterative development, and a pragmatic approach to solving problems.
+
+### SLAP
+
+The Single Level of Abstraction Principle (SLAP) is a programming principle that suggests that a function or a module should have only one level of abstraction, meaning that it should either perform low-level operations or high-level operations, but not both. This principle helps to ensure that code is easier to read, understand, and maintain, by keeping code focused on one level of abstraction.
+
+In Python, the SLAP principle can be implemented by breaking up complex functions into smaller, more focused functions that perform specific tasks at a single level of abstraction. By doing so, each function becomes more reusable, testable, and easier to understand. For example, a function that performs both high-level business logic and low-level file I/O can be refactored into two separate functions: one that handles the business logic and another that handles the file I/O at a lower level of abstraction.
+
+Here is an example of how SLAP can be implemented in Python:
+
+```python
+def read_data(file_path):
+    with open(file_path, 'r') as file:
+        data = file.read()
+    return data
+
+def process_data(data):
+    # process data here
+    return processed_data
+
+def save_data(processed_data, file_path):
+    with open(file_path, 'w') as file:
+        file.write(processed_data)
+
+def main():
+    data = read_data('input.txt')
+    processed_data = process_data(data)
+    save_data(processed_data, 'output.txt')
+```
+
+In this example, we have three separate functions: `read_data`, `process_data`, and `save_data`, each of which performs a single level of abstraction. The `main` function then orchestrates these functions to read data from a file, process it, and save it to another file. By separating the concerns in this way, the code is easier to understand, test, and modify, following the SLAP principle.
+
+### SOLID
+
+_SOLID_ is an acronym for 5 principles described by Robert Martin that contribute to good object-oriented code (and more).
+
+#### S
+
+**S**: Single Responsibility Principle.
+
+> Each class should only do one task
+
+The "S" in SOLID stands for the Single Responsibility Principle (SRP). The SRP is a design principle in software engineering that states that every module or class should have only one responsibility or reason to change. The idea behind the SRP is to create software components that are focused, modular, and easy to understand and maintain.
+
+In practice, the SRP can be implemented by breaking down large classes or modules into smaller, more focused components. Each component should have a clear and well-defined responsibility or functionality, and should not be responsible for multiple unrelated tasks. By dividing the functionality of a system into smaller, more focused components, developers can improve the maintainability, testability, and flexibility of the software.
+
+Here are some key principles of the SRP:
+
+1. High Cohesion: Each module or class should have a high degree of cohesion, meaning that all of its functions or methods are related to a single responsibility.
+
+2. Low Coupling: Modules or classes should have low coupling, meaning that they are loosely connected and do not rely on each other's internal details.
+
+3. Single Responsibility: Each module or class should have a single responsibility, meaning that it is responsible for one and only one aspect of the system's functionality.
+
+4. Separation of Concerns: Related functionality should be grouped together in a separate module or class, rather than being spread across multiple components.
+
+In Python, the SRP can be implemented through the use of classes and modules that have a clear and well-defined responsibility. Python's support for modules, classes, and functions makes it easy to create focused, modular components that adhere to the SRP. By following the SRP, Python developers can create software that is easier to understand, maintain, and test, and that can evolve more easily over time.
+
+Here's an example of implementing the SRP in Python:
+
+Let's say we have a class called `User`, which represents a user in a web application. The `User` class has methods for authentication, registration, and password reset.
+
+However, this violates the SRP because the `User` class has multiple responsibilities, which makes it harder to maintain and test.
+
+To adhere to the SRP, we can create separate classes for each responsibility:
+
+```python
+class Authenticator:
+    def authenticate(self, username, password):
+        # authenticate user
+
+class Registration:
+    def register(self, username, password, email):
+        # register user
+
+class PasswordReset:
+    def reset_password(self, username, email):
+        # reset user password
+```
+
+Now, each of these classes has a single responsibility and can be tested and maintained independently. The User class can then be refactored to use these new classes:
+
+```python
+class User:
+    def __init__(self, username, password, email):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.authenticator = Authenticator()
+        self.registration = Registration()
+        self.password_reset = PasswordReset()
+
+    def authenticate(self):
+        self.authenticator.authenticate(self.username, self.password)
+
+    def register(self):
+        self.registration.register(self.username, self.password, self.email)
+
+    def reset_password(self):
+        self.password_reset.reset_password(self.username, self.email)
+```
+
+By separating responsibilities into their own classes, the User class is now focused on managing user data, and each of the new classes is responsible for a single task. This makes the code easier to read, maintain, and test.
+
+#### O
+
+**O**: Open-Closed Principle.
+
+> Programming entities (classes, modules, functions) should be open for extension, but not for modification.
+
+The "O" in SOLID stands for the Open-Closed Principle (OCP). The OCP is a design principle in software engineering that states that software entities (such as classes, modules, and functions) should be open for extension but closed for modification. This means that once a software entity has been created, it should not be modified directly, but rather extended or overridden to add new functionality.
+
+The idea behind the OCP is to create software that is flexible and easily extensible without requiring changes to the existing codebase. By following the OCP, developers can add new functionality to a system without breaking existing code or introducing new bugs.
+
+In practice, the OCP can be implemented through the use of inheritance, abstraction, and polymorphism. By creating abstract base classes that define the behavior of a system, and allowing concrete implementations to override or extend that behavior, developers can create software that is both flexible and maintainable.
+
+Here are some key principles of the OCP:
+
+1. Abstraction: Software entities should be abstracted to the highest possible level, so that they can be easily extended without modifying the existing code.
+
+2. Inheritance: New functionality should be added through the use of inheritance, rather than modifying existing code directly.
+
+3. Polymorphism: Concrete implementations should be able to override or extend the behavior of abstract base classes, allowing for flexible and extensible software.
+
+4. Interfaces: Software entities should expose interfaces rather than implementation details, allowing for easy substitution of components.
+
+In Python, the OCP can be implemented through the use of abstract base classes, interfaces, and the duck typing philosophy. Python's support for inheritance, polymorphism, and dynamic typing makes it easy to create software that adheres to the OCP. By following the OCP, Python developers can create software that is both flexible and maintainable, and that can be easily extended to meet changing requirements.
+
+Here's an example of implementing the OCP in Python:
+
+Let's say we have a system that manages shapes, and we want to be able to calculate the area of various shapes. We start with a basic `Shape` class:
+
+```python
+class Shape:
+    pass
+```
+
+We can then create subclasses for each type of shape we want to support, and define a method for calculating the area of each shape:
+
+```python
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return 3.14 * (self.radius ** 2)
+
+class Square(Shape):
+    def __init__(self, side):
+        self.side = side
+
+    def area(self):
+        return self.side ** 2
+```
+
+Now, let's say we want to add support for calculating the area of a new shape, a rectangle. Instead of modifying the existing code, we can create a new class that extends the `Shape` class and implements its own `area` method:
+
+```python
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+```
+
+We've extended the functionality of our system without modifying any of the existing code. This follows the Open-Closed Principle, and makes our code more flexible and easier to maintain.
+
+#### L
+
+**L**: Liskov Substitution Principle.
+
+> Subclasses need to be able to serve as replacements for their superclasses.
+
+The "L" in SOLID stands for the Liskov Substitution Principle (LSP). The LSP is a design principle in software engineering that states that if a program is using a base class, it should be able to use any of its derived classes without knowing it. In other words, objects of derived classes should be substitutable for objects of their base classes without affecting the correctness of the program.
+
+The LSP is important because it ensures that code is both correct and maintainable. If a derived class is not a proper substitution for its base class, it can lead to bugs and errors in the program, and make it difficult to modify and extend the code.
+
+To adhere to the LSP, the following conditions should be met:
+
+1. The preconditions of a base class method cannot be strengthened in a derived class method.
+
+2. The postconditions of a base class method cannot be weakened in a derived class method.
+
+3. Invariants of the base class must be preserved in a derived class.
+
+In practical terms, the LSP means that if you have a function or method that takes an object of a certain class as a parameter, it should be able to take any object of a subclass of that class as well, without breaking the functionality of the function.
+
+In Python, the LSP can be implemented through the use of inheritance and polymorphism. By creating a base class that defines the behavior of a system, and allowing derived classes to override or extend that behavior, developers can create software that is both flexible and maintainable. However, it's important to ensure that derived classes do not violate the contract established by the base class. This means that they should maintain the same preconditions, postconditions, and invariants as the base class, and not introduce any new assumptions or behaviors that could break the program.
+
+Here's an example of implementing the LSP in Python:
+
+Let's say we have a `Rectangle` class with a `set_width` and `set_height` method:
+
+```python
+class Rectangle:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def set_width(self, width):
+        self.width = width
+
+    def set_height(self, height):
+        self.height = height
+```
+
+We can create a subclass of `Rectangle` called `Square`:
+
+```python
+class Square(Rectangle):
+    def __init__(self, side):
+        self.width = side
+        self.height = side
+
+    def set_width(self, width):
+        self.width = width
+        self.height = width
+
+    def set_height(self, height):
+        self.width = height
+        self.height = height
+```
+
+Now, let's say we create a `resize` function that takes a `Rectangle` object and changes its dimensions:
+
+```python
+def resize(rectangle, width, height):
+    rectangle.set_width(width)
+    rectangle.set_height(height)
+```
+
+If we pass in a `Rectangle` object to `resize`, it will behave as expected:
+
+```python
+rectangle = Rectangle(2, 3)
+resize(rectangle, 4, 5)
+print(rectangle.width)  # Output: 4
+print(rectangle.height)  # Output: 5
+```
+
+However, if we pass in a `Square` object, the behavior is unexpected:
+
+```python
+square = Square(2)
+resize(square, 4, 5)
+print(square.width)  # Output: 5
+print(square.height)  # Output: 5
+```
+
+This violates the Liskov Substitution Principle, as the behavior of the `Square` object is unexpected when passed to the `resize` function. To fix this, we can change the implementation of `Square` to make it behave like a rectangle:
+
+```python
+class Square(Rectangle):
+    def __init__(self, side):
+        self.side = side
+        super().__init__(side, side)
+
+    def set_width(self, width):
+        self.side = width
+        super().set_width(width)
+        super().set_height(width)
+
+    def set_height(self, height):
+        self.side = height
+        super().set_width(height)
+        super().set_height(height)
+```
+
+Now, the behavior of `Square` is consistent with the behavior of `Rectangle`, and we can pass `Square` objects to the resize function without unexpected behavior:
+
+```python
+square = Square(2)
+resize(square, 4, 5)
+print(square.width)  # Output: 4
+print(square.height)  # Output: 4
+```
+
+By following the Liskov Substitution Principle, we've created a more robust and maintainable system.
+
+#### I
+
+**I**: Interface Segregation Principle.
+
+> Create highly specialized interfaces designed for a specific client. Clients should not depend on interfaces they do not use.
+
+The "I" in SOLID stands for the Interface Segregation Principle (ISP). The ISP is a design principle in software engineering that states that clients should not be forced to depend on interfaces that they do not use. In other words, it's better to have many small, specific interfaces than one large, general-purpose interface.
+
+The ISP is important because it promotes modularity and flexibility in code. When interfaces are small and specific, it makes it easier to change and maintain the code, and reduces the risk of introducing bugs or errors. It also makes it easier to reuse code across different projects or systems.
+
+To adhere to the ISP, the following guidelines should be followed:
+
+1. Interfaces should be specific to the needs of clients.
+
+2. Clients should not be forced to implement methods they don't need.
+
+3. Interfaces should be cohesive and have a clear purpose.
+
+4. Interfaces should be stable and not change frequently.
+
+In practical terms, the ISP means that if you have a class that implements an interface, it should only include methods that are relevant to its purpose. This ensures that clients that use the class only depend on the methods they need, and don't have to worry about the implementation details of methods they don't use.
+
+In Python, the ISP can be implemented through the use of abstract base classes (ABCs) and interfaces. By defining specific interfaces for different types of objects and operations, and using ABCs to enforce their implementation, developers can create code that is both flexible and maintainable. However, it's important to ensure that interfaces are stable and cohesive, and not changed frequently, as this can introduce additional complexity and risk into the system.
+
+Here's an example of how the Interface Segregation Principle can be applied in Python:
+
+Suppose we have an interface called `Bird`, which has methods for both flying and swimming:
+
+```python
+class Bird:
+    def fly(self):
+        pass
+
+    def swim(self):
+        pass
+```
+
+However, not all birds can swim. If we have a client that only needs to interact with birds that can fly, it shouldn't be forced to depend on the `swim()` method. We can solve this problem by splitting the `Bird` interface into two smaller interfaces: `FlyingBird` and `SwimmingBird`:
+
+```python
+class FlyingBird:
+    def fly(self):
+        pass
+
+class SwimmingBird:
+    def swim(self):
+        pass
+```
+
+Now, any bird that can both fly and swim can implement both interfaces:
+
+```python
+class Duck(FlyingBird, SwimmingBird):
+    def fly(self):
+        print("Duck is flying")
+
+    def swim(self):
+        print("Duck is swimming")
+```
+
+And any client that only needs to interact with flying birds can depend on the FlyingBird interface:
+
+```python
+class BirdWatcher:
+    def watch_bird(self, bird: FlyingBird):
+        bird.fly()
+```
+
+This ensures that clients are not forced to depend on methods they do not need, making the code more modular and flexible.
+
+#### D
+
+**D**: Dependency Inversion Principle.
+
+> The object of dependence should be an abstraction, not something specific.
+
+The "D" in SOLID stands for the Dependency Inversion Principle (DIP). The DIP is a design principle in software engineering that states that high-level modules should not depend on low-level modules, but both should depend on abstractions. In addition, abstractions should not depend on details, but details should depend on abstractions.
+
+The DIP is important because it promotes the decoupling of modules, making it easier to change and maintain the code. It also promotes the reuse of code, as modules can be swapped in and out without affecting the rest of the system.
+
+To adhere to the DIP, the following guidelines should be followed:
+
+1. High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+2. Abstractions should not depend on details. Details should depend on abstractions.
+
+3. The use of dependency injection can help to achieve the DIP.
+
+In practical terms, the DIP means that instead of writing code that relies on specific implementations of modules or classes, developers should write code that relies on interfaces or abstract classes. This way, if the implementation of a module needs to be changed, the rest of the code doesn't need to be modified.
+
+In Python, the DIP can be implemented through the use of dependency injection frameworks like Flask-Injector, which allow developers to inject dependencies into their code using interfaces or abstract classes. By using dependency injection, developers can create code that is both flexible and maintainable, and easily swap in and out different modules without affecting the rest of the system.
+
+Here's an example of how the Dependency Inversion Principle can be applied in Python:
+
+Suppose we have a high-level module called `PaymentProcessor` that needs to process payments, and it depends on a low-level module called `PaymentGateway`:
+
+```python
+class PaymentProcessor:
+    def __init__(self):
+        self.gateway = PaymentGateway()
+
+    def process_payment(self, amount):
+        self.gateway.charge(amount)
+```
+
+The `PaymentProcessor` class depends on the `PaymentGateway` class, which is a low-level detail. If we need to change the payment gateway, we would have to modify the `PaymentProcessor` class.
+
+We can apply the Dependency Inversion Principle by introducing an abstraction that both the high-level and low-level modules can depend on:
+
+```python
+class PaymentGatewayInterface:
+    def charge(self, amount):
+        pass
+```
+
+Now, we can modify the `PaymentProcessor` class to depend on the `PaymentGatewayInterface` abstraction:
+
+```python
+class PaymentProcessor:
+    def __init__(self, gateway: PaymentGatewayInterface):
+        self.gateway = gateway
+
+    def process_payment(self, amount):
+        self.gateway.charge(amount)
+```
+
+And we can create a new `PaymentGateway` class that implements the `PaymentGatewayInterface`:
+
+```python
+class PaymentGateway(PaymentGatewayInterface):
+    def charge(self, amount):
+        print(f"Charging {amount} using PaymentGateway")
+```
+
+Now, both the `PaymentProcessor` and `PaymentGateway` classes depend on the `PaymentGatewayInterface` abstraction, rather than on each other. This makes the code more modular and flexible, and makes it easier to change the payment gateway implementation without affecting the `PaymentProcessor` class.
