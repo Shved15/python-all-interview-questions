@@ -7006,3 +7006,302 @@ To make it simple, two types of tokens:
 - A refresh token: Used to retrieve a new access token
   But why use two tokens? As we stated earlier, a JWT is generated when users log in. Moreover, JWTs used to access resources should have a short lifespan. This means that after the JWT has expired, the user has to log in again and again – and no user wants the login page to appear every 5 minutes.
   That’s where a refresh token is useful. It’ll contain the essential information needed to verify the user and generate a new access token.
+
+# SDLC
+
+SDLC stands for Software Development Life Cycle, which is a process used by software development teams to design, develop, test, and deploy software. It is a structured approach to software development that helps teams to produce high-quality software that meets the requirements of stakeholders.
+
+The SDLC process typically consists of several stages, each with its own set of activities and deliverables. The stages may vary depending on the methodology being used, but the most commonly used stages are:
+
+1. Planning: In this stage, the project goals and objectives are defined, and the project team is assembled. The project scope is also defined, and the feasibility of the project is evaluated.
+
+2. Requirements gathering: In this stage, the project team works with stakeholders to gather and document the requirements for the software.
+
+3. Design: In this stage, the project team creates the architecture and design of the software, including the user interface, data structures, and algorithms.
+
+4. Development: In this stage, the project team writes the code for the software, following the design specifications.
+
+5. Testing: In this stage, the software is tested to ensure that it meets the requirements and is free of defects.
+
+6. Deployment: In this stage, the software is released to the end-users, either in a production or test environment.
+
+7. Maintenance: In this stage, the project team provides ongoing support and maintenance for the software, including bug fixes, updates, and enhancements.
+
+Each stage of the SDLC process is important for producing high-quality software that meets the requirements of stakeholders. By following a structured approach to software development, teams can ensure that the software is developed efficiently, on time, and within budget.
+
+## What is CI/CD. What is the difference between CI and CD
+
+CI/CD stands for Continuous Integration and Continuous Delivery/Deployment. It is a set of practices used by software development teams to automate the process of building, testing, and deploying software.
+
+Continuous Integration (CI) is the practice of regularly merging code changes from multiple developers into a central repository, where automated builds and tests are run to ensure that the code is functional and compatible with other parts of the system. The goal of CI is to catch and fix errors as early as possible in the development process, to reduce the risk of bugs and conflicts arising later on.
+
+**Continuous integration (continuous integration)**
+Continuous integration is as follows: all changes made to the code are merged in the central repository (the operation is called "merge"). The merge occurs several times a day, and after each merge in a particular project, an automatic build and test is triggered.
+
+It happens that before building and testing the program needs to be compiled (this depends on the language in which it is written). Today, there is an increasing need to package an application in a Docker container. Automated tests then check specific code modules, UI performance, application performance, API robustness, and more. All of these steps collectively are commonly referred to as “builds.”
+
+CI is a kind of safety net that allows developers to avoid a lot of problems before the project is delivered.
+
+Continuous Delivery (CD) and Continuous Deployment (CD) are practices that build on top of CI. Continuous Delivery is the practice of automating the release of software to production, so that it is always in a deployable state. This means that the software can be released to production at any time, with a low risk of introducing bugs or causing downtime.
+
+**Continuous delivery (continuous delivery)**
+Continuous delivery is the practice of automating the entire software release process. The idea is to do CI, plus automatically prepare and push the release to production. In doing so, it is desirable to achieve the following: anyone with sufficient privileges to deploy a new release can deploy at any time, and this can be done in a few clicks. The programmer, getting rid of almost all manual work, works more productively.
+
+Typically, the continuous delivery process requires at least one manual step: approve the deployment to production and run it. In complex systems with many dependencies, the continuous delivery pipeline may include additional manual or automated steps.
+
+Continuous Deployment, on the other hand, is the practice of automatically deploying changes to production as soon as they pass the automated tests. This means that changes are released to production as soon as they are ready, without any manual intervention.
+
+**Continuous deployment**
+Continuous Deployment sits "a layer above" Continuous Delivery. In this case, all changes made to the source code are automatically deployed to production, without an explicit signal from the developer. As a rule, the task of the developer comes down to checking the pull request from a colleague and informing the team about the results of all important events.
+
+Continuous deployment requires that the team has a well-functioning monitoring culture, everyone knows how to keep abreast and quickly restore the system.
+
+Developers who practice CI and want to move to continuous deployment automate the deployment to a test environment to begin with, while deploying to production continues to be done manually - with one click.
+
+The main difference between CI and CD is that CI focuses on ensuring that code changes are functional and compatible with the rest of the system, while CD focuses on automating the process of releasing changes to production. CD can be further divided into Continuous Delivery and Continuous Deployment, with the former focusing on automating the release process and the latter focusing on fully automating the deployment process.
+
+Overall, CI/CD is a powerful set of practices that can help software development teams to improve their development process, reduce errors, and increase the speed and frequency of releases.
+**Summary:**
+
+- Continuous integration (CI): short-lived feature branches, the team merges them with the main development branch several times a day, build and test processes are fully automated, we have the result within 10 minutes; deployment is done manually.
+- Continuous Delivery (CD): automates CI + the entire software release process. It may consist of several stages. Deployment to production is done manually.
+- Continuous Deployment: CI + CD + fully automated production deployment.
+
+## What is docker and what features does it have
+
+Docker can be used in CI/CD. Docker is a container management tool that allows you to run applications in isolated environments and package applications and all their dependencies into containers.
+
+Using Docker can simplify the process of building and deploying applications to CI/CD. For example, instead of installing and configuring all the dependencies every time you build an application, you can create a Docker image that contains all the necessary dependencies and settings. This image can then be used in different stages of CI/CD such as build, test, and deployment.
+
+In this way, Docker can speed up and automate the process of building, testing, and deploying applications on CI/CD, enabling teams to deliver high-quality software to production more quickly.
+
+Docker is an open-source platform for building, shipping, and running applications in containers. Containers are a lightweight form of virtualization that allows applications to run in an isolated environment, with their own runtime, system libraries, and dependencies. Docker is widely used by software development teams to streamline the process of building, testing, and deploying applications.
+
+Here are some key features of Docker:
+
+1. Portability: Docker allows applications to be packaged in a container, along with all of their dependencies, making them highly portable. Containers can be easily moved between different environments, such as development, testing, and production, without the need to modify the application or its configuration.
+
+2. Isolation: Docker containers provide a level of isolation between applications, which helps to ensure that they do not interfere with each other. Each container has its own file system, networking, and system resources, which are separate from the host operating system.
+
+3. Scalability: Docker makes it easy to scale applications horizontally, by creating multiple instances of the same container. This can be done automatically, using tools like Docker Compose and Kubernetes, to ensure that the application can handle increasing amounts of traffic.
+
+4. Consistency: Docker allows teams to create a consistent environment for building, testing, and deploying applications. This helps to reduce the risk of errors and conflicts, as all team members are working with the same tools and dependencies.
+
+5 .Versioning: Docker allows teams to version their applications, by creating images of each container at different stages of the development process. This makes it easy to roll back to previous versions of the application, if needed.
+
+6. Security: Docker provides built-in security features, such as namespace isolation, seccomp profiles, and AppArmor/SELinux profiles, which help to protect applications and data from external threats.
+
+Overall, Docker is a powerful tool for software development teams, offering a range of features that can help to streamline the development process, improve the quality and consistency of applications, and make them more scalable and portable.
+
+## What is the difference between Scrum and Kanban
+
+- [Scrum vs Kanban: what is the difference and what to choose?(rus)](https://habr.com/ru/company/hygger/blog/351048/)
+
+Scrum and Kanban are representatives of the Agile family of methodologies. Both are considered flexible and iterative.
+
+More than 17 years ago, IT development leaders formulated the Agile manifesto. The main points of the manifesto are:
+
+People and interactions are more important than processes and tools.
+Working software is more important than comprehensive documentation.
+Collaboration with the customer is more important than contract negotiation.
+Responding to change is more important than following a plan.
+The basis of Scrum consists of short iterations or sprints, usually 2-3 weeks long. Before the start of the sprint, the team itself forms a list of features for the iteration, and then the sprint starts.
+
+After the sprint is completed, completed features are uploaded to production, and unfinished features are transferred to another sprint. As a rule, the features that are being worked on during the sprint do not change: what was at the start of the sprint must be done at all costs by the end of the sprint.
+
+Kanban provides more flexibility, if flexibility is understood as the frequency of changing priorities. Yesterday, you uploaded a new feature to production, and today you received data from the forefront and found out that this thing does not work as intended – people do not click the "buy" button. You "give a slap on the wrist" to the UX designer, he gives you new requirements. You move this task to the top of the queue, the programmer takes this task "from the top", completes it, and by the evening, the fix is already on production, and conversion rates have increased by 12%. This is a victory.
+
+The main difference between Scrum and Kanban is in the length of the iterations. In Scrum, iterations are 2 weeks long, and in Kanban, you can "push" tasks to the programmer every day.
+
+In Scrum, it is customary to evaluate tasks in Story points or hours. Without evaluation, it is impossible to form a sprint: we need to know if we can complete tasks within 2 weeks. After 2 weeks, we receive valuable statistics – how many hours or Story points the team was able to complete during the sprint. Velocity is the team's productivity for one sprint. This parameter allows the Scrum manager to predict where the team will be in 2 weeks.
+
+In Kanban, evaluation is not customary. This is optional, the team decides for themselves. There is no concept of "team work velocity" here, only the average time for a task is considered. This time is calculated using a special report - Cycle Time.
+
+So, in Scrum, our goal is to finish the sprint, and in Kanban, it is the task.
+
+Scrum is like a bus that stops only at certain stops, where people get off in groups. And Kanban is like a minibus: if a passenger wants to get off, he asks the driver and gets off where he needs to.
+
+## What is Code Debt and how to work with it
+
+Code debt, also known as technical debt, refers to the accumulated cost of maintaining and updating software that was developed with inefficient or outdated code. It is a metaphorical term that compares it to financial debt. Just like financial debt, code debt accumulates interest over time, and the longer it remains unpaid, the more it costs to resolve.
+
+Code debt can be the result of a variety of factors, such as using shortcuts during development, not keeping up with changes in technology, neglecting code refactoring, and so on. It is often the result of the need to deliver software quickly or the desire to add new features without considering the long-term consequences.
+
+Dealing with code debt can be challenging, but it is an essential task to maintain the health and quality of software systems. There are several strategies to deal with code debt:
+
+Refactor the code: Refactoring involves improving the design and structure of the code without changing its functionality. This can help simplify the code, remove redundant or duplicate code, and make it easier to maintain and update.
+
+Prioritize code debt: Identify the parts of the codebase that are causing the most problems or are most critical to the business. Prioritizing code debt can help focus efforts and resources where they are most needed.
+
+Establish coding standards: Consistent coding standards can help prevent code debt from accumulating in the first place. This includes using best practices, following coding conventions, and enforcing code reviews.
+
+Plan for code maintenance: Building time into development schedules for regular maintenance and updates can help prevent code debt from becoming unmanageable.
+
+Automate testing: Automated testing can help detect issues early and ensure that changes don't introduce new problems.
+
+Educate the team: Educating the team on the importance of maintaining code quality and addressing code debt can help create a culture of continuous improvement.
+
+In summary, code debt can be a significant problem for software systems, but it is possible to manage and reduce its impact. By prioritizing code debt, establishing coding standards, planning for maintenance, and educating the team, organizations can maintain the quality of their software systems and avoid the negative consequences of code debt accumulation.
+
+In the classical sense, i.e. in the form in which this metaphor was described by Ward Cunningham, technical debt is understood as a conscious trade-off decision, when the customer and key developers clearly understand all the benefits of a quick, albeit not ideal, technical solution that will have to be paid for later. And while it may sound crazy to many developers, a bad decision can be a good one, but it is actually quite possible: if a short-term solution allows the company to gain visible advantages, release a product before competitors, satisfy a key customer, or some other way to gain advantages over competitors, then such a decision is completely justified. Sometimes this may be the only way for a long-term perspective to exist at all.
+
+Technical debt in the classical sense is intentional and mainly concerns strategic decisions, therefore, the responsibility for it lies with customers, seasoned leads, architects and even PMs, but everything related to dirty code concerns mostly ordinary developers. In fact, the difference between messy code and a suboptimal policy decision isn't really all that big: when you add a new feature to a system, you have to pay the price of past shortsightedness.
+
+Paying interest on technical debt is easier if you start thinking about it at the stage of creating a product.
+
+- Make one-time MVP prototypes and include only confirmed hypotheses into work.
+- Create an architecture that will be easy to change: microservices, versioned APIs.
+- Refuse to organize your own server rooms in favor of cloud solutions. For example, Microsoft Azure, AWS Amazon Cloud, Yandex.Cloud, cloud from Mail.ru, and so on.
+- Set a clear definition of done in the team, including quality metrics. It helps a lot to include a clause in the DOD that excludes the "acceptance" of a feature if there are bugs associated with it.
+- It is good for MVP to design the system in such a way that the migration of users from prototypes to the stable part is imperceptible.
+
+Companies deal with technical debt in different ways. There are three main strategies.
+
+- Rewrite everything from scratch. This is the ultimate way to keep the system in a state where it is constantly ready for change if things have gone too far and the former flexibility is no longer there.
+- Do gradual refactoring. Tasks for technical debt are sent to the backlog along with product tasks. This slows down the work on rolling out new features, but the business usually makes compromises.
+- Reconcile with technical debt. If you don’t have a startup, but you need updates every six months, then you can simply put up with the fact that the code is not optimal, and act on the principle “it works, don’t touch it.” As soon as you realize that you made a mistake, you will somehow move to point 1.
+
+# VCS
+
+VCS, or Version Control System, is a software tool used in programming and software development to manage changes made to source code over time. It helps developers keep track of changes to the codebase, collaborate with other developers, and revert to earlier versions of the code when necessary.
+
+VCS allows developers to create a history of changes made to the codebase, providing a complete record of every modification, who made it, and when it was made. This enables developers to easily track down and fix bugs, as well as to collaborate on larger coding projects without accidentally overwriting each other's work.
+
+There are two main types of VCS: centralized and distributed. In a centralized VCS, there is a central server that stores the codebase, and developers check out and check in code changes to this central repository. Examples of centralized VCS include SVN (Subversion) and CVS (Concurrent Versions System).
+
+In a distributed VCS, each developer has a complete copy of the codebase on their local machine, and changes can be synchronized between repositories. Examples of distributed VCS include Git and Mercurial.
+
+One of the key benefits of using VCS is the ability to create branches. Branches are copies of the codebase that can be modified independently of the main codebase, allowing developers to work on new features or bug fixes without affecting the stability of the main codebase. When the new code is tested and stable, it can be merged back into the main codebase.
+
+VCS also allows for easy collaboration among team members. Developers can work on their own branches, share code with other developers, and merge their changes back into the main codebase. VCS systems also provide tools for resolving conflicts when two developers have made changes to the same file.
+
+Overall, VCS is a critical tool for software development and programming, allowing developers to keep track of changes to the codebase and collaborate effectively with other team members.
+
+## What is Git Flow
+
+Git flow is a branching model for Git that defines a strict branching and merging strategy designed to help manage large-scale software development projects. It was created by Vincent Driessen in 2010 and has become widely adopted in the industry.
+
+The Git flow model defines a specific set of branches that are used for different purposes in the development lifecycle, each with a specific naming convention and function. The main branches in Git flow are:
+
+- Master: This branch represents the stable production version of the code, and is where code that has been tested and is ready for release is merged.
+
+- Develop: This branch is where ongoing development takes place. It represents the latest development version of the code, and is where feature branches are merged.
+
+In addition to the main branches, Git flow defines several other branch types:
+
+- Historical Branches:
+  Instead of using only one master branch, this workflow uses two branches to record the project history. The master branch stores the official release history, while the development branch is used for active development. It is also important to tag commits in the master branch with version numbers.
+
+- Feature branches:
+  These branches are used for new features or functionality that are being developed. They are typically short-lived, and are merged into the Develop branch when the feature is complete.
+  Each new feature should be developed separately - in its own branch, which should be pushed to the central repository for backup or collaboration with other developers. The development branch is used to create a feature branch. When the feature development is complete, it is merged into the development branch. Features should never be merged directly into the master branch.
+
+- Release branches:
+  These branches are used to prepare a new version of the code for release. They are created from the Develop branch, and are used to perform final testing and bug fixing before the code is merged into the Master branch.
+  Once development has enough features for a release (or on a pre-determined date), a release branch is created from the development branch.
+  Creating this branch starts a new release cycle, so no new features should be added to this branch - only bug fixes, documentation generation, and other tasks aimed at the release.
+  Once the release branch is prepared, it is merged with master and tagged with a new version. It should also be merged with the development branch, which has likely moved ahead since the release was initiated.
+  Using a separate branch for releases allows one team to prepare a release while another team continues to develop new features in development for future releases.
+
+- Hotfix branches:
+  These branches are used to fix critical bugs or issues in the code that require immediate attention. They are created from the Master branch, and are merged back into both the Master and Develop branches when the fix is complete.
+  Hotfix branches are used for quick release patching. This is the only branch that is created from master. Once the fix is ready, it should be merged into both master and development (or a new release if there is one) and master should be tagged with a new version (incremented patch number, for example v.1.0.1).
+  This allows errors to be fixed without interrupting the entire workflow or waiting for the next release to roll out the fixes.
+
+The Git flow model provides a clear structure for managing code changes, and helps to ensure that changes are properly tested and reviewed before being merged into the main production codebase. It can be used in conjunction with other Git workflows and tools to provide a comprehensive approach to managing software development projects.
+
+## What is Git Rebase
+
+Git rebase is a command in Git that allows you to integrate changes from one branch into another branch by rewriting the history of the target branch. Unlike merge, which creates a new commit that combines the changes from both branches, rebase applies the changes of one branch onto another branch as if they were originally created on the target branch.
+
+To perform a rebase, you typically start by checking out the branch that you want to apply the changes to. Then, you run the git rebase command followed by the name of the branch that you want to rebase onto the current branch. Git will then replay the changes made on the rebased branch onto the current branch, modifying the commit history to make it look as if the changes were always made on the current branch.
+
+Rebasing can be useful for keeping your Git history cleaner and easier to follow, especially in cases where multiple developers are working on the same codebase and frequent merges can result in a cluttered commit history. However, it's important to use rebase carefully and only when it makes sense for the specific situation.
+
+It's worth noting that rebasing changes the commit history of a branch, which can cause issues if other developers have already cloned the original branch and are also making changes to it. In this case, it's generally best to avoid rebasing and instead use merge to integrate changes.
+
+Overall, Git rebase is a powerful tool for managing branches and integrating changes in Git, but it should be used with caution and only in situations where it makes sense for the specific project and workflow.
+
+So, git works with commits. Each commit is a set of changes. Each commit has a unique hash. When branches are merged using the merge command:
+
+`$ git merge "another_branch"`
+
+All the commits are preserved - the commit comments, their hash, and usually, an additional artificial commit is added. At the same time, commits can alternate with each other. This is not always convenient. Suppose you decided to revert your commit - searching for your commit in the general list, along with others, is not very pleasant. In general, in the shared history, you want to see truly significant changes, not "oops, I forgot to put ;". To combine several commits into one, you can use rebase. Although in the GitHub interface, there is a button squash & commit - when you create a pull request (PR) from one branch to another (usually from your working branch to the main one), and after passing all the formalities, you can press squash & commit, update the comment, and your changes will appear in the main branch as one commit.
+
+I want to write about two cases of using rebase:
+
+1. When changes are incorporated from one branch to another, not through merge but through rebase:
+   `$ git rebase "another*branch"`
+   This allows you to place your local commits after all the commits that were made in the "another_branch". The hashes of your commits will change.
+2. When you can manually edit several of your commits - for example, merge them, change the comment:
+   `$ git rebase -i {HEAD~\_commit_count*|commit_hash}`
+   So, you've done everything in your cozy branch and decided to share this commit with the world, but the world wants only one commit from you. `git rebase -i` will launch the editor and suggest editing commits (the order of the commits is from top to bottom, unlike git log). You can leave the commit as it is, change the comment, merge it with the previous one. Typically, you should leave your first commit as is, and change all the rest to `pick "commit_hash" "comment" → fixup "commit_hash" "comment"`.
+
+At the same time, all comments that were in fixup commits will be lost, and the comment from the first commit will be used. If you cherish the comments, then it is worth using squash instead of fixup.
+
+But if the development process was lengthy, then most likely, you had to merge the main branch. And all your commits will mix with the common ones, and merging yours with others will be a difficult task. Therefore, before doing `git rebase -i <>`, it is worth doing `git rebase`. `git rebase` will place all your commits at the end of the list of all commits (which can be verified by running `git log`) and then run `git rebase -i <HEAD~Number_of_your_commits>`, replace pick with {fixup|squash} in all lines except the first one, and voila - you have one commit.
+
+If you messed up something while editing the commits with `git rebase -i <>`, then you should not press Control+C - the exit code of the git editor does not matter. It will just take the file and do everything according to it. Just delete or comment out all the lines in the file. Git will understand that you did not want to do anything, and it will not make any changes.
+
+## What is Git Cherry pick
+
+Git cherry-pick is a command that allows you to apply a specific commit from one branch to another. This means that you can pick a commit from a branch and apply it to another branch, even if they have diverged and have different commit histories.
+
+When you use `git cherry-pick`, Git will apply the changes introduced by the specified commit to your current branch, creating a new commit with a new hash that incorporates the changes from the original commit. The new commit will have the same message as the original commit by default, but you can modify it if you want.
+
+One common use case for `git cherry-pick` is when you want to apply a fix or feature from a different branch to the branch you are currently working on. Instead of merging the entire branch, which could bring in unwanted changes, you can cherry-pick just the commit that contains the changes you want.
+
+To use `git cherry-pick`, you need to specify the commit you want to pick. You can do this by providing the commit hash or a branch name and a commit reference. For example:
+
+```ruby
+$ git cherry-pick <commit-hash>
+$ git cherry-pick another-branch~2
+```
+
+Git will then apply the changes from that commit to your current branch, creating a new commit with the same changes. If there are any conflicts between the changes you're trying to apply and the changes in your current branch, Git will stop and ask you to resolve the conflicts before continuing.
+
+It's important to note that when you cherry-pick a commit, you are essentially creating a new commit with the same changes as the original commit. This means that the new commit will have a different hash than the original commit, and any other changes that were made in the original branch will not be included in the new commit.
+
+Overall, Git cherry-pick is a useful command for selectively applying changes from one branch to another. It can help you avoid merging unwanted changes and make it easier to manage your Git history.
+
+## What is force push
+
+In Git, a force push is a way to update a remote branch with your local changes, even if those changes conflict with the current state of the remote branch. It overwrites the remote branch with the local branch, discarding any changes made on the remote branch that are not on the local branch.
+
+A regular push will only update the remote branch if the local branch is ahead of the remote branch. If the remote branch has changes that are not in your local branch, a regular push will fail, prompting you to pull the changes first.
+
+However, there may be situations where you want to push your local changes to the remote branch, even if they conflict with the current state of the remote branch. This is where a force push comes in handy. A force push will update the remote branch with your local changes, regardless of whether the remote branch is ahead or behind your local branch.
+
+It's important to note that force pushing can be dangerous and should be used with caution. It can potentially overwrite other developers' changes and cause conflicts. Therefore, it's important to communicate with your team before performing a force push and ensure that it won't cause any issues.
+
+To perform a force push, you can use the `git push --force` or `git push -f` command, followed by the name of the remote branch and the local branch you want to push to the remote branch. For example, if you want to force push the changes in your local master branch to the `origin` remote's `master` branch, you would use the command `git push --force origin master`.
+
+If you have corrected any old commits in git history, such as changing the author's name or email, or undoing the last commit, or using amend or revert, git will "complain" when attempting to push.
+
+To push our changes anyway, we need to execute either:
+`git push --force origin <branch_name>`
+
+However, in this case, we risk overwriting someone else's changes if someone has pushed their commits since we pulled changes from the server. Therefore, it is better to use a safer command:
+`git push --force-with-lease origin <branch_name>`.
+
+This option is better because if someone has pushed their commits after we pulled changes from the server, they will not be overwritten, and we will receive an error message. We can then integrate other people's commits with our changes and try `push --force-with-lease` again.
+
+## What is a pre-commit check
+
+A pre-commit check is a software development practice that involves automatically verifying code changes for issues or errors before they are committed to the repository. This is done to ensure that the code is of high quality and meets the coding standards and guidelines of the project.
+
+Pre-commit checks can be implemented using various tools such as linters, code analyzers, and testing frameworks. These tools can check for a variety of issues, including syntax errors, style violations, security vulnerabilities, and performance problems.
+
+By running pre-commit checks, developers can catch and fix issues early in the development process, before they are introduced into the codebase. This can help prevent bugs and improve the overall quality and maintainability of the code.
+
+Pre-commit checks can be integrated into the development workflow using various tools and plugins, such as Git hooks, IDE plugins, and CI/CD pipelines. When a developer makes changes to the code and attempts to commit them, the pre-commit checks are automatically run, and the commit is only allowed if there are no errors or issues detected.
+
+Overall, pre-commit checks are an important practice for ensuring code quality and preventing issues from being introduced into the codebase. By catching and fixing issues early, developers can save time and effort in the long run and ensure that the code is of high quality and meets the requirements of the project.
+
+As in many other version control systems, Git has the ability to run custom scripts at certain key moments. There are two groups of such interceptors, or hooks: client-side hooks and server-side hooks. Client-side hooks are intended for client operations, such as creating a commit and merging. Server-side hooks are needed for server operations, such as receiving sent commits. Hooks can be used to perform a wide variety of tasks, and we will talk about some of these tasks.
+
+Pre-commit checks can be used, for example, to:
+
+- perform code validation checks (such as compliance with PEP8 requirements, presence of documentation, etc.);
+- perform comprehensive project checks (unit tests, etc.);
+- abort the commit operation in case of errors and display a detailed log for troubleshooting.
