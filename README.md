@@ -1,4 +1,22 @@
-## A list of questions
+# Interview Questions for Python Developers
+
+This repository contains questions and answers to help prepare for a Python developer interview. Please don't take the answers as gospel truth, as I am a beginner developer and created this for my own use.
+
+Firstly, prepare for the interview by studying all the relevant topics that I think are relevant in this field. Secondly, implement everything in English and practice it while reviewing the material.
+
+Sources included both Russian and English articles and books, as well as similar repositories found on Github.
+
+I did this because when analyzing similar projects, I noticed that explanations for some questions were incomplete, and I wanted to understand them more deeply.
+
+### However, as I mentioned earlier, I am a beginner and cannot guarantee the absence of errors in the information I provided, so:
+
+- If you are a native English speaker and find that the text is nonsense or there are lexical errors, please submit a pull request.
+- If you are familiar with the topic and would like to suggest corrections regarding the questions and answers themselves, please submit a pull request.
+<br>
+<h2>Otherwise, enjoy reading and good luck to those who are just starting their journey!<h2>
+==========================================
+<br>
+<br>
 
 - [Python](questions.md/#python)
   - [Typing](questions.md/#typing)
