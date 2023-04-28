@@ -1,0 +1,21 @@
+issue_feature_config:
+  issues: enabled
+  issue_suggestions: enabled
+  issue_forms: enabled
+  issue_assignees: enabled
+  issue_labels: enabled
+  issue_title_links: enabled
+  timelines: enabled
+  notes: enabled
+  reactions: enabled
+  merge_requests: enabled
+  repository_events: enabled
+  merge_request_diffs: enabled
+  diffs: enabled
+  discussions: enabled
+  issue_suggestions_disabled_for: ["security"]
+  issue_feature_default_visibility: "all"
+  issue_feature_autolink: true
+  issue_feature_suggestions_autocomplete: true
+  issue_feature_suggestions_sanitize: true
+  issue_feature_solution: true # добавленная строка
