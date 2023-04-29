@@ -2677,6 +2677,87 @@ Foo().hello()
 getattr(globals()['Foo'](), 'hello')()
 ```
 
+## Are you keeping up with the development of the language? What are the latest updates that you are aware of?
+
+Of course, in the fall of 2021, version 3.10 was released, and in the fall of 2022, version 3.11 of the language was released.
+
+Python 3.10, released in October 2021, contains a number of new features, including:
+
+- `match` operator for pattern matching
+- Support for parameter annotations in `functools.cache()` and `functools.lru_cache()` decorators
+- Added `ctx` and `future_warning` options to `importlib.resources.open_binary()`, `importlib.resources.open_text()`, `importlib.resources.path()`, `importlib.resources.read_binary()`, `importlib.resources.read_text()`, and `importlib.resources.as_file()`
+- Improvements in type hint syntax and variable typing, including support for `+` and `|` for a combination of types
+- Multiple `with` blocks can now be combined into a single block using the `as` operator (e.g. `with a as x, b as y:`)
+- Updated and expanded standard library, including new modules and methods such as `zoneinfo`, `pathlib.Path.replace()`, and `statistics.median_low()`
+  These are just a few of the many changes introduced in Python 3.10. A complete list of changes can be found in the Python documentation.
+
+One of the major innovations in Python 3.10 is the addition of the "match" construct (analogous to "switch" in other programming languages) to more easily handle multiple choices. Instead of using a long chain of "if-elif-else" conditional statements to compare a single value with multiple options, you can now use the "match" construct, which allows you to more clearly define all the possible values for a variable.
+
+For example:
+
+```python
+def calculate(value1, operator, value2):
+    match operator:
+        case '+':
+            return value1 + value2
+        case '-':
+            return value1 - value2
+        case '*':
+            return value1 * value2
+        case '/':
+            return value1 / value2
+        case _:
+            raise ValueError("Invalid operator")
+
+result = calculate(10, '+', 5)
+print(result)  # Output: 15
+
+result = calculate(10, '%', 5)  # Invalid operator
+```
+
+In this example, the `calculate` function takes two numeric values, `value1` and `value2`, and an operator `operator`, which can be one of four valid values: `+`, `-`, `*`, `/`. The match construct tests the value of an operator and performs the corresponding action on two numbers. If the statement does not match any of the valid values, then a `ValueError` exception is thrown.
+
+Calling the `calculate(10, '+', 5)` function will return the value `15`, while calling `calculate(10, '%', 5)` will throw a `ValueError` exception.
+
+Main features of match in Python 3.10:
+
+- Support for various data types. You can use strings, integers, enums, objects, lists, and many other data types in a match.
+
+- Template support. Match can use wildcards to match values more precisely. For example, you can use a pattern to match all integers that are even.
+
+- Condition support. A match can use conditions to match values more precisely. For example, you can use a condition to match only those strings that contain a specific substring.
+
+- Range support. A match can use ranges to match values that are within a certain range. For example, you can use a range to match all integers from 1 to 10.
+
+- Support for multiple mappings. A match can perform multiple matches that use different patterns, conditions, and ranges.
+
+In addition, improvements have been made to the annotation type, new operators have been added, including an assignment operator with an operation ("walrus" operator), work has been improved with asynchronous programming, new methods and functions have been added for working with strings and bytes, work with decorators has been improved, etc. .d.
+
+It is also worth noting that deprecated functions and methods have been removed in Python 3.10, which has reduced the size and simplification of the interpreter code.
+
+At the time of the answer (April 2023), a stable version of Python 3.11 has not yet been released, so it is not possible to fully answer the question.
+
+However, on the official Python website (https://www.python.org/downloads/release/python-3110a1/) you can find information about additions and changes in Python 3.11. Some of them:
+
+- Added exception handling in asynchronous functions
+- Added new features in pathlib and contextvars modules
+- Improved work with virtual environments (venv)
+- Changes have been made to the standard library (for example, new methods have been added to the math module)
+- Changes have been made to the syntax of the language (for example, support for the match operator has been added)
+  And much more.
+
+Key differences between Python 3.9 and 3.10:
+
+1. PEP 634 - Structural Pattern Matching: Specification - The major new feature in Python 3.10 is the introduction of structural pattern matching, which allows developers to match and destructure data structures such as tuples, lists, and dictionaries. This feature was proposed in PEP 634 and provides a more concise and expressive way of writing code that deals with complex data structures.
+
+2. PEP 604 - Allow writing union types as X | Y - Another significant change in Python 3.10 is the ability to use the pipe operator (|) to create union types. This feature, proposed in PEP 604, provides a more concise and Pythonic way of expressing complex type annotations.
+
+3. PEP 616 - String methods to remove prefixes and suffixes - Python 3.10 introduced two new string methods, str.removeprefix() and str.removesuffix(), which make it easier to remove prefixes and suffixes from strings. These methods are intended to replace the existing str.startswith() and str.endswith() methods when only the prefix or suffix needs to be removed.
+
+4. PEP 613 - Explicit Type Aliases - Python 3.10 added support for explicit type aliases, which allow developers to create aliases for complex type annotations. This feature, proposed in PEP 613, makes it easier to write and read complex type annotations by providing a way to give a name to a type.
+
+5. PEP 635 - Structural Pattern Matching: Motivation and Rationale - Python 3.10 also introduced PEP 635, which explains the motivation and rationale behind the new structural pattern matching feature. This document provides an in-depth look at why the feature was added and how it can be used effectively.
+
 # Django
 
 ## What is Middleware, why, how it is implemented

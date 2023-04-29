@@ -12,11 +12,12 @@ I did this because when analyzing similar projects, I noticed that explanations 
 
 - If you are a native English speaker and find that the text is nonsense or there are lexical errors, please submit a pull request.
 - If you are familiar with the topic and would like to suggest corrections regarding the questions and answers themselves, please submit a pull request.
-<br>
-<h2>Otherwise, enjoy reading and good luck to those who are just starting their journey!<h2>
-==========================================
-<br>
-<br>
+  <br>
+
+  # <h2>Otherwise, enjoy reading and good luck to those who are just starting their journey!<h2>
+
+  <br>
+  <br>
 
 - [Python](questions.md/#python)
   - [Typing](questions.md/#typing)
@@ -178,6 +179,7 @@ I did this because when analyzing similar projects, I noticed that explanations 
   - [What is a garbage collector. What are its pros and cons](questions.md/#what-is-a-garbage-collector-what-are-its-pros-and-cons)
   - [What is introspection](questions.md/#what-is-introspection)
   - [What is reflection](questions.md/#what-is-reflection)
+  - [Are you keeping up with the development of the language? What are the latest updates that you are aware of?](questions.md/#are-you-keeping-up-with-the-development-of-the-language-what-are-the-latest-updates-that-you-are-aware-of)
 - [Django](questions.md/#django)
   - [What is Middleware, why, how it is implemented](questions.md/#what-is-middleware-why-how-it-is-implemented)
   - [Describe how the CSRF middleware works](questions.md/#describe-how-the-csrf-middleware-works)
