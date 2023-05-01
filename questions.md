@@ -7388,3 +7388,27 @@ Here are some key features of Docker:
 6. Security: Docker provides built-in security features, such as namespace isolation, seccomp profiles, and AppArmor/SELinux profiles, which help to protect applications and data from external threats.
 
 Overall, Docker is a powerful tool for software development teams, offering a range of features that can help to streamline the development process, improve the quality and consistency of applications, and make them more scalable and portable.
+
+## Tell us what you know about docker components
+
+DOCKER COMPONENTS:
+
+1. CLIENT - Docker Client is a command-line interface (CLI) tool used to interact with the Docker daemon (server). It sends commands to the daemon, which then executes them. The client can be used to build, run, and manage containers, as well as manage images and networks. Example: `docker build`, `docker run`.
+
+2. DAEMON - Docker daemon is the core component of Docker. It runs as a background service on the host operating system and manages the container lifecycle. It receives requests from the Docker client, and then builds, runs, and manages containers accordingly. Example: `dockerd`.
+
+3. HOST - Docker host is the machine on which Docker is installed and runs. The host can be a physical machine, a virtual machine, or a cloud instance. It's the environment in which containers run. Example: A computer running Linux, macOS, or Windows.
+
+4. CONTAINER - Docker container is an instance of an image. It's a lightweight, standalone, and executable package of software that contains everything needed to run an application, including code, runtime, system tools, libraries, and settings. Containers are isolated from each other and the host system, which makes them secure and portable. Example: 'docker container run'.
+
+5. IMAGE - Docker image is a read-only template used to create Docker containers. It's a snapshot of the filesystem and configuration of an application. Images are built from a Dockerfile, which contains a list of instructions for building the image. Example: `docker image build`.
+
+6. REPOSITORY - Docker repository is a collection of related Docker images. A repository contains one or more tagged images that share the same name but have different versions or tags. The repository can be hosted locally or remotely. Example: `docker push`, `docker pull`.
+
+7. REGISTRY - Docker registry is a central place to store and distribute Docker images. It's a server-side application that stores and manages Docker repositories. The Docker Hub is the default public registry for Docker images, but you can also use private registries for security reasons. Example: `docker login`, `docker push`.
+
+Other components of Docker include:
+
+8. DOCKERFILE - Dockerfile is a text file that contains a list of commands for building a Docker image. It's used to automate the process of creating images, so you can easily reproduce the same environment in different locations. Example: `FROM`, `RUN`, `COPY`, `CMD`.
+
+9. DOCKER COMPOSE - Docker Compose is a tool used to define and run multi-container Docker applications. It allows you to define your application's services, networks, and volumes in a YAML file and then start or stop them all with a single command. Example: `docker-compose up`.

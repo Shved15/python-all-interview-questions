@@ -288,3 +288,4 @@ I did this because when analyzing similar projects, I noticed that explanations 
   - [What is a pre-commit check](questions.md/#what-is-a-pre-commit-check)
 - [Docker](questions.md/#dokcer)
   - [What is docker and what features does it have](questions.md/#what-is-docker-and-what-features-does-it-have)
+  - [Tell us what you know about docker components](questions.md/#tell-us-what-you-know-about-docker-components)
