@@ -278,7 +278,6 @@ I did this because when analyzing similar projects, I noticed that explanations 
   - [What is JWT (JSON Web Token)](questions.md/#what-is-jwt-json-web-token)
 - [SDLC](questions.md/#sdlc)
   - [What is CI/CD. What is the difference between CI and CD](questions.md/#what-is-cicd-what-is-the-difference-between-ci-and-cd)
-  - [What is docker and what features does it have](questions.md/#what-is-docker-and-what-features-does-it-have)
   - [What is the difference between Scrum and Kanban](questions.md/#what-is-the-difference-between-scrum-and-kanban)
   - [What is Code Debt and how to work with it](questions.md/#what-is-code-debt-and-how-to-work-with-it)
 - [VCS](questions.md/#vcs)
@@ -287,3 +286,5 @@ I did this because when analyzing similar projects, I noticed that explanations 
   - [What is Git Cherry pick](questions.md/#what-is-git-cherry-pick)
   - [What is force push](questions.md/#what-is-force-push)
   - [What is a pre-commit check](questions.md/#what-is-a-pre-commit-check)
+- [Docker](questions.md/#dokcer)
+  - [What is docker and what features does it have](questions.md/#what-is-docker-and-what-features-does-it-have)

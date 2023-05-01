@@ -7148,32 +7148,6 @@ Overall, CI/CD is a powerful set of practices that can help software development
 - Continuous Delivery (CD): automates CI + the entire software release process. It may consist of several stages. Deployment to production is done manually.
 - Continuous Deployment: CI + CD + fully automated production deployment.
 
-## What is docker and what features does it have
-
-Docker can be used in CI/CD. Docker is a container management tool that allows you to run applications in isolated environments and package applications and all their dependencies into containers.
-
-Using Docker can simplify the process of building and deploying applications to CI/CD. For example, instead of installing and configuring all the dependencies every time you build an application, you can create a Docker image that contains all the necessary dependencies and settings. This image can then be used in different stages of CI/CD such as build, test, and deployment.
-
-In this way, Docker can speed up and automate the process of building, testing, and deploying applications on CI/CD, enabling teams to deliver high-quality software to production more quickly.
-
-Docker is an open-source platform for building, shipping, and running applications in containers. Containers are a lightweight form of virtualization that allows applications to run in an isolated environment, with their own runtime, system libraries, and dependencies. Docker is widely used by software development teams to streamline the process of building, testing, and deploying applications.
-
-Here are some key features of Docker:
-
-1. Portability: Docker allows applications to be packaged in a container, along with all of their dependencies, making them highly portable. Containers can be easily moved between different environments, such as development, testing, and production, without the need to modify the application or its configuration.
-
-2. Isolation: Docker containers provide a level of isolation between applications, which helps to ensure that they do not interfere with each other. Each container has its own file system, networking, and system resources, which are separate from the host operating system.
-
-3. Scalability: Docker makes it easy to scale applications horizontally, by creating multiple instances of the same container. This can be done automatically, using tools like Docker Compose and Kubernetes, to ensure that the application can handle increasing amounts of traffic.
-
-4. Consistency: Docker allows teams to create a consistent environment for building, testing, and deploying applications. This helps to reduce the risk of errors and conflicts, as all team members are working with the same tools and dependencies.
-
-5 .Versioning: Docker allows teams to version their applications, by creating images of each container at different stages of the development process. This makes it easy to roll back to previous versions of the application, if needed.
-
-6. Security: Docker provides built-in security features, such as namespace isolation, seccomp profiles, and AppArmor/SELinux profiles, which help to protect applications and data from external threats.
-
-Overall, Docker is a powerful tool for software development teams, offering a range of features that can help to streamline the development process, improve the quality and consistency of applications, and make them more scalable and portable.
-
 ## What is the difference between Scrum and Kanban
 
 - [Scrum vs Kanban: what is the difference and what to choose?(rus)](https://habr.com/ru/company/hygger/blog/351048/)
@@ -7386,3 +7360,31 @@ Pre-commit checks can be used, for example, to:
 - perform code validation checks (such as compliance with PEP8 requirements, presence of documentation, etc.);
 - perform comprehensive project checks (unit tests, etc.);
 - abort the commit operation in case of errors and display a detailed log for troubleshooting.
+
+# Dokcer
+
+## What is docker and what features does it have
+
+Docker can be used in CI/CD. Docker is a container management tool that allows you to run applications in isolated environments and package applications and all their dependencies into containers.
+
+Using Docker can simplify the process of building and deploying applications to CI/CD. For example, instead of installing and configuring all the dependencies every time you build an application, you can create a Docker image that contains all the necessary dependencies and settings. This image can then be used in different stages of CI/CD such as build, test, and deployment.
+
+In this way, Docker can speed up and automate the process of building, testing, and deploying applications on CI/CD, enabling teams to deliver high-quality software to production more quickly.
+
+Docker is an open-source platform for building, shipping, and running applications in containers. Containers are a lightweight form of virtualization that allows applications to run in an isolated environment, with their own runtime, system libraries, and dependencies. Docker is widely used by software development teams to streamline the process of building, testing, and deploying applications.
+
+Here are some key features of Docker:
+
+1. Portability: Docker allows applications to be packaged in a container, along with all of their dependencies, making them highly portable. Containers can be easily moved between different environments, such as development, testing, and production, without the need to modify the application or its configuration.
+
+2. Isolation: Docker containers provide a level of isolation between applications, which helps to ensure that they do not interfere with each other. Each container has its own file system, networking, and system resources, which are separate from the host operating system.
+
+3. Scalability: Docker makes it easy to scale applications horizontally, by creating multiple instances of the same container. This can be done automatically, using tools like Docker Compose and Kubernetes, to ensure that the application can handle increasing amounts of traffic.
+
+4. Consistency: Docker allows teams to create a consistent environment for building, testing, and deploying applications. This helps to reduce the risk of errors and conflicts, as all team members are working with the same tools and dependencies.
+
+5 .Versioning: Docker allows teams to version their applications, by creating images of each container at different stages of the development process. This makes it easy to roll back to previous versions of the application, if needed.
+
+6. Security: Docker provides built-in security features, such as namespace isolation, seccomp profiles, and AppArmor/SELinux profiles, which help to protect applications and data from external threats.
+
+Overall, Docker is a powerful tool for software development teams, offering a range of features that can help to streamline the development process, improve the quality and consistency of applications, and make them more scalable and portable.
