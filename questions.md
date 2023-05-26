@@ -69,10 +69,6 @@ Python typing : dynamic, strict, implicit.
 - Dictionaries (dict)
 - Sets(set)
 - Bytearray
-- Queues(queue)
-- Stacks(stack)
-- Trees(tree)
-- Graphs(graph)
 
 2. immutable
 
@@ -172,100 +168,6 @@ One advantage of bytearray over bytes is that you can change individual bytes of
 ```python
 ba[1] = 111  # changes the second byte to the ASCII code for 'o'
 ```
-
-- Queues
-
-In Python, queues are a type of data structure used to store and manage a collection of elements in a first-in, first-out (FIFO) order. Queues are commonly used in computer science and software engineering to manage tasks or events that need to be processed in the order in which they were received.
-
-Python provides a built-in module called queue that contains several classes for implementing different types of queues. One of the most commonly used classes is Queue, which is a basic FIFO queue. Other classes in the queue module include LifoQueue, which is a last-in, first-out (LIFO) queue, and PriorityQueue, which is a queue that stores elements with associated priorities.
-
-To use a Queue object in Python, you must first create an instance of the class:
-
-```python
-import queue
-my_queue = queue.Queue()
-```
-
-Once the queue is created, you can add elements to the queue using the put() method and remove elements from the queue using the get() method:
-
-```python
-my_queue.put(1)
-my_queue.put(2)
-my_queue.put(3)
-
-print(my_queue.get()) # Output: 1
-print(my_queue.get()) # Output: 2
-```
-
-The put() method adds an element to the end of the queue, while the get() method removes and returns the element at the front of the queue.
-Queues in Python are thread-safe, which means that they can be safely accessed and modified by multiple threads in a concurrent program. This makes them a useful tool for managing task queues and message queues in multi-threaded applications.
-
-- Stacks
-
-In Python, a stack is a type of data structure that stores and manages a collection of elements in a last-in, first-out (LIFO) order. Stacks are commonly used in computer science and software engineering to manage program memory, function calls, and other types of data.
-Python provides a built-in list data type that can be used to implement a stack. To use a list as a stack, you can use the append() method to add elements to the top of the stack and the pop() method to remove elements from the top of the stack:
-
-```python
-my_stack = []
-
-my_stack.append(1)
-my_stack.append(2)
-my_stack.append(3)
-
-print(my_stack.pop()) # Output: 3
-print(my_stack.pop()) # Output: 2
-```
-
-Python also provides a built-in module called queue that contains a class called LifoQueue, which is a last-in, first-out (LIFO) queue. LifoQueue can be used to implement a stack, and provides the same methods as a regular Queue object (put(), get(), etc.):
-
-```python
-import queue
-
-my_stack = queue.LifoQueue()
-
-my_stack.put(1)
-my_stack.put(2)
-my_stack.put(3)
-
-print(my_stack.get()) # Output: 3
-print(my_stack.get()) # Output: 2
-```
-
-In general, stacks are a useful tool for managing collections of data in a last-in, first-out (LIFO) order. They are commonly used in algorithm design, programming language implementations, and other areas of computer science.
-
-- Trees
-
-In Python, a tree is a type of data structure used to represent hierarchical relationships between elements. Trees consist of nodes, which are connected by edges to form a hierarchical structure. The topmost node in a tree is called the root, and nodes without any child nodes are called leaves.
-
-Trees are commonly used in computer science and software engineering for organizing and managing data, such as file systems, search trees, and decision trees. There are several different types of trees in Python, including binary trees, n-ary trees, and balanced trees.
-
-- Graphs
-
-In Python, a graph is a data structure used to represent a collection of interconnected nodes, called vertices or nodes, and the edges that connect them. Graphs are commonly used in computer science and software engineering to represent complex networks, such as social networks, transportation networks, and communication networks.
-In a graph, each node is represented as an object or a data structure, and each edge is represented as a pair of nodes that are connected. Edges can be directed or undirected, depending on whether they represent a one-way or two-way connection between nodes. Graphs can also be weighted, meaning that each edge has a weight or a value associated with it.
-Python provides several libraries and modules for working with graphs, such as the networkx library for creating and analyzing graphs, and the graph-tool library for performing advanced graph operations.
-
-```python
-import networkx as nx
-
-# create an empty graph
-G = nx.Graph()
-
-# add nodes to the graph
-G.add_node(1)
-G.add_node(2)
-G.add_node(3)
-
-# add edges to the graph
-G.add_edge(1, 2)
-G.add_edge(2, 3)
-G.add_edge(3, 1)
-
-# print information about the graph
-print(nx.info(G))
-```
-
-Overall, graphs are a powerful data structure for representing complex networks and relationships, and Python provides several tools and libraries for working with them effectively.
 
 2. Immutable
 
@@ -969,7 +871,7 @@ Actually `yield` is an expression. It can take values that are sent to the gener
 
 ### Is it possible to extract a generator element by index
 
-No, there will be an error. The generator does not support the `__getitem__` method.
+No, there will be an Error. The generator does not support the `__getitem__` method.
 
 ### What does iterating over a dictionary return
 
